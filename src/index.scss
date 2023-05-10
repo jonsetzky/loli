@@ -1,4 +1,15 @@
 @import url(sanitize.css);
+@import url(./assets/inter-font/inter.css);
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root { font-family: 'Inter', sans-serif; }
+// @supports (font-variation-settings: normal) {
+//   :root { font-family: 'Inter var', sans-serif; }
+// }
+
+* {
+    -webkit-app-region: no-drag;
+}
+#drag-region{ -webkit-app-region: drag; }

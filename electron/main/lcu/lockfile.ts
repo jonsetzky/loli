@@ -1,4 +1,4 @@
-import { readFile } from 'fs';
+import { readFile } from "fs";
 
 export interface Lockfile {
   pid: number;
@@ -9,7 +9,7 @@ export interface Lockfile {
 
 export const readLockfile = async (): Promise<Lockfile> => {
   return new Promise((resolve, reject) => {
-    readFile('C:/Riot Games/League of Legends/lockfile', (err, data) => {
+    readFile("C:/Riot Games/League of Legends/lockfile", (err, data) => {
       if (err) return reject(new Error("couldn't read lockfile"));
 
       const lockfileString = data.toString();

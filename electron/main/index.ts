@@ -2,6 +2,9 @@ import { app, BrowserWindow, shell, ipcMain } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
 import { update } from "./update";
+import { getLocalSummoner } from "./lcu/summoner";
+import { readLockfile } from "./lcu/lockfile";
+import { LCU } from "./lcu";
 
 // The built directory structure
 //
@@ -53,6 +56,10 @@ async function createWindow() {
       nodeIntegration: true,
       contextIsolation: true,
     },
+    height: 720,
+    width: 1280,
+    resizable: false,
+    titleBarStyle: "hidden",
   });
 
   if (url) {
@@ -118,4 +125,23 @@ ipcMain.handle("open-win", (_, arg) => {
   } else {
     childWindow.loadFile(indexHtml, { hash: arg });
   }
+});
+
+const lcu = LCU.create();
+ipcMain.handle("test", () => {
+  console.log("test in the renderer");
+});
+
+ipcMain.handle("getLocalSummoner", () => {
+  return lcu
+    .then((l) => getLocalSummoner(l).then((summoner) => summoner))
+    .catch((error) => console.error("error getting summoner:", error));
+});
+
+ipcMain.handle("window:minimize", () => {
+  win?.minimize();
+});
+
+ipcMain.handle("quit", () => {
+  app.quit();
 });
