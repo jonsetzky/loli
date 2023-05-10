@@ -1,16 +1,10 @@
 import { useState } from "react";
-import Update from "@/components/update";
-import logoVite from "./assets/logo-vite.svg";
-import logoElectron from "./assets/logo-electron.svg";
 
-console.log(
-  "[App.tsx]",
-  `Hello world from Electron ${process.versions.electron}!`
-);
+console.log("[App.tsx]");
 
 function App() {
   const [count, setCount] = useState(0);
-  return <div className="App">test</div>;
+  return <div className="App">testi</div>;
 }
 
 export default App;
