@@ -40,7 +40,7 @@ export const Lobby = () => {
     <>
       <p className="bg-white">{JSON.stringify(members)}</p>
       <div className="">
-        <div className="flex p-1">
+        <div className="flex flex-col p-1 gap-1">
           {members?.map((m) => (
             <LobbySummonerCard member={m} />
           ))}

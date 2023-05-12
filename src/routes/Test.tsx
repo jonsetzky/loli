@@ -33,7 +33,6 @@ export const TestRoute = () => {
         // (c?.searchState === "Invalid" ? "bg-black" : "bg-blue-600")
       }
     >
-      <div className="">TestRoute</div>
       <button
         className={
           "uppercase text-sm p-1 font-semibold transition-colors " +
