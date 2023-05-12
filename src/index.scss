@@ -4,12 +4,65 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { font-family: 'Inter', sans-serif; }
+:root { 
+    font-family: 'Inter', sans-serif;
+    height: 100%;
+}
+body {
+    height: 100%;
+}
+#root {
+    height: 100%;
+}
+
+
 // @supports (font-variation-settings: normal) {
 //   :root { font-family: 'Inter var', sans-serif; }
 // }
 
+@layer base {
+    .font-outline-1 {  
+        text-shadow:
+         -1px 1px 0 #000,
+          1px 1px 0 #000;
+    }
+    .text-glow {
+        color: #fff;
+        text-align: center;
+        text-shadow: 0 0 10px #fff, 0 0 30px #fff;
+    }
+    .no-drag {
+        user-drag: none;
+        -webkit-user-drag: none;
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+    
+}
+
 * {
     -webkit-app-region: no-drag;
 }
+
+h1 {
+    user-select: none;
+}
+
+button {
+    user-select: none;
+}
+
+img {
+    user-drag: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+
 #drag-region{ -webkit-app-region: drag; }
+

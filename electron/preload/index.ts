@@ -1,4 +1,5 @@
-import { exposeElectronAPI } from "@electron-toolkit/preload";
+import { contextBridge, ipcRenderer } from "electron";
+import { LCUStatus } from "electron/main/lcu";
 
 function domReady(
   condition: DocumentReadyState[] = ["complete", "interactive"]
@@ -84,7 +85,31 @@ function useLoading() {
   };
 }
 
-exposeElectronAPI();
+const electronHandler = {
+  test: () => ipcRenderer.invoke("test"),
+  windowMinimize: () => ipcRenderer.invoke("window:minimize"),
+  quit: () => ipcRenderer.invoke("quit"),
+  startClient: () => ipcRenderer.invoke("startClient"),
+  getLockfile: () => ipcRenderer.invoke("getLockfile"),
+
+  getLcuUri: (uri: string): any => ipcRenderer.invoke("getLcuUri", uri),
+  onUpdateLcuUri: (
+    uri: string,
+    callback: (_event: any, ...args: any[]) => void
+  ) => {
+    ipcRenderer.on(`updateLcuUri:${uri}`, callback);
+  },
+  getLcuStatus: (): Promise<LCUStatus> =>
+    ipcRenderer.invoke("getLcuStatus") as Promise<LCUStatus>,
+  onUpdateLcuStatus: (callback: (_event: any, status: LCUStatus) => void) => {
+    ipcRenderer.on("updateLcuStatus", callback);
+  },
+  getLcuAsset: (uri: string): any => ipcRenderer.invoke("getLcuAsset", uri),
+};
+
+contextBridge.exposeInMainWorld("electron", electronHandler);
+
+export type ElectronHandler = typeof electronHandler;
 
 // ----------------------------------------------------------------------
 

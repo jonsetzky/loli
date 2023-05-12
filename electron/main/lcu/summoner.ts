@@ -1,7 +1,4 @@
-import axios from "axios";
-import { LCU } from ".";
-
-export interface Summoner {
+export interface ISummoner {
   accountId: number;
   displayName: string;
   internalName: string;
@@ -22,12 +19,16 @@ export interface Summoner {
   unnamed: false;
   xpSinceLastLevel: number;
   xpUntilNextLevel: number;
+
+  profile?: {
+    backgroundSkinId: number;
+    /**
+     * In JSON format
+     */
+    equippedBannerFlag: string;
+    /**
+     * In JSON format
+     */
+    regalia: string;
+  };
 }
-export const getLocalSummoner = (lcu: LCU): Promise<Summoner> => {
-  return axios({
-    method: "get",
-    url: lcu.endpoint("/lol-summoner/v1/current-summoner"),
-    auth: lcu.auth(),
-    httpsAgent: lcu.httpsAgent,
-  }).then((response) => response.data as Summoner);
-};

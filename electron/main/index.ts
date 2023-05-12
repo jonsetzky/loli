@@ -2,9 +2,8 @@ import { app, BrowserWindow, shell, ipcMain } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
 import { update } from "./update";
-import { getLocalSummoner } from "./lcu/summoner";
-import { readLockfile } from "./lcu/lockfile";
-import { LCU } from "./lcu";
+import { Lockfile, readLockfile } from "./lcu/lockfile";
+import { startClient, isClientAlive } from "./lcu/client";
 
 // The built directory structure
 //
@@ -84,6 +83,12 @@ async function createWindow() {
 
   // Apply electron-updater
   update(win);
+
+  const lcu = new LCU();
+  lcu.start(win);
+  ipcMain.handle("getLcuStatus", (): LCUStatus => {
+    return lcu.status;
+  });
 }
 
 app.whenReady().then(createWindow);
@@ -127,15 +132,16 @@ ipcMain.handle("open-win", (_, arg) => {
   }
 });
 
-const lcu = LCU.create();
 ipcMain.handle("test", () => {
   console.log("test in the renderer");
 });
 
-ipcMain.handle("getLocalSummoner", () => {
-  return lcu
-    .then((l) => getLocalSummoner(l).then((summoner) => summoner))
-    .catch((error) => console.error("error getting summoner:", error));
+ipcMain.handle("isClientAlive", () => {
+  return isClientAlive();
+});
+
+ipcMain.handle("startClient", () => {
+  startClient();
 });
 
 ipcMain.handle("window:minimize", () => {
@@ -145,3 +151,32 @@ ipcMain.handle("window:minimize", () => {
 ipcMain.handle("quit", () => {
   app.quit();
 });
+
+ipcMain.handle("getLockfile", (): Promise<Lockfile | null> => {
+  return readLockfile().catch((e) => null);
+});
+
+ipcMain.handle(
+  "getLcuUri",
+  async (_event: Electron.IpcMainInvokeEvent, uri: string) => {
+    console.log("requested", uri);
+    const lockfile = await readLockfile().catch((e) => null);
+    if (!lockfile) return {};
+    return request(lockfile, uri);
+  }
+);
+
+ipcMain.handle(
+  "getLcuAsset",
+  async (_event: Electron.IpcMainInvokeEvent, uri: string) => {
+    console.log("requested asset", uri);
+    const lockfile = await readLockfile().catch((e) => null);
+    if (!lockfile) return {};
+    return requestAsset(lockfile, uri);
+  }
+);
+
+import WebSocket from "ws";
+import { readFileSync } from "fs";
+import { LCU, LCUStatus } from "./lcu";
+import { request, requestAsset } from "./lcu/request";
