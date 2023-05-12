@@ -158,11 +158,16 @@ ipcMain.handle("getLockfile", (): Promise<Lockfile | null> => {
 
 ipcMain.handle(
   "getLcuUri",
-  async (_event: Electron.IpcMainInvokeEvent, uri: string) => {
+  async (
+    _event: Electron.IpcMainInvokeEvent,
+    uri: string,
+    method: string = "get",
+    data?: any
+  ) => {
     console.log("requested", uri);
     const lockfile = await readLockfile().catch((e) => null);
     if (!lockfile) return {};
-    return request(lockfile, uri);
+    return request(lockfile, uri, method, data);
   }
 );
 
@@ -173,6 +178,25 @@ ipcMain.handle(
     const lockfile = await readLockfile().catch((e) => null);
     if (!lockfile) return {};
     return requestAsset(lockfile, uri);
+  }
+);
+
+ipcMain.handle(
+  "postLcu",
+  async (_event: Electron.IpcMainInvokeEvent, uri: string, data?: any) => {
+    console.log("requested asset", uri);
+    const lockfile = await readLockfile().catch((e) => null);
+    if (!lockfile) return {};
+    return request(lockfile, uri, "post", data);
+  }
+);
+ipcMain.handle(
+  "delLcu",
+  async (_event: Electron.IpcMainInvokeEvent, uri: string, data: any) => {
+    console.log("requested asset", uri);
+    const lockfile = await readLockfile().catch((e) => null);
+    if (!lockfile) return {};
+    return request(lockfile, uri, "delete");
   }
 );
 

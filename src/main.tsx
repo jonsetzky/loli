@@ -14,6 +14,7 @@ import { ClientStatus } from "./ClientStatus";
 import { Root } from "./Root";
 import { ClientStatus as IClientStatus } from "electron/main/lcu/client";
 import { Lockfile, readLockfile } from "electron/main/lcu/lockfile";
+import { Home } from "./routes/Home";
 
 const router = createBrowserRouter([
   {
@@ -22,8 +23,8 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       {
-        path: "/home",
-        element: <>home</>,
+        path: "/",
+        element: <Home></Home>,
       },
       {
         path: "/test",

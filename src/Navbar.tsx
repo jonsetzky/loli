@@ -4,6 +4,7 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Lockfile } from "electron/main/lcu/lockfile";
 import { ISummoner } from "electron/main/lcu/summoner";
 import { Link } from "react-router-dom";
+import { Tooltip } from "./components/Tooltip";
 
 export const Navbar = () => {
   const [summonerImg, setSummonerImg] = useState<string>();
@@ -28,6 +29,9 @@ export const Navbar = () => {
       .getLcuUri("/lol-summoner/v1/current-summoner")
       .then((newSummoner: ISummoner) => setSummoner(newSummoner));
 
+    setInterval(() => {
+      window.electron.getLockfile().then((lf) => setLockfile(lf));
+    }, 1000);
     window.electron.getLockfile().then((lf) => setLockfile(lf));
   }, []);
 
@@ -42,7 +46,7 @@ export const Navbar = () => {
           <img
             className="object-scale-down h-[96px]"
             style={{ maxWidth: 96 }}
-            src={`data:;base64,${summonerImg}`}
+            src={summonerImg !== undefined ? `data:;base64,${summonerImg}` : ""}
           />
           <div className="XpProgressBar relative">
             <div className="absolute w-[96px] h-[4px] bg-cyan-900 bottom-0">
@@ -50,8 +54,23 @@ export const Navbar = () => {
                 className={`absolute h-[4px] bg-cyan-400 bottom-0`}
                 style={{ width: summoner?.percentCompleteForNextLevel }}
               ></div>
-              <div className="relative flex justify-center tracking-wide font-outline-1 bottom-3.5 text-sm select-none">
-                <div className="absolute">{summoner?.summonerLevel}</div>
+              <div className="relative flex justify-center tracking-wide bottom-3.5 text-sm select-none">
+                <div />
+                <Tooltip
+                  className="text-[10px] bg-black text-white pr-1 pl-1 whitespace-nowrap "
+                  y={"17px"}
+                  message={
+                    <>
+                      {summoner?.xpSinceLastLevel}
+                      {" / "}
+                      {summoner?.xpUntilNextLevel}
+                      {" xp"}
+                    </>
+                  }
+                >
+                  <p className="font-outline-1">{summoner?.summonerLevel}</p>
+                </Tooltip>
+                <div />
               </div>
             </div>
           </div>
@@ -60,7 +79,7 @@ export const Navbar = () => {
         <div id="drag-region" className="flex flex-row grow">
           <Link
             className="shrink uppercase text-1xl font-light text-center hover:text-glow no-drag pr-4 pl-4"
-            to="/home"
+            to="/"
           >
             <div className="flex flex-col justify-center h-full">
               <p className=" shadow-white">Home</p>
@@ -74,7 +93,7 @@ export const Navbar = () => {
               <p className=" shadow-white">Test</p>
             </div>
           </Link>
-          <div className="SummonerIcon grow bg-blue-600" />
+          <div className="SummonerIcon grow bg-blue-600 mt-12" />
           <div className="absolute top-0 right-0 grid grid-flow-col p-1 gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -120,37 +139,41 @@ export const Navbar = () => {
                 }}
               />
 
-              <div className="group h-6 w-6 flex justify-center">
+              <Tooltip
+                x="-18rem"
+                message={
+                  <>
+                    <h1 className="text-bold select-none text-sm">
+                      LOL Client lockfile
+                    </h1>
+                    <table>
+                      <tbody>
+                        {Object.entries(
+                          Object.assign(
+                            {
+                              auth: btoa(`riot:${lockfile?.password ?? ""}`),
+                            },
+                            lockfile
+                          )
+                        ).map((e) => (
+                          <tr key={e[0]}>
+                            <td className="select-none text-gray-400 text-right tracking-tighter pr-1">
+                              {e[0]
+                                .replace(/password/, "pwd")
+                                .replace(/protocol/, "proto")}
+                            </td>
+                            <td className="select-all" draggable="false">
+                              {String(e[1])}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </>
+                }
+              >
                 <InformationCircleIcon className="h-6 w-6 cursor-help scale-75" />
-                <span className="absolute top-12 right-2 invisible rounded bg-gray-800 p-2 text-xs text-white group-hover:visible">
-                  <h1 className="text-bold select-none text-sm">
-                    LOL Client lockfile
-                  </h1>
-                  <table>
-                    <tbody>
-                      {Object.entries(
-                        Object.assign(
-                          {
-                            auth: btoa(`riot:${lockfile?.password ?? ""}`),
-                          },
-                          lockfile
-                        )
-                      ).map((e) => (
-                        <tr key={e[0]}>
-                          <td className="select-none text-gray-400 text-right tracking-tighter pr-1">
-                            {e[0]
-                              .replace(/password/, "pwd")
-                              .replace(/protocol/, "proto")}
-                          </td>
-                          <td className="select-all" draggable="false">
-                            {String(e[1])}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </span>
-              </div>
+              </Tooltip>
             </div>
           </div>
         </div>

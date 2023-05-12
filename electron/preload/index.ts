@@ -92,7 +92,8 @@ const electronHandler = {
   startClient: () => ipcRenderer.invoke("startClient"),
   getLockfile: () => ipcRenderer.invoke("getLockfile"),
 
-  getLcuUri: (uri: string): any => ipcRenderer.invoke("getLcuUri", uri),
+  getLcuUri: (uri: string, method: string = "get", data?: any): any =>
+    ipcRenderer.invoke("getLcuUri", uri, method, data),
   onUpdateLcuUri: (
     uri: string,
     callback: (_event: any, ...args: any[]) => void
@@ -105,6 +106,10 @@ const electronHandler = {
     ipcRenderer.on("updateLcuStatus", callback);
   },
   getLcuAsset: (uri: string): any => ipcRenderer.invoke("getLcuAsset", uri),
+
+  postLcu: (uri: string, data?: any): any =>
+    ipcRenderer.invoke("postLcu", uri, data),
+  delLcu: (uri: string): any => ipcRenderer.invoke("postLcu", uri),
 };
 
 contextBridge.exposeInMainWorld("electron", electronHandler);

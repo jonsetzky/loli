@@ -3,9 +3,14 @@ import { Lockfile } from "./lockfile";
 import { readFileSync } from "fs";
 import https from "https";
 
-export const request = (lockfile: Lockfile, endpoint: string): Promise<any> => {
+export const request = (
+  lockfile: Lockfile,
+  endpoint: string,
+  method: string = "get",
+  data?: any
+): Promise<any> => {
   return axios({
-    method: "get",
+    method: method,
     url: `${lockfile.protocol}://127.0.0.1:${lockfile.port}${endpoint}`,
     auth: {
       password: lockfile.password,
@@ -14,6 +19,7 @@ export const request = (lockfile: Lockfile, endpoint: string): Promise<any> => {
     httpsAgent: new https.Agent({
       ca: readFileSync("./riotgames.pem"),
     }),
+    data: data,
   }).then((response) => response.data);
 };
 
