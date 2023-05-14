@@ -197,6 +197,25 @@ export const Navbar = ({
                           </td>
                         </tr>
                       ))}
+                      <tr key="link">
+                        <td className="select-none text-gray-400 text-right tracking-tighter pr-1">
+                          in browser
+                        </td>
+                        <td>
+                          <a
+                            href="/riotclient/app-name"
+                            className="text-blue-600 underline"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              window.electron.openExternal(
+                                "/riotclient/app-name"
+                              );
+                            }}
+                          >
+                            /riotclient/app-name
+                          </a>
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </>

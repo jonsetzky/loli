@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ILobby, IMember } from "./Lobby";
 import { AssetImage } from "./AssetImage";
-import { updatableContent } from "@/updatableContent";
+import { useUpdatableContent } from "@/updatableContent";
 import { ISummoner } from "electron/main/lcu/summoner";
 import { Tooltip } from "./Tooltip";
 import { RolePicker } from "./RolePicker";
@@ -85,13 +85,11 @@ export const LobbySummonerCard = ({
       <div className={"flex flex-col basis-1/5 bg-white opacity-5 "}></div>
     );
 
-  const summoner = updatableContent<ISummonerFriendInfo>(
+  const summoner = useUpdatableContent<ISummonerFriendInfo>(
     `/lol-hovercard/v1/friend-info-by-summoner/${member.summonerId}`
   );
 
   const memberId = member.summonerId;
-
-  // console.log("search state,", searchState);
 
   return (
     <div

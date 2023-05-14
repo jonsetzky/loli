@@ -223,6 +223,16 @@ ipcMain.handle(
   }
 );
 
+ipcMain.handle(
+  "openExternal",
+  async (_event: Electron.IpcMainInvokeEvent, url: string) => {
+    const lf = await readLockfile();
+    shell.openExternal(
+      `${lf.protocol}://riot:${lf.password}@127.0.0.1:${lf.port}${url}`
+    );
+  }
+);
+
 import WebSocket from "ws";
 import { readFileSync } from "fs";
 import { LCU, LCUStatus } from "./lcu";

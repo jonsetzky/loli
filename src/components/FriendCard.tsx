@@ -1,5 +1,6 @@
-import { updatableContent } from "@/updatableContent";
-import React from "react";
+import { useUpdatableContent } from "@/updatableContent";
+import { ISummoner } from "electron/main/lcu/summoner";
+import React, { memo, useEffect, useState } from "react";
 
 export interface IFriend {
   availability: string;
@@ -28,12 +29,26 @@ export interface IFriend {
   time: number;
 }
 
-export const FriendCard = ({ pid }: { pid: string }) => {
-  const friend = updatableContent<IFriend>("/lol-chat/v1/friends/" + pid);
+export const FriendCard = memo(
+  ({
+    pid,
+    setAvailability,
+  }: {
+    pid: string;
+    setAvailability: (av: string | undefined) => void;
+  }) => {
+    const friend = useUpdatableContent<IFriend>(
+      "/lol-chat/v1/friends/" + pid,
+      true,
+      (f) => setAvailability(f.availability)
+    );
 
-  return (
-    <div className="bg-black text-white ">
-      {friend?.gameName} {friend?.availability}
-    </div>
-  );
-};
+    console.log("update friend card:", friend?.name);
+
+    return (
+      <div key={"sus"} className="bg-black text-white ">
+        {friend?.name} {friend?.availability}
+      </div>
+    );
+  }
+);

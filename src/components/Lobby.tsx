@@ -1,4 +1,4 @@
-import { updatableContent } from "@/updatableContent";
+import { useUpdatableContent } from "@/updatableContent";
 import React, { useEffect, useState } from "react";
 import { LobbySummonerCard } from "./LobbySummonerCard";
 import { ISummoner } from "electron/main/lcu/summoner";
@@ -124,11 +124,11 @@ const playableQueues = [
 ];
 
 export const Lobby = () => {
-  const lobby = updatableContent<ILobby>("/lol-lobby/v2/lobby");
-  const searchState = updatableContent<any>(
+  const lobby = useUpdatableContent<ILobby>("/lol-lobby/v2/lobby");
+  const searchState = useUpdatableContent<any>(
     "/lol-lobby/v2/lobby/matchmaking/search-state"
   );
-  const queueInfo = updatableContent<any>("/lol-game-queues/v1/queues");
+  const queueInfo = useUpdatableContent<any>("/lol-game-queues/v1/queues");
 
   // const navigate = useNavigate();
   //   useEffect(() => {

@@ -119,6 +119,8 @@ const electronHandler = {
   setStore: (key: string, data: any | null): any =>
     ipcRenderer.invoke("setStore", key, data),
   getStore: (key: string): any | null => ipcRenderer.invoke("getStore", key),
+
+  openExternal: (url: string) => ipcRenderer.invoke("openExternal", url),
 };
 
 contextBridge.exposeInMainWorld("electron", electronHandler);
