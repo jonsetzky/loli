@@ -4,8 +4,8 @@ export const updatableContent = <T>(uri: string) => {
   const [content, setContent] = useState<T | null>();
 
   useEffect(() => {
-    window.electron.onUpdateLcuUri(uri, (e, newContent) => {
-      console.log("updating lobby");
+    window.electron.onLcuEvent(uri, (e, type, newContent) => {
+      console.log("updating lobby:", type);
       setContent(newContent);
     });
     window.electron

@@ -46,7 +46,10 @@ export class LCU {
       }
 
       const lockfile = await readLockfile().catch((e) => null);
-      if (!lockfile) continue;
+      if (!lockfile) {
+        console.error("no lockfile found");
+        continue;
+      }
       const authString = btoa(`riot:${lockfile.password ?? ""}`);
 
       this.setStatus("connecting");
@@ -83,25 +86,12 @@ export class LCU {
             packet.toString() ?? ""
           );
 
-          switch (data.eventType) {
-            case "Update":
-              win?.webContents.send(`updateLcuUri:${data.uri}`, data.data);
-              console.log("got update at", data.uri);
-              break;
-
-            case "Create":
-              console.log("(unimplemented) got create at ", data.uri);
-              break;
-            case "Delete":
-              console.log("(unimplemented) got deletes at ", data.uri);
-              break;
-
-            default:
-              break;
-          }
-
-          if (data.eventType !== "Update")
-            return console.error("unknown event type:", data.eventType);
+          win?.webContents.send(
+            `lcuEvent:${data.uri}`,
+            data.eventType,
+            data.data
+          );
+          console.log("got", data.eventType, "at", data.uri);
         });
         newWs.on("ping", () => console.log("ws pinged"));
         await sleep(2500);

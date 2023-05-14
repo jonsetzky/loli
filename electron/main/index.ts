@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { update } from "./update";
 import { Lockfile, readLockfile } from "./lcu/lockfile";
 import { startClient, isClientAlive } from "./lcu/client";
+import Store from "electron-store";
 
 // The built directory structure
 //
@@ -89,6 +90,8 @@ async function createWindow() {
   ipcMain.handle("getLcuStatus", (): LCUStatus => {
     return lcu.status;
   });
+
+  ipcMain.handle("window:isFocused", (e) => win?.isFocused());
 }
 
 app.whenReady().then(createWindow);
@@ -167,7 +170,7 @@ ipcMain.handle(
     console.log("requested", uri);
     const lockfile = await readLockfile().catch((e) => null);
     if (!lockfile) return {};
-    return request(lockfile, uri, method, data);
+    return request(lockfile, uri, method, data).catch(() => null);
   }
 );
 
@@ -197,6 +200,26 @@ ipcMain.handle(
     const lockfile = await readLockfile().catch((e) => null);
     if (!lockfile) return {};
     return request(lockfile, uri, "delete");
+  }
+);
+
+const store = new Store();
+
+ipcMain.handle(
+  "setStore",
+  async (
+    _event: Electron.IpcMainInvokeEvent,
+    key: string,
+    data: any | null
+  ) => {
+    store.set(key, data);
+  }
+);
+
+ipcMain.handle(
+  "getStore",
+  async (_event: Electron.IpcMainInvokeEvent, key: string) => {
+    return store.get(key);
   }
 );
 

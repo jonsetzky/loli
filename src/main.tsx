@@ -13,7 +13,6 @@ import { TestRoute } from "./routes/Test";
 import { ClientStatus } from "./ClientStatus";
 import { Root } from "./Root";
 import { ClientStatus as IClientStatus } from "electron/main/lcu/client";
-import { Lockfile, readLockfile } from "electron/main/lcu/lockfile";
 import { Home } from "./routes/Home";
 
 const router = createBrowserRouter([

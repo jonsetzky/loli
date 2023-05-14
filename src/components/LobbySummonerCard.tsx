@@ -1,16 +1,108 @@
 import React, { useEffect, useState } from "react";
-import { IMember } from "./Lobby";
+import { ILobby, IMember } from "./Lobby";
 import { AssetImage } from "./AssetImage";
 import { updatableContent } from "@/updatableContent";
 import { ISummoner } from "electron/main/lcu/summoner";
+import { Tooltip } from "./Tooltip";
+import { RolePicker } from "./RolePicker";
 
-export const LobbySummonerCard = ({ member }: { member: IMember }) => {
-  const summoner = updatableContent(
+interface ISummonerFriendInfo {
+  accountId: number;
+  availability: string;
+  gameName: string;
+  gameTag: string;
+  icon: number;
+  id: string;
+  lol: {
+    bannerIdSelected: string;
+    challengeCrystalLevel: string;
+    challengePoints: string;
+    challengeTitleSelected: string;
+    challengeTokensSelected: string;
+    championId: string;
+    companionId: string;
+    damageSkinId: string;
+    gameId: string;
+    gameMode: string;
+    gameQueueType: string;
+    gameStatus: string;
+    iconOverride: string;
+    isObservable: string;
+    level: string;
+    mapId: string;
+    mapSkinId: string;
+    masteryScore: string;
+    pty: string;
+    puuid: string;
+    queueId: string;
+    rankedLeagueDivision: string;
+    rankedLeagueQueue: string;
+    rankedLeagueTier: string;
+    rankedLosses: string;
+    rankedPrevSeasonDivision: string;
+    rankedPrevSeasonTier: string;
+    rankedSplitRewardLevel: string;
+    rankedWins: string;
+    regalia: string;
+    skinVariant: string;
+    skinname: string;
+    timeStamp: string;
+  };
+  masteryScore: number;
+  name: string;
+  note: string;
+  partySummoners: string[];
+  patchline: string;
+  platformId: string;
+  product: string;
+  productName: string;
+  puuid: string;
+  remotePlatform: boolean;
+  remoteProduct: boolean;
+  remoteProductBackdropUrl: string;
+  remoteProductIconUrl: string;
+  statusMessage: string;
+  summonerIcon: number;
+  summonerId: number;
+  summonerLevel: number;
+}
+
+export const LobbySummonerCard = ({
+  member,
+  lobby,
+  searchState,
+}: {
+  member: IMember | null;
+  lobby?: ILobby;
+  searchState?: any;
+}) => {
+  const [rolePicker, setRolePicker] = useState<"primary" | "secondary" | null>(
+    null
+  );
+
+  if (member === null)
+    return (
+      <div className={"flex flex-col basis-1/5 bg-white opacity-5 "}></div>
+    );
+
+  const summoner = updatableContent<ISummonerFriendInfo>(
     `/lol-hovercard/v1/friend-info-by-summoner/${member.summonerId}`
   );
 
+  const memberId = member.summonerId;
+
+  // console.log("search state,", searchState);
+
   return (
-    <div className="flex flex-col bg-white w-48" id={member.summonerName}>
+    <div
+      className={
+        "flex flex-col basis-1/5 bg-white text-black " +
+        (searchState?.searchState === "Invalid" && !member.ready
+          ? "opacity-25"
+          : "")
+      }
+      id={member.summonerName}
+    >
       <div className="flex justify-center text-sm">
         <div className="basis-1/3 flex row grow justify-end">
           <div className="flex flex-col justify-center">
@@ -33,36 +125,124 @@ export const LobbySummonerCard = ({ member }: { member: IMember }) => {
           </div>
         </div>
 
-        <div className="">{member.summonerName}</div>
+        <div className="font-bold">{member.summonerName}</div>
         <div className="basis-1/3 grow"></div>
       </div>
 
-      <div className="flex flex-row mb-1 ml-1 mr-1 gap-1">
+      <div className="flex flex-row ml-1 mr-1 mb-1 gap-1 h-full">
         <div className="flex flex-col gap-1 w-16">
           <AssetImage
+            key={summoner?.icon}
             uri={`/lol-game-data/assets/v1/profile-icons/${
               summoner?.icon ?? 29
             }.jpg`}
             className="w-16"
           ></AssetImage>
-          <div className="flex flex-row grow justify-evenly">
+          {lobby?.gameConfig.showPositionSelector ? (
+            <div className="flex flex-row grow justify-evenly">
+              {lobby?.localMember.summonerId === member.summonerId ? (
+                <Tooltip
+                  id="role-picker"
+                  data-tooltip-place="right"
+                  classNameExtend="absolute z-50"
+                  delayHide={0}
+                  isOpen={rolePicker !== null}
+                  openOnClick={true}
+                  noArrow={false}
+                >
+                  <div onMouseLeave={() => setRolePicker(null)}>
+                    <RolePicker
+                      currentRole={
+                        rolePicker === "primary"
+                          ? member.firstPositionPreference.toLowerCase()
+                          : rolePicker === "secondary"
+                          ? member.secondPositionPreference.toLowerCase()
+                          : undefined
+                      }
+                      onPickRole={(newRole) => {
+                        console.log("setting", rolePicker, "to", newRole);
+                        let newLobby = structuredClone(lobby);
+                        newLobby.localMember.firstPositionPreference = "MIDDLE";
+
+                        let newFirst =
+                          rolePicker === "primary"
+                            ? newRole
+                            : member.firstPositionPreference;
+                        let newSecond =
+                          rolePicker === "secondary"
+                            ? newRole
+                            : member.secondPositionPreference;
+
+                        // if (
+                        //   newFirst.toUpperCase() === newSecond.toUpperCase()
+                        // ) {
+                        //   newFirst = member.secondPositionPreference;
+                        //   newSecond = member.firstPositionPreference;
+                        // }
+
+                        window.electron
+                          .getLcuUri(
+                            "/lol-lobby/v2/lobby/members/localMember/position-preferences",
+                            "put",
+                            {
+                              firstPreference: newFirst.toUpperCase(),
+                              secondPreference: newSecond.toUpperCase(),
+                            }
+                          )
+                          .then((e: any) => console.log(e));
+                        setRolePicker(null);
+                      }}
+                    />
+                  </div>
+                </Tooltip>
+              ) : (
+                <></>
+              )}
+              <div className="flex flex-col justify-center">
+                <img
+                  data-tooltip-id="role-picker"
+                  src={`./positions/position-${member.firstPositionPreference.toLowerCase()}.svg`}
+                  className="h-6 primary-role"
+                  style={{
+                    filter: "brightness(0)",
+                  }}
+                  onClick={(e: any) => {
+                    setRolePicker("primary");
+                  }}
+                />
+              </div>
+              <div className="flex flex-col justify-center">
+                <img
+                  data-tooltip-id="role-picker"
+                  src={`./positions/position-${member.secondPositionPreference.toLowerCase()}.svg`}
+                  className="h-4"
+                  style={{
+                    filter: "brightness(0)",
+                    opacity: "75%",
+                  }}
+                  onClick={() => {
+                    setRolePicker("secondary");
+                  }}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-row grow justify-evenly h-4" />
+          )}
+        </div>
+        <div className="flex bg-black text-white w-full divide-x divide-dashed">
+          <div className="w-72 truncate"></div>
+          <div className="shrink-0 relative overflow-hidden aspect-square">
             <img
-              src={`./positions/position-${member.firstPositionPreference.toLowerCase()}.svg`}
-              className="h-4"
-              style={{
-                filter: "brightness(0)",
-              }}
-            />
-            <img
-              src={`./positions/position-${member.secondPositionPreference.toLowerCase()}.svg`}
-              className="h-4"
-              style={{
-                filter: "brightness(0%)",
-              }}
+              src={
+                summoner !== undefined
+                  ? `./ranked-emblem/emblem-${summoner?.lol.rankedLeagueTier.toLowerCase()}.png`
+                  : ""
+              }
+              className="absolute object-scale-down h-full scale-[3.7]"
             />
           </div>
         </div>
-        <div className="bg-black w-full grow"></div>
       </div>
     </div>
   );

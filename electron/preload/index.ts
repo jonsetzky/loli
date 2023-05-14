@@ -88,17 +88,22 @@ function useLoading() {
 const electronHandler = {
   test: () => ipcRenderer.invoke("test"),
   windowMinimize: () => ipcRenderer.invoke("window:minimize"),
+  windowIsFocused: () => ipcRenderer.invoke("window:isFocused"),
   quit: () => ipcRenderer.invoke("quit"),
   startClient: () => ipcRenderer.invoke("startClient"),
   getLockfile: () => ipcRenderer.invoke("getLockfile"),
 
   getLcuUri: (uri: string, method: string = "get", data?: any): any =>
     ipcRenderer.invoke("getLcuUri", uri, method, data),
-  onUpdateLcuUri: (
+  onLcuEvent: (
     uri: string,
-    callback: (_event: any, ...args: any[]) => void
+    callback: (
+      _event: any,
+      eventType: "update" | "create" | "delete",
+      ...args: any[]
+    ) => void
   ) => {
-    ipcRenderer.on(`updateLcuUri:${uri}`, callback);
+    ipcRenderer.on(`lcuEvent:${uri}`, callback);
   },
   getLcuStatus: (): Promise<LCUStatus> =>
     ipcRenderer.invoke("getLcuStatus") as Promise<LCUStatus>,
@@ -110,6 +115,10 @@ const electronHandler = {
   postLcu: (uri: string, data?: any): any =>
     ipcRenderer.invoke("postLcu", uri, data),
   delLcu: (uri: string): any => ipcRenderer.invoke("postLcu", uri),
+
+  setStore: (key: string, data: any | null): any =>
+    ipcRenderer.invoke("setStore", key, data),
+  getStore: (key: string): any | null => ipcRenderer.invoke("getStore", key),
 };
 
 contextBridge.exposeInMainWorld("electron", electronHandler);

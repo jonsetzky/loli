@@ -5,11 +5,20 @@ import { Lockfile } from "electron/main/lcu/lockfile";
 import { ISummoner } from "electron/main/lcu/summoner";
 import { Link } from "react-router-dom";
 import { Tooltip } from "./components/Tooltip";
+// import { Tooltip } from "react-tooltip";
 
-export const Navbar = () => {
+export const Navbar = ({
+  setSettingsVisible,
+  settingsVisible,
+}: {
+  setSettingsVisible: (visible: boolean) => void;
+  settingsVisible: boolean;
+}) => {
   const [summonerImg, setSummonerImg] = useState<string>();
   const [summoner, setSummoner] = useState<ISummoner>();
   const [lockfile, setLockfile] = useState<Lockfile>();
+
+  // const summonerupdatableContent
 
   const fetchImage = async () => {
     const img = await window.electron.getLcuAsset(
@@ -21,9 +30,11 @@ export const Navbar = () => {
   };
 
   useEffect(() => {
-    window.electron.onUpdateLcuUri(
+    window.electron.onLcuEvent(
       "/lol-summoner/v1/current-summoner",
-      (e, newSummoner) => setSummoner(newSummoner)
+      (e, type, data) => {
+        setSummoner(data);
+      }
     );
     window.electron
       .getLcuUri("/lol-summoner/v1/current-summoner")
@@ -56,7 +67,7 @@ export const Navbar = () => {
               ></div>
               <div className="relative flex justify-center tracking-wide bottom-3.5 text-sm select-none">
                 <div />
-                <Tooltip
+                {/* <Tooltip
                   className="text-[10px] bg-black text-white pr-1 pl-1 whitespace-nowrap "
                   y={"17px"}
                   message={
@@ -68,7 +79,20 @@ export const Navbar = () => {
                     </>
                   }
                 >
-                  <p className="font-outline-1">{summoner?.summonerLevel}</p>
+                </Tooltip> */}
+                <p className="xp-anchor font-outline-1">
+                  {summoner?.summonerLevel}
+                </p>
+
+                <Tooltip
+                  anchorSelect=".xp-anchor"
+                  className="absolute text-[10px] bg-black text-white pr-1 pl-1 whitespace-nowrap"
+                  offset={-20}
+                >
+                  {summoner?.xpSinceLastLevel}
+                  {" / "}
+                  {summoner?.xpUntilNextLevel}
+                  {" xp"}
                 </Tooltip>
                 <div />
               </div>
@@ -93,7 +117,7 @@ export const Navbar = () => {
               <p className=" shadow-white">Test</p>
             </div>
           </Link>
-          <div className="SummonerIcon grow bg-blue-600 mt-12" />
+          {/* <div className="SummonerIcon grow bg-blue-600 mt-12" /> */}
           <div className="absolute top-0 right-0 grid grid-flow-col p-1 gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -118,6 +142,9 @@ export const Navbar = () => {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               className="w-6 h-6 scale-[0.8] cursor-pointer stroke-white hover:stroke-slate-300"
+              onClick={() => {
+                setSettingsVisible(!settingsVisible);
+              }}
             >
               <path
                 strokeLinecap="round"
@@ -138,41 +165,41 @@ export const Navbar = () => {
                   window.electron.quit();
                 }}
               />
-
+              <InformationCircleIcon className="info-anchor h-6 w-6 scale-75" />
               <Tooltip
-                x="-18rem"
-                message={
-                  <>
-                    <h1 className="text-bold select-none text-sm">
-                      LOL Client lockfile
-                    </h1>
-                    <table>
-                      <tbody>
-                        {Object.entries(
-                          Object.assign(
-                            {
-                              auth: btoa(`riot:${lockfile?.password ?? ""}`),
-                            },
-                            lockfile
-                          )
-                        ).map((e) => (
-                          <tr key={e[0]}>
-                            <td className="select-none text-gray-400 text-right tracking-tighter pr-1">
-                              {e[0]
-                                .replace(/password/, "pwd")
-                                .replace(/protocol/, "proto")}
-                            </td>
-                            <td className="select-all" draggable="false">
-                              {String(e[1])}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </>
-                }
+                anchorSelect=".info-anchor"
+                data-tooltip-place="left"
+                classNameExtend="absolute"
               >
-                <InformationCircleIcon className="h-6 w-6 cursor-help scale-75" />
+                {" "}
+                <>
+                  <h1 className="text-bold select-none text-sm">
+                    LOL Client lockfile
+                  </h1>
+                  <table>
+                    <tbody>
+                      {Object.entries(
+                        Object.assign(
+                          {
+                            auth: btoa(`riot:${lockfile?.password ?? ""}`),
+                          },
+                          lockfile ?? {}
+                        )
+                      ).map((e) => (
+                        <tr key={e[0]}>
+                          <td className="select-none text-gray-400 text-right tracking-tighter pr-1">
+                            {e[0]
+                              .replace(/password/, "pwd")
+                              .replace(/protocol/, "proto")}
+                          </td>
+                          <td className="select-all" draggable="false">
+                            {String(e[1])}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </>
               </Tooltip>
             </div>
           </div>
