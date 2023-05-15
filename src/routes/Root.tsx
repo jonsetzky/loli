@@ -2,13 +2,21 @@ import React, { useEffect, useRef, useState } from "react";
 import { ClientStatus as IClientStatus } from "electron/main/lcu/client";
 import { ClientStatus } from "../ClientStatus";
 import { Navbar } from "../Navbar";
-import { Outlet, useRevalidator } from "react-router-dom";
+import { Outlet, useOutletContext, useRevalidator } from "react-router-dom";
 import { Settings } from "./Settings";
+import { FriendList } from "@/components/FriendList";
+import { GameModePicker } from "@/components/GameModePicker";
+
+type RootContextType = {
+  gameModePickerVisible: boolean;
+  setGameModePickerVisible: (visible: boolean) => void;
+};
 
 export const Root = () => {
   const [windowHasFocus, setWindowHasFocus] = useState(true);
   const [windowHasDelayedFocus, setWindowHasDelayedFocus] = useState(true);
   const [settingsVisible, setSettingsVisible] = useState(false);
+  const [gameModePickerVisible, setGameModePickerVisible] = useState(false);
 
   window.onfocus = () => {
     setWindowHasFocus(true);
@@ -18,6 +26,14 @@ export const Root = () => {
     setWindowHasFocus(false);
     setTimeout(() => setWindowHasDelayedFocus(false), 100);
   };
+
+  const createRootContext = (): RootContextType => {
+    return {
+      gameModePickerVisible,
+      setGameModePickerVisible,
+    };
+  };
+
   return (
     <>
       <ClientStatus />
@@ -31,8 +47,20 @@ export const Root = () => {
           setVisible={setSettingsVisible}
           windowFocusedDelayed={windowHasDelayedFocus}
         />
-        <Outlet />
+        <GameModePicker
+          visible={gameModePickerVisible}
+          setVisible={setGameModePickerVisible}
+        />
+        <div className="h-full">
+          {" "}
+          <FriendList />
+          <Outlet context={createRootContext()} />
+        </div>
       </div>
     </>
   );
+};
+
+export const useRootContext = () => {
+  return useOutletContext<RootContextType>();
 };

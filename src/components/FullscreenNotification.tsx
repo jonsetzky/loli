@@ -7,7 +7,7 @@ export const FullscreenNotification = ({
   children: JSX.Element | JSX.Element[] | string;
 }) => {
   return (
-    <div className="absolute w-full h-screen z-50 bg-[#000000cb]">
+    <div className="absolute w-full h-screen z-[300] bg-[#000000cb]">
       <div className="grid place-content-center w-full h-screen">
         <div className=" bg-black text-white w-96 h-48 p-4 border-white border-[0.5px]">
           {children}

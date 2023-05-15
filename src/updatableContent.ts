@@ -20,10 +20,10 @@ export const useUpdatableContent = <T>(
   const [content, setContent] = useState<T | null>();
 
   useEffect(() => {
-    if (options?.update)
+    if (options?.update ?? true)
       window.electron.onLcuEvent(uri, (e, type, data) => {
         setContent(data);
-        if (options.onUpdate) options.onUpdate(data);
+        if (options?.onUpdate) options.onUpdate(data);
       });
 
     if (options?.updateOnEventAtUri) {

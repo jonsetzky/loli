@@ -81,21 +81,19 @@ export const LobbySummonerCard = ({
   );
 
   if (member === null)
-    return (
-      <div className={"flex flex-col basis-1/5 bg-white opacity-5 "}></div>
-    );
+    return <div className={"flex flex-col basis-1/5 bg-neutral-900 "}></div>;
 
   const summoner = useUpdatableContent<ISummonerFriendInfo>(
     `/lol-hovercard/v1/friend-info-by-summoner/${member.summonerId}`
   );
 
-  const memberId = member.summonerId;
+  if (!summoner || !searchState) return <>loading</>;
 
   return (
     <div
       className={
         "flex flex-col basis-1/5 bg-white text-black " +
-        (searchState?.searchState === "Invalid" && !member.ready
+        (searchState.searchState === "Invalid" && !member.ready
           ? "opacity-25"
           : "")
       }
@@ -130,12 +128,10 @@ export const LobbySummonerCard = ({
       <div className="flex flex-row ml-1 mr-1 mb-1 gap-1 h-full">
         <div className="flex flex-col gap-1 w-16">
           <AssetImage
-            key={summoner?.icon}
-            uri={`/lol-game-data/assets/v1/profile-icons/${
-              summoner?.icon ?? 29
-            }.jpg`}
-            className="w-16"
-          ></AssetImage>
+            key={summoner.icon}
+            uri={`/profileicon/${summoner.icon}.png`}
+            placeholderSrc="/profileicon/29.png"
+          />
           {lobby?.gameConfig.showPositionSelector ? (
             <div className="flex flex-row grow justify-evenly">
               {lobby?.localMember.summonerId === member.summonerId ? (

@@ -6,6 +6,9 @@ import { FullscreenNotification } from "../components/FullscreenNotification";
 import { useNavigate } from "react-router-dom";
 import queues from "../assets/queues.json";
 import ReactDropdown from "react-dropdown";
+import { ErrorPage } from "@/components/ErrorPage";
+import { GameModePicker } from "@/components/GameModePicker";
+import { useRootContext } from "./Root";
 
 export interface IMember {
   allowedChangeActivity: boolean;
@@ -116,25 +119,89 @@ export interface ILobby {
   warnings: any[];
 }
 
-const playableQueues = [
-  {
-    value: "430",
-    label: "Some summoners rift",
-  },
-];
+export interface IQueue {
+  allowablePremadeSizes: number[];
+  areFreeChampionsAllowed: boolean;
+  assetMutator: string;
+  category: string;
+  championsRequiredToPlay: number;
+  description: string;
+  detailedDescription: string;
+  gameMode: string;
+  gameTypeConfig: {
+    advancedLearningQuests: boolean;
+    allowTrades: boolean;
+    banMode: string;
+    banTimerDuration: number;
+    battleBoost: boolean;
+    crossTeamChampionPool: boolean;
+    deathMatch: boolean;
+    doNotRemove: boolean;
+    duplicatePick: boolean;
+    exclusivePick: boolean;
+    gameModeOverride: any;
+    id: number;
+    learningQuests: boolean;
+    mainPickTimerDuration: number;
+    maxAllowableBans: number;
+    name: string;
+    numPlayersPerTeamOverride: any;
+    onboardCoopBeginner: boolean;
+    pickMode: string;
+    postPickTimerDuration: number;
+    reroll: boolean;
+    teamChampionPool: boolean;
+  };
+  id: number;
+  isRanked: boolean;
+  isTeamBuilderManaged: boolean;
+  lastToggledOffTime: number;
+  lastToggledOnTime: number;
+  mapId: number;
+  maxDivisionForPremadeSize2: string;
+  maxTierForPremadeSize2: string;
+  maximumParticipantListSize: number;
+  minLevel: number;
+  minimumParticipantListSize: number;
+  name: string;
+  numPlayersPerTeam: number;
+  queueAvailability: string;
+  queueRewards: {
+    isChampionPointsEnabled: boolean;
+    isIpEnabled: boolean;
+    isXpEnabled: boolean;
+    partySizeIpRewards: any[];
+  };
+  removalFromGameAllowed: boolean;
+  removalFromGameDelayMinutes: number;
+  shortName: string;
+  showPositionSelector: boolean;
+  spectatorEnabled: boolean;
+  type: string;
+}
 
 export const Lobby = () => {
+  const ctx = useRootContext();
   const lobby = useUpdatableContent<ILobby>("/lol-lobby/v2/lobby");
   const searchState = useUpdatableContent<any>(
     "/lol-lobby/v2/lobby/matchmaking/search-state"
   );
-  const queueInfo = useUpdatableContent<any>("/lol-game-queues/v1/queues");
 
-  // const navigate = useNavigate();
-  //   useEffect(() => {
-  //     // window.on
-  //     navigate("/test");
-  //   });
+  if (!searchState) return <ErrorPage>loading</ErrorPage>;
+  if (!lobby)
+    return (
+      <ErrorPage className>
+        No lobby
+        <div className="flex justify-center m-4">
+          <button
+            className="btn"
+            onClick={() => ctx.setGameModePickerVisible(true)}
+          >
+            Create
+          </button>
+        </div>
+      </ErrorPage>
+    );
 
   return (
     <>
@@ -170,25 +237,12 @@ export const Lobby = () => {
       {/* <p className="bg-white">{JSON.stringify(members)}</p> */}
       <div className="flex flex-col h-full bg-black text-white">
         <div className="lobby-type-header flex flex-row justify-center w-full text-2xl bg-zinc-900">
-          <ReactDropdown options={playableQueues} value={playableQueues[0]} />
+          {/* <ReactDropdown options={playableQueues} value={playableQueues[0]} /> */}
           {/* <h1 className="p-2">
             {queues
               .find((q) => q.queueId === lobby?.gameConfig.queueId)
               ?.description?.replace(/\s*games/, "")}
           </h1> */}
-        </div>
-        <div>
-          {queueInfo
-            ?.filter(
-              (q: any) =>
-                q.queueAvailability === "Available" && q.category === "PvP"
-            )
-            .map((q: any) => (
-              <div key={q.id}>
-                {q.gameMode + " - " + q.description}
-                <br></br>
-              </div>
-            )) ?? ""}
         </div>
 
         <div className="flex basis-[6%] m-1 justify-center">

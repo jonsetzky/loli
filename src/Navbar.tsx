@@ -38,7 +38,7 @@ export const Navbar = ({
 
   return (
     <>
-      <div className="Navbar bg-black text-white flex flex-row">
+      <div className="Navbar bg-black text-white flex flex-row z-40">
         <div className="SummonerIcon w-[96px]">
           {/* <img
             className="object-scale-down h-[96px]"
@@ -56,19 +56,7 @@ export const Navbar = ({
               ></div>
               <div className="relative flex justify-center tracking-wide bottom-3.5 text-sm select-none">
                 <div />
-                {/* <Tooltip
-                  className="text-[10px] bg-black text-white pr-1 pl-1 whitespace-nowrap "
-                  y={"17px"}
-                  message={
-                    <>
-                      {summoner?.xpSinceLastLevel}
-                      {" / "}
-                      {summoner?.xpUntilNextLevel}
-                      {" xp"}
-                    </>
-                  }
-                >
-                </Tooltip> */}
+
                 <p className="xp-anchor font-outline-1">
                   {summoner?.summonerLevel}
                 </p>
