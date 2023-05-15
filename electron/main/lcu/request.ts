@@ -28,6 +28,7 @@ export const requestAsset = (
   endpoint: string
 ): Promise<any> => {
   console.log("rrequested: ", endpoint);
+
   return axios({
     method: "get",
     url: `${lockfile.protocol}://127.0.0.1:${lockfile.port}${endpoint}`,
@@ -40,12 +41,6 @@ export const requestAsset = (
     }),
     responseType: "arraybuffer",
   }).then((response) => {
-    const base64 = btoa(
-      new Uint8Array(response.data).reduce(
-        (data, byte) => data + String.fromCharCode(byte),
-        ""
-      )
-    );
-    return base64;
+    return response.data;
   });
 };

@@ -5,6 +5,8 @@ import { Lockfile } from "electron/main/lcu/lockfile";
 import { ISummoner } from "electron/main/lcu/summoner";
 import { Link } from "react-router-dom";
 import { Tooltip } from "./components/Tooltip";
+import { NavbarLink } from "./components/NavbarLink";
+import { AssetImage } from "./components/AssetImage";
 // import { Tooltip } from "react-tooltip";
 
 export const Navbar = ({
@@ -14,20 +16,8 @@ export const Navbar = ({
   setSettingsVisible: (visible: boolean) => void;
   settingsVisible: boolean;
 }) => {
-  const [summonerImg, setSummonerImg] = useState<string>();
   const [summoner, setSummoner] = useState<ISummoner>();
   const [lockfile, setLockfile] = useState<Lockfile>();
-
-  // const summonerupdatableContent
-
-  const fetchImage = async () => {
-    const img = await window.electron.getLcuAsset(
-      `/lol-game-data/assets/v1/profile-icons/${
-        summoner?.profileIconId ?? "29"
-      }.jpg`
-    );
-    setSummonerImg(img);
-  };
 
   useEffect(() => {
     window.electron.onLcuEvent(
@@ -46,18 +36,17 @@ export const Navbar = ({
     window.electron.getLockfile().then((lf) => setLockfile(lf));
   }, []);
 
-  useEffect(() => {
-    fetchImage();
-  }, [summoner]);
-
   return (
     <>
       <div className="Navbar bg-black text-white flex flex-row">
         <div className="SummonerIcon w-[96px]">
-          <img
+          {/* <img
             className="object-scale-down h-[96px]"
             style={{ maxWidth: 96 }}
             src={summonerImg !== undefined ? `data:;base64,${summonerImg}` : ""}
+          /> */}
+          <AssetImage
+            uri={`/profileicon/${summoner?.profileIconId ?? "29"}.png`}
           />
           <div className="XpProgressBar relative">
             <div className="absolute w-[96px] h-[4px] bg-cyan-900 bottom-0">
@@ -117,6 +106,7 @@ export const Navbar = ({
               <p className=" shadow-white">Test</p>
             </div>
           </Link>
+          <NavbarLink to="/setups">Setups</NavbarLink>
           {/* <div className="SummonerIcon grow bg-blue-600 mt-12" /> */}
           <div className="absolute top-0 right-0 grid grid-flow-col p-1 gap-2">
             <svg

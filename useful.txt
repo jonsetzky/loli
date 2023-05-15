@@ -1,0 +1,56 @@
+enabledqueueids
+	/lol-platform-config/v1/namespaces/ClientSystemStates
+
+disabled champions
+    /lol-platform-config/v1/namespaces/DisabledChampions
+
+rank info
+    /lol-ranked/v1/ranked-stats/7f80beaf-7d49-57cc-860c-8e0e5653311e
+
+interesting uris
+    /lol-lobby/v2/eligibility/initial-configuration-complete
+    /lol-platform-config/v1/initial-configuration-complete
+    /lol-player-preferences/v1/player-preferences-ready
+    /lol-inventory/v1/initial-configuration-complete
+
+whole platform config
+    /lol-platform-config/v1/namespaces
+
+mastery info
+    /lol-collections/v1/inventories/{summonerId}/champion-mastery
+    /lol-collections/v1/inventories/local-player/champion-mastery-score
+
+inventory
+    /lol-inventory/v2/inventory/{inventory type}
+    /lol-loot/v1/player-display-categories
+
+player loot
+    /lol-loot/v2/player-loot-map
+
+uris not found in https://lcu.vivide.re
+    /lol-honeyfruit/v1/account-claim/migration
+    /lol-tastes/v1/ready
+    /lol-progression/v1/ready
+    /lol-client-config/v3/client-config/lol.client_settings.rewards
+    /lol-marketing-preferences/v1/ready
+
+inventory types
+    CHAMPION
+    TFT_MAP_SKIN
+    BOOST
+    CHAMPION_SKIN
+    COMPANION
+    TFT_DAMAGE_SKIN
+    EVENT_PASS
+    STATSTONE
+    SPELL_BOOK_PAGE
+    WARD_SKIN
+    QUEUE_ENTRY
+    SUMMONER_ICON
+    EMOTE
+    TOURNAMENT_TROPHY
+    TOURNAMENT_FLAG
+    TOURNAMENT_LOGO
+    AUGMENT
+    CURRENCY
+    ACHIEVEMENT_TITLE

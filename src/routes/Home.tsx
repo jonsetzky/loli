@@ -19,7 +19,6 @@ const availabilities = [
   "away",
   "chat", // in client
   "dnd", // in game/queue/champion select/clash
-  "online", // doesn't exist?
 ] as const;
 
 type Availability = (typeof availabilities)[number];
@@ -30,6 +29,7 @@ const availabilityToNumber = (av: Availability) => {
 };
 
 export const Home = () => {
+  const [sortedFriendsList, setSortedFriendsList] = useState<JSX.Element[]>();
   const [friendsList, setFriendsList] = useState<JSX.Element[]>();
   const avs = useRef(new Map<string, string>());
 
@@ -38,7 +38,14 @@ export const Home = () => {
     false
   );
 
-  const updateFriendsList = () => {
+  const getFriendCardAvNumber = (fc: JSX.Element) => {
+    const num = availabilityToNumber(
+      (avs.current.get(fc.key?.toString() ?? "") ?? "offline") as Availability
+    );
+    return num;
+  };
+
+  const createFriendsList = () => {
     setFriendsList(
       friends?.map((f) => {
         avs.current.set(f.pid, f.availability ?? "offline");
@@ -54,18 +61,11 @@ export const Home = () => {
   };
 
   const reorder = () => {
-    friendsList?.sort((a, b) => {
-      return (
-        availabilityToNumber(
-          (avs.current.get(b.key?.toString() ?? "") ??
-            "offline") as Availability
-        ) -
-        availabilityToNumber(
-          (avs.current.get(a.key?.toString() ?? "") ??
-            "offline") as Availability
-        )
-      );
-    });
+    setSortedFriendsList(
+      friendsList?.sort(
+        (a, b) => getFriendCardAvNumber(b) - getFriendCardAvNumber(a)
+      )
+    );
   };
 
   /**
@@ -80,17 +80,21 @@ export const Home = () => {
 
   useEffect(() => {
     reorder();
-  }, [friendsList, friendCounts]);
+  }, [friendCounts]);
 
   useEffect(() => {
-    updateFriendsList();
-  }, []);
+    createFriendsList();
+  }, [friends]);
+
+  useEffect(() => {
+    reorder();
+  }, [friendsList]);
 
   return (
     <div className="h-full bg-diagonal-lines">
       <div className="flex flex-row">
         <div className="friends-content flex flex-col basis-64 m-1 gap-1">
-          {friendsList}
+          {sortedFriendsList ?? friendsList}
         </div>
       </div>
     </div>

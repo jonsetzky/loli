@@ -1,21 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
-export const AssetImage = (props: { uri: string; className?: string }) => {
-  const [img, setImg] = useState<string>();
+type LazyLoadImageProps = Parameters<typeof LazyLoadImage>[0];
 
-  const fetchImage = async () => {
-    const img = await window.electron.getLcuAsset(props.uri);
-    setImg(img);
-  };
-
-  useEffect(() => {
-    fetchImage();
-  }, []);
+export const AssetImage = (props: { uri: string } & LazyLoadImageProps) => {
+  const { uri, ...p } = props;
 
   return (
-    <img
-      className={"object-scale-down " + props.className}
-      src={img !== undefined ? `data:;base64,${img}` : ""}
-    />
+    <LazyLoadImage src={`./dragontail/13.9.1/img${uri}`} {...p}></LazyLoadImage>
+    // <img
+    //   className={"object-scale-down " + props.className}
+    //   src={`./dragontail/13.9.1/img${props.uri}`}
+    // />
   );
 };

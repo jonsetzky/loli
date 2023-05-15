@@ -1,6 +1,7 @@
 import { useUpdatableContent } from "@/updatableContent";
 import { ISummoner } from "electron/main/lcu/summoner";
 import React, { memo, useEffect, useState } from "react";
+import { AssetImage } from "./AssetImage";
 
 export interface IFriend {
   availability: string;
@@ -32,9 +33,11 @@ export interface IFriend {
 export const FriendCard = memo(
   ({
     pid,
+    summonerId,
     setAvailability,
   }: {
     pid: string;
+    summonerId: string;
     setAvailability: (av: string | undefined) => void;
   }) => {
     const friend = useUpdatableContent<IFriend>(
@@ -42,12 +45,23 @@ export const FriendCard = memo(
       true,
       (f) => setAvailability(f.availability)
     );
+    if (!friend) return <></>;
 
-    console.log("update friend card:", friend?.name);
+    console.log("rerendering", pid);
 
     return (
       <div key={"sus"} className="bg-black text-white ">
-        {friend?.name} {friend?.availability}
+        <div className="flex w-full">
+          <div className="w-6">
+            <AssetImage
+              key={friend.icon}
+              uri={`/profileicon/${friend.icon}.png`}
+              placeholderSrc="/profileicon/29.png"
+            />
+          </div>
+          <div className="grow">{friend.name}</div>
+          <div>{friend.availability.replace(/dnd/, "playing")}</div>
+        </div>
       </div>
     );
   }

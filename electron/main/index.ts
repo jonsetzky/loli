@@ -179,7 +179,7 @@ ipcMain.handle(
   async (_event: Electron.IpcMainInvokeEvent, uri: string) => {
     console.log("requested asset", uri);
     const lockfile = await readLockfile().catch((e) => null);
-    if (!lockfile) return {};
+    if (!lockfile) return null;
     return requestAsset(lockfile, uri);
   }
 );
@@ -237,3 +237,11 @@ import WebSocket from "ws";
 import { readFileSync } from "fs";
 import { LCU, LCUStatus } from "./lcu";
 import { request, requestAsset } from "./lcu/request";
+
+// setInterval(() => {
+//   win?.webContents.send(
+//     "lcuEvent:/lol-chat/v1/friends/b487f6aa-ddfe-5a37-9702-aafce1c00222@eu1.pvp.net",
+//     "update",
+//     { name: "something", availability: "dnd", icon: 13 }
+//   );
+// }, 1000);

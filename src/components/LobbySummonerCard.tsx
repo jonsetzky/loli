@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ILobby, IMember } from "./Lobby";
+import { ILobby, IMember } from "../routes/Lobby";
 import { AssetImage } from "./AssetImage";
 import { useUpdatableContent } from "@/updatableContent";
 import { ISummoner } from "electron/main/lcu/summoner";

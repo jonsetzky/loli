@@ -1,8 +1,8 @@
 import { useUpdatableContent } from "@/updatableContent";
 import React, { useEffect, useState } from "react";
-import { LobbySummonerCard } from "./LobbySummonerCard";
+import { LobbySummonerCard } from "../components/LobbySummonerCard";
 import { ISummoner } from "electron/main/lcu/summoner";
-import { FullscreenNotification } from "./FullscreenNotification";
+import { FullscreenNotification } from "../components/FullscreenNotification";
 import { useNavigate } from "react-router-dom";
 import queues from "../assets/queues.json";
 import ReactDropdown from "react-dropdown";
@@ -184,10 +184,10 @@ export const Lobby = () => {
                 q.queueAvailability === "Available" && q.category === "PvP"
             )
             .map((q: any) => (
-              <>
+              <div key={q.id}>
                 {q.gameMode + " - " + q.description}
                 <br></br>
-              </>
+              </div>
             )) ?? ""}
         </div>
 
@@ -222,14 +222,15 @@ export const Lobby = () => {
           >
             {lobby?.members.map((m) => (
               <LobbySummonerCard
+                key={m.summonerId}
                 member={m}
                 lobby={lobby ?? undefined}
                 searchState={searchState}
               />
             ))}
 
-            {[...Array(5 - (lobby?.members.length ?? 0))].map(() => (
-              <LobbySummonerCard member={null} />
+            {[...Array(5 - (lobby?.members.length ?? 0))].map((x, i) => (
+              <LobbySummonerCard member={null} key={i} />
             ))}
           </div>
         </div>

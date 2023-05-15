@@ -11,9 +11,10 @@ import {
 } from "react-router-dom";
 import { TestRoute } from "./routes/Test";
 import { ClientStatus } from "./ClientStatus";
-import { Root } from "./Root";
+import { Root } from "./routes/Root";
 import { ClientStatus as IClientStatus } from "electron/main/lcu/client";
 import { Home } from "./routes/Home";
+import { Setups } from "./routes/Setups";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: "/test",
         element: <TestRoute />,
+      },
+      {
+        path: "/setups",
+        element: <Setups />,
       },
     ],
   },
