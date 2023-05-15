@@ -33,18 +33,14 @@ export interface IFriend {
 export const FriendCard = memo(
   ({
     pid,
-    summonerId,
     setAvailability,
   }: {
     pid: string;
-    summonerId: string;
     setAvailability: (av: string | undefined) => void;
   }) => {
-    const friend = useUpdatableContent<IFriend>(
-      "/lol-chat/v1/friends/" + pid,
-      true,
-      (f) => setAvailability(f.availability)
-    );
+    const friend = useUpdatableContent<IFriend>("/lol-chat/v1/friends/" + pid, {
+      onUpdate: (f) => setAvailability(f.availability),
+    });
     if (!friend) return <></>;
 
     console.log("rerendering", pid);

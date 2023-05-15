@@ -33,10 +33,9 @@ export const Home = () => {
   const [friendsList, setFriendsList] = useState<JSX.Element[]>();
   const avs = useRef(new Map<string, string>());
 
-  const friends = useUpdatableContent<IFriend[]>(
-    "/lol-chat/v1/friends/",
-    false
-  );
+  const friends = useUpdatableContent<IFriend[]>("/lol-chat/v1/friends/", {
+    update: false,
+  });
 
   const getFriendCardAvNumber = (fc: JSX.Element) => {
     const num = availabilityToNumber(
@@ -74,8 +73,7 @@ export const Home = () => {
    */
   const friendCounts = useUpdatableContent<IFriendCounts>(
     "/lol-chat/v1/friend-counts",
-    true,
-    () => reorder()
+    { onUpdate: () => reorder() }
   );
 
   useEffect(() => {
