@@ -39,6 +39,11 @@ friend list updates
     /lol-hovercard/v1/friend-info/124dd9f6-1c8d-5f62-97fb-09f776c136c0
     /lol-chat/v1/friends/124dd9f6-1c8d-5f62-97fb-09f776c136c0@eu1.pvp.net
 
+session expiration could be found in one of these
+    /process-control/v1/process
+    /riotclient/ux-state/request
+    /riotclient/pre-shutdown/begin
+
 inventory types
     CHAMPION
     TFT_MAP_SKIN
