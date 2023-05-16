@@ -16,7 +16,7 @@ export function Tooltip(
       {...props}
       className={
         props.className ??
-        "text-xs bg-black text-white p-2 border-[1px] z-[50] " +
+        "text-xs bg-black text-white p-2 border-[1px] z-[5000] " +
           props.classNameExtend
       }
       noArrow={props.noArrow ?? true}
