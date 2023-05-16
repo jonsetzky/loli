@@ -5,6 +5,15 @@ import { update } from "./update";
 import { Lockfile, readLockfile } from "./lcu/lockfile";
 import { startClient, isClientAlive } from "./lcu/client";
 import Store from "electron-store";
+import { LCU, LCUStatus } from "./lcu";
+import { request, requestAsset } from "./lcu/request";
+import {
+  SettingsKeys,
+  SettingsValueType,
+  getSetting,
+  onSettingChange,
+  setSetting,
+} from "./settings";
 
 // The built directory structure
 //
@@ -161,12 +170,7 @@ ipcMain.handle("getLockfile", (): Promise<Lockfile | null> => {
 
 ipcMain.handle(
   "getLcuUri",
-  async (
-    _event: Electron.IpcMainInvokeEvent,
-    uri: string,
-    method: string = "get",
-    data?: any
-  ) => {
+  async (_event, uri: string, method: string = "get", data?: any) => {
     console.log("requested", uri);
     const lockfile = await readLockfile().catch((e) => null);
     if (!lockfile) return {};
@@ -174,69 +178,63 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(
-  "getLcuAsset",
-  async (_event: Electron.IpcMainInvokeEvent, uri: string) => {
-    console.log("requested asset", uri);
-    const lockfile = await readLockfile().catch((e) => null);
-    if (!lockfile) return null;
-    return requestAsset(lockfile, uri);
-  }
-);
+ipcMain.handle("getLcuAsset", async (_event, uri: string) => {
+  console.log("requested asset", uri);
+  const lockfile = await readLockfile().catch((e) => null);
+  if (!lockfile) return null;
+  return requestAsset(lockfile, uri);
+});
 
-ipcMain.handle(
-  "postLcu",
-  async (_event: Electron.IpcMainInvokeEvent, uri: string, data?: any) => {
-    console.log("requested asset", uri);
-    const lockfile = await readLockfile().catch((e) => null);
-    if (!lockfile) return {};
-    return request(lockfile, uri, "post", data);
-  }
-);
-ipcMain.handle(
-  "delLcu",
-  async (_event: Electron.IpcMainInvokeEvent, uri: string, data: any) => {
-    console.log("requested asset", uri);
-    const lockfile = await readLockfile().catch((e) => null);
-    if (!lockfile) return {};
-    return request(lockfile, uri, "delete");
-  }
-);
+ipcMain.handle("postLcu", async (_event, uri: string, data?: any) => {
+  console.log("requested asset", uri);
+  const lockfile = await readLockfile().catch((e) => null);
+  if (!lockfile) return {};
+  return request(lockfile, uri, "post", data);
+});
+ipcMain.handle("delLcu", async (_event, uri: string, data: any) => {
+  console.log("requested asset", uri);
+  const lockfile = await readLockfile().catch((e) => null);
+  if (!lockfile) return {};
+  return request(lockfile, uri, "delete");
+});
 
 const store = new Store();
 
+ipcMain.handle("setStore", async (_event, key: string, data: any | null) => {
+  store.set(key, data);
+});
+
+ipcMain.handle("getStore", async (_event, key: string) => {
+  return store.get(key);
+});
+
+ipcMain.handle("openExternal", async (_event, url: string) => {
+  const lf = await readLockfile();
+  shell.openExternal(
+    `${lf.protocol}://riot:${lf.password}@127.0.0.1:${lf.port}${url}`
+  );
+});
+
 ipcMain.handle(
-  "setStore",
-  async (
-    _event: Electron.IpcMainInvokeEvent,
-    key: string,
-    data: any | null
+  "setSetting",
+  async <K extends SettingsKeys, R extends SettingsValueType<K>>(
+    _event: any,
+    key: K,
+    value: R
   ) => {
-    store.set(key, data);
+    setSetting(key, value, win);
   }
 );
 
 ipcMain.handle(
-  "getStore",
-  async (_event: Electron.IpcMainInvokeEvent, key: string) => {
-    return store.get(key);
+  "getSetting",
+  async <K extends SettingsKeys, R extends SettingsValueType<K>>(
+    _event: any,
+    key: K
+  ): Promise<R> => {
+    return getSetting(key) as R;
   }
 );
-
-ipcMain.handle(
-  "openExternal",
-  async (_event: Electron.IpcMainInvokeEvent, url: string) => {
-    const lf = await readLockfile();
-    shell.openExternal(
-      `${lf.protocol}://riot:${lf.password}@127.0.0.1:${lf.port}${url}`
-    );
-  }
-);
-
-import WebSocket from "ws";
-import { readFileSync } from "fs";
-import { LCU, LCUStatus } from "./lcu";
-import { request, requestAsset } from "./lcu/request";
 
 // setInterval(() => {
 //   win?.webContents.send(

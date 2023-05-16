@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { SettingBase } from "./SettingBase";
 
-export const ToggleSetting = ({
+export const BooleanSetting = ({
   storeId,
   label,
   onChange,

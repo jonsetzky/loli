@@ -1,5 +1,11 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { LCUStatus } from "electron/main/lcu";
+import type {
+  SettingsKeys,
+  SettingsValueType,
+  getSetting,
+  setSetting,
+} from "electron/main/settings";
 
 function domReady(
   condition: DocumentReadyState[] = ["complete", "interactive"]
@@ -85,6 +91,16 @@ function useLoading() {
   };
 }
 
+type Destructor = () => void;
+
+const createIpcListener = (
+  channel: string,
+  callback: (event: Electron.IpcRendererEvent, ...args: any[]) => void
+): Destructor => {
+  ipcRenderer.on(channel, callback);
+  return () => ipcRenderer.off(channel, callback);
+};
+
 const electronHandler = {
   test: () => ipcRenderer.invoke("test"),
   windowMinimize: () => ipcRenderer.invoke("window:minimize"),
@@ -103,12 +119,12 @@ const electronHandler = {
       ...args: any[]
     ) => void
   ) => {
-    ipcRenderer.on(`lcuEvent:${uri}`, callback);
+    return createIpcListener(`lcuEvent:${uri}`, callback);
   },
   getLcuStatus: (): Promise<LCUStatus> =>
     ipcRenderer.invoke("getLcuStatus") as Promise<LCUStatus>,
   onUpdateLcuStatus: (callback: (_event: any, status: LCUStatus) => void) => {
-    ipcRenderer.on("updateLcuStatus", callback);
+    return createIpcListener("updateLcuStatus", callback);
   },
   getLcuAsset: (uri: string): any => ipcRenderer.invoke("getLcuAsset", uri),
 
@@ -121,6 +137,20 @@ const electronHandler = {
   getStore: (key: string): any | null => ipcRenderer.invoke("getStore", key),
 
   openExternal: (url: string) => ipcRenderer.invoke("openExternal", url),
+
+  setSetting: <K extends SettingsKeys, R extends SettingsValueType<K>>(
+    key: K,
+    value: R
+  ) => ipcRenderer.invoke("setSetting", key, value),
+  getSetting: <K extends SettingsKeys, R extends SettingsValueType<K>>(
+    key: K
+  ): Promise<R> => ipcRenderer.invoke("getSetting", key),
+  onSettingChange: <K extends SettingsKeys, R extends SettingsValueType<K>>(
+    key: K,
+    callback: (_event: any, value: R) => void
+  ): Destructor => {
+    return createIpcListener(`settingChange:${key}`, callback);
+  },
 };
 
 contextBridge.exposeInMainWorld("electron", electronHandler);

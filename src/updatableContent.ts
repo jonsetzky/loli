@@ -20,21 +20,25 @@ export const useUpdatableContent = <T>(
   const [content, setContent] = useState<T | null>();
 
   useEffect(() => {
+    const destructors: (() => void)[] = [];
+    const createListener = (uri: string, cb: (...args: any[]) => void) => {
+      destructors.push(window.electron.onLcuEvent(uri, cb));
+    };
+
     if (options?.update ?? true)
-      window.electron.onLcuEvent(uri, (e, type, data) => {
+      createListener(uri, (e, type, data) => {
         setContent(data);
         if (options?.onUpdate) options.onUpdate(data);
       });
 
     if (options?.updateOnEventAtUri) {
-      const listenUris: string[] = (
-        options.updateOnEventAtUri === "string"
+      const listenUris: string[] =
+        typeof options.updateOnEventAtUri === "string"
           ? [options.updateOnEventAtUri]
-          : options.updateOnEventAtUri
-      ) as string[];
+          : options.updateOnEventAtUri;
 
-      listenUris.forEach((uri) =>
-        window.electron.onLcuEvent(uri, (e, type, data) => {
+      listenUris.map((uri) =>
+        createListener(uri, (e, type, data) => {
           setContent(data);
           if (options.onUpdate) options.onUpdate(data);
         })
@@ -42,6 +46,8 @@ export const useUpdatableContent = <T>(
     }
 
     window.electron.getLcuUri(uri).then((data: T) => setContent(data));
+
+    return () => destructors.forEach((cb) => cb());
   }, []);
 
   return content;

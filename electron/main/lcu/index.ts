@@ -8,6 +8,7 @@ import { BrowserWindow } from "electron";
 import { ISummoner } from "./summoner";
 import { request } from "./request";
 import { isClientAlive } from "./client";
+import { offSettingChange, onSettingChange } from "../settings";
 
 export type LCUStatus =
   | "starting"
@@ -97,9 +98,19 @@ export class LCU {
         await sleep(2500);
       }
 
+      const hideClientCb = (hide: boolean) => {
+        request(
+          lockfile,
+          hide ? "/riotclient/kill-ux" : "/riotclient/launch-ux",
+          "post"
+        );
+      };
+
+      onSettingChange("hideRealClient", hideClientCb);
       while (connected) {
         await sleep(150);
       }
+      offSettingChange("hideRealClient", hideClientCb);
 
       this.setStatus("disconnected");
       console.error("disconnected: retrying connecting");

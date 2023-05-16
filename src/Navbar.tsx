@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { Tooltip } from "./components/Tooltip";
 import { NavbarLink } from "./components/NavbarLink";
 import { AssetImage } from "./components/AssetImage";
+import { useSetting } from "./setting";
 // import { Tooltip } from "react-tooltip";
 
 export const Navbar = ({
@@ -16,6 +17,8 @@ export const Navbar = ({
   setSettingsVisible: (visible: boolean) => void;
   settingsVisible: boolean;
 }) => {
+  const [testVisible, setTestVisible] = useSetting("testSetting");
+
   const [summoner, setSummoner] = useState<ISummoner>();
   const [lockfile, setLockfile] = useState<Lockfile>();
 
@@ -38,45 +41,35 @@ export const Navbar = ({
 
   return (
     <>
-      <div className="Navbar bg-black text-white flex flex-row z-40">
-        <div className="SummonerIcon w-[96px]">
-          {/* <img
-            className="object-scale-down h-[96px]"
-            style={{ maxWidth: 96 }}
-            src={summonerImg !== undefined ? `data:;base64,${summonerImg}` : ""}
-          /> */}
+      <div className="Navbar bg-black text-white flex flex-row z-40 h-24">
+        <div className="summoner-icon relative basis-[96px] shrink-0">
           <AssetImage
             uri={`/profileicon/${summoner?.profileIconId ?? "29"}.png`}
           />
-          <div className="XpProgressBar relative">
-            <div className="absolute w-[96px] h-[4px] bg-cyan-900 bottom-0">
+          <div className="xp-progress-bar relative">
+            <div className="xp-progress-bar-bg absolute w-full h-1 bg-cyan-900 bottom-0">
               <div
-                className={`absolute h-[4px] bg-cyan-400 bottom-0`}
+                className={`xp-progress-bar-fg absolute h-1 bg-cyan-400 bottom-0`}
                 style={{ width: summoner?.percentCompleteForNextLevel }}
               ></div>
-              <div className="relative flex justify-center tracking-wide bottom-3.5 text-sm select-none">
-                <div />
-
-                <p className="xp-anchor font-outline-1">
-                  {summoner?.summonerLevel}
-                </p>
-
-                <Tooltip
-                  anchorSelect=".xp-anchor"
-                  className="absolute text-[10px] bg-black text-white pr-1 pl-1 whitespace-nowrap"
-                  offset={-20}
-                >
-                  {summoner?.xpSinceLastLevel}
-                  {" / "}
-                  {summoner?.xpUntilNextLevel}
-                  {" xp"}
-                </Tooltip>
-                <div />
+              <div className="xp-progress-bar-level absolute flex justify-center tracking-wide w-full bottom-0 text-sm select-none">
+                <p className=" font-outline-1">{summoner?.summonerLevel}</p>
               </div>
             </div>
           </div>
+          <div className="xp-progress-bar-xp-tooltip">
+            <Tooltip
+              anchorSelect=".xp-progress-bar-level"
+              className="absolute text-[10px] bg-black text-white pr-1 pl-1 whitespace-nowrap"
+              offset={-16}
+            >
+              {summoner?.xpSinceLastLevel}
+              {" / "}
+              {summoner?.xpUntilNextLevel}
+              {" xp"}
+            </Tooltip>
+          </div>
         </div>
-        {/* <div className="SummonerIcon w-16 bg-green-600" /> */}
         <div id="drag-region" className="flex flex-row grow">
           <Link
             className="shrink uppercase text-1xl font-light text-center hover:text-glow no-drag pr-4 pl-4"
@@ -87,7 +80,7 @@ export const Navbar = ({
             </div>
           </Link>
           <Link
-            className="SummonerIcon shrink uppercase text-1xl font-light text-center hover:text-glow no-drag pr-4 pl-4"
+            className="shrink uppercase text-1xl font-light text-center hover:text-glow no-drag pr-4 pl-4"
             to="/test"
           >
             <div className="flex flex-col justify-center h-full">
@@ -95,57 +88,75 @@ export const Navbar = ({
             </div>
           </Link>
           <NavbarLink to="/setups">Setups</NavbarLink>
-          {/* <div className="SummonerIcon grow bg-blue-600 mt-12" /> */}
-          <div className="absolute top-0 right-0 grid grid-flow-col p-1 gap-2">
+          <button className="grid place-content-center h-full p-5">
+            <div
+              className="btn text-xs whitespace-nowrap p-2 font-bold"
+              onClick={() => setTestVisible(!testVisible)}
+            >
+              test
+            </div>
+          </button>
+          {testVisible ? <div className="grow bg-blue-600 mt-12" /> : <></>}
+          <div className="navbar-control-buttons absolute top-0 right-0 grid grid-flow-col p-1 gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              className="w-6 h-6 translate-y-[2px] cursor-pointer stroke-white hover:stroke-slate-300"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-6 h-6  cursor-pointer"
               onClick={() => {
                 window.electron.windowMinimize();
               }}
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                fillRule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                clipRule="evenodd"
               />
             </svg>
 
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              className="w-6 h-6 scale-[0.8] cursor-pointer stroke-white hover:stroke-slate-300"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-4 h-4 translate-y-1 cursor-pointer"
               onClick={() => {
                 setSettingsVisible(!settingsVisible);
               }}
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                fillRule="evenodd"
+                d="M8.34 1.804A1 1 0 019.32 1h1.36a1 1 0 01.98.804l.295 1.473c.497.144.971.342 1.416.587l1.25-.834a1 1 0 011.262.125l.962.962a1 1 0 01.125 1.262l-.834 1.25c.245.445.443.919.587 1.416l1.473.294a1 1 0 01.804.98v1.361a1 1 0 01-.804.98l-1.473.295a6.95 6.95 0 01-.587 1.416l.834 1.25a1 1 0 01-.125 1.262l-.962.962a1 1 0 01-1.262.125l-1.25-.834a6.953 6.953 0 01-1.416.587l-.294 1.473a1 1 0 01-.98.804H9.32a1 1 0 01-.98-.804l-.295-1.473a6.957 6.957 0 01-1.416-.587l-1.25.834a1 1 0 01-1.262-.125l-.962-.962a1 1 0 01-.125-1.262l.834-1.25a6.957 6.957 0 01-.587-1.416l-1.473-.294A1 1 0 011 10.68V9.32a1 1 0 01.804-.98l1.473-.295c.144-.497.342-.971.587-1.416l-.834-1.25a1 1 0 01.125-1.262l.962-.962A1 1 0 015.38 3.03l1.25.834a6.957 6.957 0 011.416-.587l.294-1.473zM13 10a3 3 0 11-6 0 3 3 0 016 0z"
+                clipRule="evenodd"
               />
             </svg>
+
             <div className="flex flex-col">
-              <XMarkIcon
-                className="h-6 w-6 stroke-white cursor-pointer hover:stroke-slate-400"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-5 h-5 cursor-pointer translate-y-[1px]"
                 onClick={() => {
                   console.log("exiting");
                   window.electron.quit();
                 }}
-              />
-              <InformationCircleIcon className="info-anchor h-6 w-6 scale-75" />
+              >
+                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+              </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="lockfile-information-circle w-5 h-5"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
+                  clipRule="evenodd"
+                />
+              </svg>
               <Tooltip
-                anchorSelect=".info-anchor"
+                anchorSelect=".lockfile-information-circle"
                 data-tooltip-place="left"
                 classNameExtend="absolute"
               >
@@ -201,7 +212,7 @@ export const Navbar = ({
             </div>
           </div>
         </div>
-        <div className="SummonerIcon basis-24 bg-black-600" />
+        <div className="basis-24 bg-black-600" />
       </div>
     </>
     // <div
@@ -209,8 +220,8 @@ export const Navbar = ({
     //   className="Navbar h-24 bg-black text-white draggable flex flex-row"
     // >
     //   <div className="w-24 grid place-content-center">
-    //     <div className="SummonerIcon w-16 h-16 bg-white" />
-    //     {/* <div className="SummonerIcon w-16 h-16 bg-yellow-700 rounded-full" /> */}
+    //     <div className="w-16 h-16 bg-white" />
+    //     {/* <div className="w-16 h-16 bg-yellow-700 rounded-full" /> */}
     //   </div>
     //   Navbar
     // </div>

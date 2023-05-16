@@ -46,7 +46,6 @@ export const Settings = ({
             <h1 className="text-3xl">Settings</h1>
           </div>
           <div className="flex flex-col">
-            <button className="btn">Kill client</button>
             {Object.keys(settings).map((k) => (
               <TestSetting id={k as SettingsKeys} />
             ))}

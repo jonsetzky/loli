@@ -89,7 +89,7 @@ export const FriendList = () => {
   useEffect(() => {
     reorder();
   }, [friendsList]);
-  const [isOpen, setIsOpen] = React.useState(true);
+  const [isOpen, setIsOpen] = React.useState(false);
   const toggleDrawer = () => {
     setIsOpen((prevState) => !prevState);
   };
@@ -127,7 +127,6 @@ export const FriendList = () => {
           clickable
           place="right"
           offset={3}
-          float
         />
       </div>
     </div>

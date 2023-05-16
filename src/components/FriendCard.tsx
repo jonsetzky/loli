@@ -172,12 +172,13 @@ export const FriendCard = memo(
               placeholderSrc="/profileicon/29.png"
             />
           </div>
-          <div
-            className="grow"
-            data-tooltip-id="friend-info-tooltip"
-            data-tooltip-content={friend.puuid}
-          >
-            {friend.name}
+          <div className="grow flex flex-row justify-start">
+            <div
+              data-tooltip-id="friend-info-tooltip"
+              data-tooltip-content={friend.puuid}
+            >
+              {friend.name}
+            </div>
           </div>
           <div
             data-tooltip-id={tooltip !== null ? "status-tooltip" : ""}

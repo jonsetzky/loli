@@ -7,7 +7,7 @@ export const AssetImage = (props: { uri: string } & LazyLoadImageProps) => {
   const { uri, ...p } = props;
 
   return (
-    <LazyLoadImage src={`./dragontail/13.9.1/img${uri}`} {...p}></LazyLoadImage>
+    <LazyLoadImage src={`./dragontail/13.9.1/img${uri}`} {...p} />
     // <img
     //   className={"object-scale-down " + props.className}
     //   src={`./dragontail/13.9.1/img${props.uri}`}
