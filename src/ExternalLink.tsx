@@ -12,7 +12,7 @@ export const ExternalLink = ({
   return (
     <a
       href={uri}
-      className="text-blue-600 underline"
+      className=""
       onClick={(e) => {
         e.preventDefault();
         window.electron.openExternal(uri);

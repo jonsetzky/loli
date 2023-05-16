@@ -1,9 +1,12 @@
 import { useUpdatableContent } from "@/updatableContent";
 import { ISummoner } from "electron/main/lcu/summoner";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useId, useState } from "react";
 import { AssetImage } from "./AssetImage";
 import { Tooltip } from "./Tooltip";
 import { ExternalLink } from "@/ExternalLink";
+import { ContextMenu } from "./context-menu/ContextMenu";
+import { ContextMenuList } from "./context-menu/ContextMenuList";
+import { ContextMenuListItem } from "./context-menu/ContextMenuListItem";
 
 export interface IFriend {
   availability: string;
@@ -133,6 +136,7 @@ export const FriendCard = memo(
     puuid: string;
     setAvailability: (av: string | undefined) => void;
   }) => {
+    const id = useId();
     const [tooltip, setTooltip] = useState<string | null>(null);
 
     const friend = useUpdatableContent<IFriendHoverCard>(
@@ -164,35 +168,51 @@ export const FriendCard = memo(
     // console.log(friend.lol);
 
     return (
-      <div key={"sus"} className="bg-black text-white no-drag ">
-        <div className="flex w-full">
-          <div className="w-6">
-            <AssetImage
-              key={friend.icon}
-              uri={`/profileicon/${friend.icon}.png`}
-              placeholderSrc="/profileicon/29.png"
-            />
-          </div>
-          <div className="grow flex flex-row justify-start">
+      <>
+        <ContextMenu targetId={id} label={friend.name}>
+          <ContextMenuList>
+            <ContextMenuListItem>hihh</ContextMenuListItem>
+          </ContextMenuList>
+          <ContextMenuListItem>
+            <div>
+              <ExternalLink
+                uri={`/lol-hovercard/v1/friend-info/${friend?.puuid}`}
+              >
+                View as JSON
+              </ExternalLink>
+            </div>
+          </ContextMenuListItem>
+        </ContextMenu>
+        <div key={"sus"} id={id} className="bg-black text-white no-drag">
+          <div className="flex w-full">
+            <div className="w-6">
+              <AssetImage
+                key={friend.icon}
+                uri={`/profileicon/${friend.icon}.png`}
+                placeholderSrc="/profileicon/29.png"
+              />
+            </div>
+            <div className="grow flex flex-row justify-start">
+              <div
+                data-tooltip-id="friend-info-tooltip"
+                data-tooltip-content={friend.puuid}
+              >
+                {friend.name}
+              </div>
+            </div>
             <div
-              data-tooltip-id="friend-info-tooltip"
-              data-tooltip-content={friend.puuid}
+              data-tooltip-id={tooltip !== null ? "status-tooltip" : ""}
+              data-tooltip-content={tooltip ?? ""}
+              data-tooltip-place="right"
+              className="text-xs"
             >
-              {friend.name}
+              {friend.availability.replace(/dnd/, "playing") +
+                " " +
+                friend.productName.replace(/league\s+of\s+legends/i, "")}
             </div>
           </div>
-          <div
-            data-tooltip-id={tooltip !== null ? "status-tooltip" : ""}
-            data-tooltip-content={tooltip ?? ""}
-            data-tooltip-place="right"
-            className="text-xs"
-          >
-            {friend.availability.replace(/dnd/, "playing") +
-              " " +
-              friend.productName.replace(/league\s+of\s+legends/i, "")}
-          </div>
         </div>
-      </div>
+      </>
     );
   }
 );

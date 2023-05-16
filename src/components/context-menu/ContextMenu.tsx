@@ -26,8 +26,10 @@ const containPosWithinArea = (
 export const ContextMenu = ({
   targetId,
   children,
+  label,
 }: {
   targetId: string;
+  label?: string;
   children?: any;
 }) => {
   const [contextData, setContextData] = useState<ContextDataType>({
@@ -84,13 +86,21 @@ export const ContextMenu = ({
   return (
     <div
       ref={ref}
-      className="context-menu absolute"
+      className="text-sm bg-black text-white leading-3 border-[1px] fixed"
       style={{
         display: `${contextData.visible ? "block" : "none"}`,
         left: contextData.posX,
         top: contextData.posY,
       }}
     >
+      {!label ? (
+        ""
+      ) : (
+        <h1 className="text-sm font-medium m-1 text-neutral-400 mt-0 mb-0 leading-4">
+          {label}
+          <hr className="border-neutral-700"></hr>
+        </h1>
+      )}
       {children}
     </div>
     // <div
