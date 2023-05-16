@@ -3,6 +3,7 @@ import { ISummoner } from "electron/main/lcu/summoner";
 import React, { memo, useEffect, useState } from "react";
 import { AssetImage } from "./AssetImage";
 import { Tooltip } from "./Tooltip";
+import { ExternalLink } from "@/ExternalLink";
 
 export interface IFriend {
   availability: string;
@@ -158,9 +159,9 @@ export const FriendCard = memo(
 
     if (!friend) return <></>;
 
-    console.log("rerendering", puuid);
+    // console.log("rerendering", puuid);
 
-    console.log(friend.lol);
+    // console.log(friend.lol);
 
     return (
       <div key={"sus"} className="bg-black text-white no-drag ">
@@ -184,8 +185,11 @@ export const FriendCard = memo(
             data-tooltip-id={tooltip !== null ? "status-tooltip" : ""}
             data-tooltip-content={tooltip ?? ""}
             data-tooltip-place="right"
+            className="text-xs"
           >
-            {friend.availability.replace(/dnd/, "playing")}
+            {friend.availability.replace(/dnd/, "playing") +
+              " " +
+              friend.productName.replace(/league\s+of\s+legends/i, "")}
           </div>
         </div>
       </div>

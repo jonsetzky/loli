@@ -10,6 +10,8 @@ import { GameModePicker } from "@/components/GameModePicker";
 type RootContextType = {
   gameModePickerVisible: boolean;
   setGameModePickerVisible: (visible: boolean) => void;
+  friendsListVisible: boolean;
+  setFriendsListVisible: (visible: boolean) => void;
 };
 
 export const Root = () => {
@@ -17,6 +19,7 @@ export const Root = () => {
   const [windowHasDelayedFocus, setWindowHasDelayedFocus] = useState(true);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [gameModePickerVisible, setGameModePickerVisible] = useState(false);
+  const [friendsListVisible, setFriendsListVisible] = useState(false);
 
   window.onfocus = () => {
     setWindowHasFocus(true);
@@ -31,6 +34,8 @@ export const Root = () => {
     return {
       gameModePickerVisible,
       setGameModePickerVisible,
+      friendsListVisible,
+      setFriendsListVisible,
     };
   };
 
@@ -53,7 +58,10 @@ export const Root = () => {
         />
         <div className="h-full">
           {" "}
-          <FriendList />
+          <FriendList
+            visible={friendsListVisible}
+            setVisible={setFriendsListVisible}
+          />
           <Outlet context={createRootContext()} />
         </div>
       </div>

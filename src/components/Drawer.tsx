@@ -20,23 +20,6 @@ export const Drawer = ({
   childClassName?: string;
   className?: string;
 }) => {
-  const leftRight =
-    direction === "left"
-      ? "-translate-x-"
-      : direction === "right"
-      ? "translate-x-"
-      : null;
-
-  const upDown =
-    direction === "up"
-      ? "-translate-y-"
-      : direction === "down"
-      ? "translate-y-"
-      : null;
-
-  const dirStr = leftRight ?? upDown;
-  console.log(directions.get(direction));
-
   return (
     <div className={" " + className}>
       <div

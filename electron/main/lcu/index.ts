@@ -7,8 +7,8 @@ import { WebSocket } from "ws";
 import { BrowserWindow } from "electron";
 import { ISummoner } from "./summoner";
 import { request } from "./request";
-import { isClientAlive } from "./client";
-import { offSettingChange, onSettingChange } from "../settings";
+import { isClientAlive, startClient } from "./client";
+import { getSetting, offSettingChange, onSettingChange } from "../settings";
 
 export type LCUStatus =
   | "starting"
@@ -43,6 +43,7 @@ export class LCU {
       while (!(await isClientAlive()).online) {
         console.log("not alive");
         this.setStatus("disconnected");
+        if (getSetting("autoRestartClient")) startClient();
         await sleep(500);
       }
 
@@ -92,7 +93,8 @@ export class LCU {
             data.eventType,
             data.data
           );
-          console.log("got", data.eventType, "at", data.uri);
+
+          // if (data.uri == "/lol-chat/v1/friends") console.log("got", data);
         });
         newWs.on("ping", () => console.log("ws pinged"));
         await sleep(2500);

@@ -1,4 +1,4 @@
-import settings from "@/assets/settings";
+import settings from "../../src/assets/settings";
 import { BrowserWindow } from "electron";
 import Store from "electron-store";
 import { EventEmitter } from "ws";
@@ -27,7 +27,7 @@ export const getSetting = <
 >(
   key: K
 ): R => {
-  return store.get(key) as R;
+  return (store.get(key) as R) ?? settings[key].default;
 };
 
 export const setSetting = <

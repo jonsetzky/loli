@@ -3,6 +3,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { FriendCard, IFriend } from "./FriendCard";
 import { Drawer } from "./Drawer";
 import { Tooltip } from "./Tooltip";
+import { useRootContext } from "@/routes/Root";
+import { ExternalLink } from "@/ExternalLink";
+import { ErrorPage } from "./ErrorPage";
 
 interface IFriendCounts {
   numFriends: number;
@@ -30,14 +33,19 @@ const availabilityToNumber = (av: Availability) => {
   return availabilities.indexOf(av);
 };
 
-export const FriendList = () => {
+export const FriendList = ({
+  visible,
+  setVisible,
+}: {
+  visible: boolean;
+  setVisible: (v: boolean) => void;
+}) => {
   const [sortedFriendsList, setSortedFriendsList] = useState<JSX.Element[]>();
   const [friendsList, setFriendsList] = useState<JSX.Element[]>();
   const avs = useRef(new Map<string, string>());
 
-  const friends = useUpdatableContent<IFriend[]>("/lol-chat/v1/friends/", {
-    update: false,
-  });
+  const friends = useUpdatableContent<IFriend[]>("/lol-chat/v1/friends");
+  console.log("f", friends);
 
   const getFriendCardAvNumber = (fc: JSX.Element) => {
     const num = availabilityToNumber(
@@ -79,26 +87,19 @@ export const FriendList = () => {
   );
 
   useEffect(() => {
-    reorder();
-  }, [friendCounts]);
-
-  useEffect(() => {
     createFriendsList();
   }, [friends]);
 
   useEffect(() => {
     reorder();
-  }, [friendsList]);
-  const [isOpen, setIsOpen] = React.useState(false);
-  const toggleDrawer = () => {
-    setIsOpen((prevState) => !prevState);
-  };
+  }, [friendsList, friendCounts]);
 
+  const toggleDrawer = () => setVisible(!visible);
   return (
     <div className="absolute">
       <div className="flex flex-row flex-1 w-72">
         <Drawer
-          visible={isOpen}
+          visible={visible}
           direction="left"
           className="w-full h-[80vh]"
           childClassName="h-full"
@@ -127,6 +128,13 @@ export const FriendList = () => {
           clickable
           place="right"
           offset={3}
+          render={({ content, activeAnchor }) => {
+            return (
+              <ExternalLink
+                uri={`/lol-hovercard/v1/friend-info/${content}`}
+              >{`/lol-hovercard/v1/friend-info/${content}`}</ExternalLink>
+            );
+          }}
         />
       </div>
     </div>
