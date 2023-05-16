@@ -120,8 +120,12 @@ export const FriendList = ({
             {sortedFriendsList ?? friendsList}
           </div>
         </Drawer>
-        {/* <Tooltip id="status-tooltip" classNameExtend="absolute" />
         <Tooltip
+          id="status-tooltip"
+          classNameExtend="absolute"
+          delayShow={70}
+        />
+        {/*<Tooltip
           id="friend-info-tooltip"
           classNameExtend="select-all absolute  whitespace-nowrap"
           clickable
