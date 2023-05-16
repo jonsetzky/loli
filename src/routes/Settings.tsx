@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { FullscreenNotification } from "../components/FullscreenNotification";
-import { ToggleSetting } from "../components/settings/ToggleSetting";
+import { BooleanSetting } from "../components/settings/BooleanSetting";
+
+import settings from "../assets/settings";
+import { TestSetting } from "@/components/settings/TestSetting";
+import { SettingsKeys } from "electron/main/settings";
 
 const Setting = ({ head, children }: { head: any; children?: any }) => {
   return (
@@ -42,16 +46,10 @@ export const Settings = ({
             <h1 className="text-3xl">Settings</h1>
           </div>
           <div className="flex flex-col">
-            <ToggleSetting
-              storeId="hide-real-client"
-              label="Hide real client"
-              onChange={(value) =>
-                window.electron.getLcuUri(
-                  value ? "/riotclient/kill-ux" : "/riotclient/launch-ux",
-                  "post"
-                )
-              }
-            ></ToggleSetting>
+            <button className="btn">Kill client</button>
+            {Object.keys(settings).map((k) => (
+              <TestSetting id={k as SettingsKeys} />
+            ))}
           </div>
         </div>
       </div>
