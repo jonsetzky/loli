@@ -45,7 +45,6 @@ export const FriendList = ({
   const avs = useRef(new Map<string, string>());
 
   const friends = useUpdatableContent<IFriend[]>("/lol-chat/v1/friends");
-  console.log("f", friends);
 
   const getFriendCardAvNumber = (fc: JSX.Element) => {
     const num = availabilityToNumber(

@@ -87,6 +87,14 @@ export const Navbar = ({
               <p className=" shadow-white">Test</p>
             </div>
           </Link>
+          <Link
+            className="shrink uppercase text-1xl font-light text-center hover:text-glow no-drag pr-4 pl-4"
+            to="/playground"
+          >
+            <div className="flex flex-col justify-center h-full">
+              <p className=" shadow-white">Playground</p>
+            </div>
+          </Link>
           <NavbarLink to="/setups">Setups</NavbarLink>
           <button className="grid place-content-center h-full p-5">
             <div
@@ -159,6 +167,7 @@ export const Navbar = ({
                 anchorSelect=".lockfile-information-circle"
                 data-tooltip-place="left"
                 classNameExtend="absolute"
+                clickable
               >
                 {" "}
                 <>

@@ -15,6 +15,7 @@ import { Root } from "./routes/Root";
 import { ClientStatus as IClientStatus } from "electron/main/lcu/client";
 import { Home } from "./routes/Home";
 import { Setups } from "./routes/Setups";
+import { Playground } from "./routes/Playground";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: "/setups",
         element: <Setups />,
+      },
+      {
+        path: "/playground",
+        element: <Playground />,
       },
     ],
   },

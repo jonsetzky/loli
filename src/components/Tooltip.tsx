@@ -19,7 +19,6 @@ export function Tooltip(
         "text-xs bg-black text-white p-2 border-[1px] " + props.classNameExtend
       }
       noArrow={props.noArrow ?? true}
-      clickable={true}
     ></ReactTooltip>
   );
 

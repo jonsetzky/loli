@@ -57,7 +57,6 @@ export const Root = () => {
           setVisible={setGameModePickerVisible}
         />
         <div className="h-full">
-          {" "}
           <FriendList
             visible={friendsListVisible}
             setVisible={setFriendsListVisible}
