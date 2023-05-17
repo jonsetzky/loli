@@ -174,7 +174,7 @@ ipcMain.handle(
     // console.log("requested", uri);
     const lockfile = await readLockfile().catch((e) => null);
     if (!lockfile) return null;
-    return request(lockfile, uri, method, data).catch(() => null);
+    return request(lockfile, uri, method, data);
   }
 );
 

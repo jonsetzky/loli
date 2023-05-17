@@ -3,11 +3,17 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 
 type LazyLoadImageProps = Parameters<typeof LazyLoadImage>[0];
 
-export const AssetImage = (props: { uri: string } & LazyLoadImageProps) => {
-  const { uri, ...p } = props;
-
+export const AssetImage = ({
+  uri,
+  placeholderSrc,
+  ...p
+}: { uri: string } & LazyLoadImageProps) => {
   return (
-    <LazyLoadImage src={`./dragontail/13.9.1/img${uri}`} {...p} />
+    <LazyLoadImage
+      placeholderSrc={`./dragontail/13.9.1/img${placeholderSrc}`}
+      src={`./dragontail/13.9.1/img${uri}`}
+      {...p}
+    />
     // <img
     //   className={"object-scale-down " + props.className}
     //   src={`./dragontail/13.9.1/img${props.uri}`}

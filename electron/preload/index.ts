@@ -109,8 +109,12 @@ const electronHandler = {
   startClient: () => ipcRenderer.invoke("startClient"),
   getLockfile: () => ipcRenderer.invoke("getLockfile"),
 
-  getLcuUri: (uri: string, method: string = "get", data?: any): any =>
-    ipcRenderer.invoke("getLcuUri", uri, method, data),
+  getLcuUri: (
+    uri: string,
+    method: string = "get",
+    data?: any,
+    contentType?: "application/json" | "application/x-www-form-urlencoded"
+  ): any => ipcRenderer.invoke("getLcuUri", uri, method, data),
   onLcuEvent: (
     uri: string,
     callback: (

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { Lockfile } from "./lockfile";
 import { readFileSync } from "fs";
 import https from "https";
@@ -9,9 +9,9 @@ export const request = (
   method: string = "get",
   data?: any
 ): Promise<any> => {
-  return axios({
+  const url = `${lockfile.protocol}://127.0.0.1:${lockfile.port}${endpoint}`;
+  const config: AxiosRequestConfig<any> = {
     method: method,
-    url: `${lockfile.protocol}://127.0.0.1:${lockfile.port}${endpoint}`,
     auth: {
       password: lockfile.password,
       username: "riot",
@@ -19,8 +19,19 @@ export const request = (
     httpsAgent: new https.Agent({
       ca: readFileSync("./riotgames.pem"),
     }),
-    data: data,
-  }).then((response) => response.data);
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+  if (method === "put")
+    return axios
+      .put(url, typeof data === "string" ? '"' + data + '"' : data, config)
+      .then((response) => response.data)
+      .catch((e) => console.error("error at", endpoint, e.response.data));
+  console.log("data", typeof data);
+  return axios({ ...config, data, url })
+    .then((response) => response.data)
+    .catch((e) => console.error("error at", endpoint, e.response.data));
 };
 
 export const requestAsset = (
@@ -40,7 +51,9 @@ export const requestAsset = (
       ca: readFileSync("./riotgames.pem"),
     }),
     responseType: "arraybuffer",
-  }).then((response) => {
-    return response.data;
-  });
+  })
+    .then((response) => {
+      return response.data;
+    })
+    .catch((e) => console.error("error at", endpoint, e.response.data));
 };

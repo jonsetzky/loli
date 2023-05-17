@@ -8,16 +8,12 @@ import { Tooltip } from "./components/common/Tooltip";
 import { NavbarLink } from "./components/navbar/NavbarLink";
 import { AssetImage } from "./components/common/AssetImage";
 import { useSetting } from "./setting";
+import { Settings } from "./routes/Settings";
 // import { Tooltip } from "react-tooltip";
 
-export const Navbar = ({
-  setSettingsVisible,
-  settingsVisible,
-}: {
-  setSettingsVisible: (visible: boolean) => void;
-  settingsVisible: boolean;
-}) => {
+export const Navbar = () => {
   const [testVisible, setTestVisible] = useSetting("testSetting");
+  const [settingsVisible, setSettingsVisible] = useState(false);
 
   const [summoner, setSummoner] = useState<ISummoner>();
   const [lockfile, setLockfile] = useState<Lockfile>();
@@ -41,6 +37,7 @@ export const Navbar = ({
 
   return (
     <>
+      <Settings visible={settingsVisible} setVisible={setSettingsVisible} />
       <div className="Navbar bg-black text-white flex flex-row z-40 h-24">
         <div className="summoner-icon relative basis-[96px] shrink-0">
           <AssetImage

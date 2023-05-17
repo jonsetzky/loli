@@ -18,14 +18,17 @@ const Setting = ({ head, children }: { head: any; children?: any }) => {
 export const Settings = ({
   visible,
   setVisible,
-  windowFocusedDelayed,
 }: {
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  windowFocusedDelayed: boolean;
 }) => {
-  const [windowHasFocus, setWindowHasFocus] = useState(true);
-
+  const [windowHasDelayedFocus, setWindowHasDelayedFocus] = useState(true);
+  window.onfocus = () => {
+    setTimeout(() => setWindowHasDelayedFocus(true), 100);
+  };
+  window.onblur = () => {
+    setTimeout(() => setWindowHasDelayedFocus(false), 100);
+  };
   useEffect(() => {}, []);
 
   if (!visible) return <></>;
@@ -33,8 +36,8 @@ export const Settings = ({
   return (
     <div
       className="absolute w-full h-screen z-50 bg-[#000000cb]"
-      onClick={async () => {
-        if (windowFocusedDelayed) setVisible(!visible);
+      onClick={async (e) => {
+        if (windowHasDelayedFocus) setVisible(!visible);
       }}
     >
       <div className="grid place-content-center w-full h-screen">

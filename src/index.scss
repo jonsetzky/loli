@@ -56,8 +56,16 @@ body {
     }
 
     .btn {
-        @apply bg-white text-black m-1 pl-5 pr-5 p-1 w-min h-min uppercase text-base tracking-wide cursor-pointer
+        @apply bg-white text-black m-1 pl-5 pr-5 p-1 w-min h-min 
+        uppercase text-base tracking-wide cursor-pointer 
+        hover:underline active:bg-blue-500 disabled:bg-neutral-700;
     }
+
+    .btn-active {
+        @apply btn bg-blue-500
+    }
+
+
 
     // .context-menu {
     //     @apply text-xs bg-black text-white p-2 border-[1px]
