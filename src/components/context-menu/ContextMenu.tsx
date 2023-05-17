@@ -1,4 +1,5 @@
 import React, {
+  createContext,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -22,6 +23,14 @@ const containPosWithinArea = (
     pos[1] + size[1] >= area[1] ? area[1] - size[1] - 1 : pos[1],
   ];
 };
+
+export const CTXContextMenuVisibility = createContext<{
+  visible: boolean;
+  setVisible: (n: boolean) => void;
+}>({
+  visible: false,
+  setVisible: (n: boolean) => {},
+});
 
 export const ContextMenu = ({
   targetId,
@@ -84,25 +93,33 @@ export const ContextMenu = ({
   }, [contextData.visible]);
 
   return (
-    <div
-      ref={ref}
-      className="text-sm bg-black text-white leading-3 border-[1px] fixed"
-      style={{
-        display: `${contextData.visible ? "block" : "none"}`,
-        left: contextData.posX,
-        top: contextData.posY,
+    <CTXContextMenuVisibility.Provider
+      value={{
+        setVisible: (n) => setContextData((c) => ({ ...c, visible: n })),
+        visible: contextData.visible,
       }}
     >
-      {!label ? (
-        ""
-      ) : (
-        <h1 className="text-sm font-medium m-1 text-neutral-400 mt-0 mb-0 leading-4">
-          {label}
-          <hr className="border-neutral-700"></hr>
-        </h1>
-      )}
-      {children}
-    </div>
+      {" "}
+      <div
+        ref={ref}
+        className="text-sm bg-black text-white leading-3 border-[1px] fixed z-50"
+        style={{
+          display: `${contextData.visible ? "block" : "none"}`,
+          left: contextData.posX,
+          top: contextData.posY,
+        }}
+      >
+        {!label ? (
+          ""
+        ) : (
+          <h1 className="text-xs font-medium text-black bg-white mt-0 mb-0  pr-1 pl-1 leading-4">
+            {label}
+          </h1>
+        )}
+        {children}
+      </div>
+    </CTXContextMenuVisibility.Provider>
+
     // <div
     //   ref={ref}
     //   className="context-menu"

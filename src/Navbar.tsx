@@ -9,6 +9,7 @@ import { NavbarLink } from "./components/navbar/NavbarLink";
 import { AssetImage } from "./components/common/AssetImage";
 import { useSetting } from "./setting";
 import { Settings } from "./routes/Settings";
+import { NavbarSummonerIcon } from "./components/navbar/NavbarSummonerIcon";
 // import { Tooltip } from "react-tooltip";
 
 export const Navbar = () => {
@@ -39,34 +40,7 @@ export const Navbar = () => {
     <>
       <Settings visible={settingsVisible} setVisible={setSettingsVisible} />
       <div className="Navbar bg-black text-white flex flex-row z-40 h-24">
-        <div className="summoner-icon relative basis-[96px] shrink-0">
-          <AssetImage
-            uri={`/profileicon/${summoner?.profileIconId ?? "29"}.png`}
-          />
-          <div className="xp-progress-bar relative">
-            <div className="xp-progress-bar-bg absolute w-full h-1 bg-cyan-900 bottom-0">
-              <div
-                className={`xp-progress-bar-fg absolute h-1 bg-cyan-400 bottom-0`}
-                style={{ width: summoner?.percentCompleteForNextLevel }}
-              ></div>
-              <div className="xp-progress-bar-level absolute flex justify-center tracking-wide w-full bottom-0 text-sm select-none">
-                <p className=" font-outline-1">{summoner?.summonerLevel}</p>
-              </div>
-            </div>
-          </div>
-          <div className="xp-progress-bar-xp-tooltip">
-            <Tooltip
-              anchorSelect=".xp-progress-bar-level"
-              className="absolute text-[10px] bg-black text-white pr-1 pl-1 whitespace-nowrap"
-              offset={-16}
-            >
-              {summoner?.xpSinceLastLevel}
-              {" / "}
-              {summoner?.xpUntilNextLevel}
-              {" xp"}
-            </Tooltip>
-          </div>
-        </div>
+        <NavbarSummonerIcon summoner={summoner} />
         <div id="drag-region" className="flex flex-row grow">
           <Link
             className="shrink uppercase text-1xl font-light text-center hover:text-glow no-drag pr-4 pl-4"

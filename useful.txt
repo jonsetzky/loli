@@ -30,6 +30,9 @@ inventory
 player loot
     /lol-loot/v2/player-loot-map
 
+challenge tokens
+    /lol-challenges/v1/update-player-preferences
+
 uris not found in https://lcu.vivide.re
     /lol-honeyfruit/v1/account-claim/migration
     /lol-tastes/v1/ready

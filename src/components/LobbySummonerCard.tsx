@@ -89,6 +89,8 @@ export const LobbySummonerCard = ({
 
   if (!summoner || !searchState) return <>loading</>;
 
+  // console.log(member.secondPositionPreference);
+
   return (
     <div
       className={
@@ -133,7 +135,7 @@ export const LobbySummonerCard = ({
             placeholderSrc="/profileicon/29.png"
           />
           {lobby?.gameConfig.showPositionSelector ? (
-            <div className="flex flex-row grow justify-evenly">
+            <div className="flex flex-row grow justify-center">
               {lobby?.localMember.summonerId === member.summonerId ? (
                 <Tooltip
                   id="role-picker"
@@ -192,33 +194,38 @@ export const LobbySummonerCard = ({
               ) : (
                 <></>
               )}
-              <div className="flex flex-col justify-center">
-                <img
-                  data-tooltip-id="role-picker"
-                  src={`./positions/position-${member.firstPositionPreference.toLowerCase()}.svg`}
-                  className="h-6 primary-role"
-                  style={{
-                    filter: "brightness(0)",
-                  }}
-                  onClick={(e: any) => {
-                    setRolePicker("primary");
-                  }}
-                />
-              </div>
-              <div className="flex flex-col justify-center">
-                <img
-                  data-tooltip-id="role-picker"
-                  src={`./positions/position-${member.secondPositionPreference.toLowerCase()}.svg`}
-                  className="h-4"
-                  style={{
-                    filter: "brightness(0)",
-                    opacity: "75%",
-                  }}
-                  onClick={() => {
-                    setRolePicker("secondary");
-                  }}
-                />
-              </div>
+              <img
+                data-tooltip-id="role-picker"
+                src={`./positions/position-${member.firstPositionPreference.toLowerCase()}.svg`}
+                className="h-6 primary-role"
+                style={{
+                  filter: "brightness(0)",
+                }}
+                onClick={(e: any) => {
+                  setRolePicker("primary");
+                }}
+              />{" "}
+              {member.secondPositionPreference.toLowerCase() ===
+              "unselected" ? (
+                <></>
+              ) : (
+                <div className="grid h-6 w-6 place-content-center">
+                  {" "}
+                  <img
+                    data-tooltip-id="role-picker"
+                    src={`./positions/position-${member.secondPositionPreference.toLowerCase()}.svg`}
+                    className="h-4 place-self-center"
+                    style={{
+                      filter: "brightness(0)",
+                      opacity: "75%",
+                    }}
+                    onClick={() => {
+                      setRolePicker("secondary");
+                    }}
+                  />
+                </div>
+              )}
+              <div className="flex flex-col justify-center"></div>
             </div>
           ) : (
             <div className="flex flex-row grow justify-evenly h-4" />
