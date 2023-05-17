@@ -3,7 +3,7 @@ import settings from "@/assets/settings";
 import { SettingsKeys } from "electron/main/settings";
 import React, { useId } from "react";
 import { SettingBase } from "./SettingBase";
-import { Tooltip } from "../Tooltip";
+import { Tooltip } from "../common/Tooltip";
 
 export const TestSetting = ({ id }: { id: SettingsKeys }) => {
   const eId = useId();

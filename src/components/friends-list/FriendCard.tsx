@@ -1,12 +1,10 @@
 import { useUpdatableContent } from "@/updatableContent";
-import { ISummoner } from "electron/main/lcu/summoner";
 import React, { memo, useEffect, useId, useState } from "react";
-import { AssetImage } from "./AssetImage";
-import { Tooltip } from "./Tooltip";
+import { AssetImage } from "../common/AssetImage";
 import { ExternalLink } from "@/ExternalLink";
-import { ContextMenu } from "./context-menu/ContextMenu";
-import { ContextMenuList } from "./context-menu/ContextMenuList";
-import { ContextMenuListItem } from "./context-menu/ContextMenuListItem";
+import { ContextMenu } from "../context-menu/ContextMenu";
+import { ContextMenuList } from "../context-menu/ContextMenuList";
+import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 
 export interface IFriend {
   availability: string;

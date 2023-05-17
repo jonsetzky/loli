@@ -1,7 +1,4 @@
 import { Lobby } from "@/routes/Lobby";
-import { Tooltip } from "@/components/Tooltip";
-import { useUpdatableContent } from "@/updatableContent";
-import React, { useEffect, useState } from "react";
 
 export const TestRoute = () => {
   // const [content, setContent] = useState("");

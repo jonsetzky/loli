@@ -4,9 +4,9 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Lockfile } from "electron/main/lcu/lockfile";
 import { ISummoner } from "electron/main/lcu/summoner";
 import { Link } from "react-router-dom";
-import { Tooltip } from "./components/Tooltip";
-import { NavbarLink } from "./components/NavbarLink";
-import { AssetImage } from "./components/AssetImage";
+import { Tooltip } from "./components/common/Tooltip";
+import { NavbarLink } from "./components/navbar/NavbarLink";
+import { AssetImage } from "./components/common/AssetImage";
 import { useSetting } from "./setting";
 // import { Tooltip } from "react-tooltip";
 
@@ -105,7 +105,7 @@ export const Navbar = ({
             </div>
           </button>
           {testVisible ? <div className="grow bg-blue-600 mt-12" /> : <></>}
-          <div className="navbar-control-buttons absolute top-0 right-0 grid grid-flow-col p-1 gap-2">
+          <div className="navbar-control-buttons absolute top-0 right-0 grid grid-flow-col p-1 gap-2 z-[400]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"

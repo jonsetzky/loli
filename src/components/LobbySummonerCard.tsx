@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { ILobby, IMember } from "../routes/Lobby";
-import { AssetImage } from "./AssetImage";
+import { AssetImage } from "./common/AssetImage";
 import { useUpdatableContent } from "@/updatableContent";
 import { ISummoner } from "electron/main/lcu/summoner";
-import { Tooltip } from "./Tooltip";
+import { Tooltip } from "./common/Tooltip";
 import { RolePicker } from "./RolePicker";
 
 interface ISummonerFriendInfo {

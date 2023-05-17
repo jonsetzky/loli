@@ -1,11 +1,8 @@
 import { useUpdatableContent } from "@/updatableContent";
 import React, { useEffect, useRef, useState } from "react";
 import { FriendCard, IFriend } from "./FriendCard";
-import { Drawer } from "./Drawer";
-import { Tooltip } from "./Tooltip";
-import { useRootContext } from "@/routes/Root";
-import { ExternalLink } from "@/ExternalLink";
-import { ErrorPage } from "./ErrorPage";
+import { Drawer } from "../common/Drawer";
+import { Tooltip } from "../common/Tooltip";
 
 interface IFriendCounts {
   numFriends: number;

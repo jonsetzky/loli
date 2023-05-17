@@ -64,3 +64,24 @@ inventory types
     AUGMENT
     CURRENCY
     ACHIEVEMENT_TITLE
+
+
+when session expires this happens:
+    /lol-login/v1/session
+    {
+        "accountId": 2480614657795840,
+        "connected": false,
+        "error": {
+            "description": "League Token Expired",
+            "id": "ALE-C17DA63E",
+            "messageId": "LEAGUE_TOKEN_EXPIRED"
+        },
+        "idToken": "eyJraWQiOiJzMSIsInR5cCI6ImlkX3Rva2VuK2p3dCIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoiWVZ1MEhPM0F6NTV6WmV0T0R0QXhoUSIsInN1YiI6IjdmODBiZWFmLTdkNDktNTdjYy04NjBjLThlMGU1NjUzMzExZSIsImNvdW50cnkiOiJmaW4iLCJjb3VudHJ5X2F0IjoxNTkxNjQ0MzgwMDAwLCJhbXIiOlsicGFzc3dvcmQiLCJtZmEiLCJjb29raWUiXSwiaXNzIjoiaHR0cHM6XC9cL2F1dGgucmlvdGdhbWVzLmNvbSIsImxvbCI6W3sidWlkIjoyNDgwNjE0NjU3Nzk1ODQwLCJjdWlkIjoyNDgwNjE0NjU3Nzk1ODQwLCJ1bmFtZSI6ImpvbnNldHpreTEiLCJjcGlkIjoiRVVXMSIsInB0cmlkIjpudWxsLCJwaWQiOiJFVVcxIiwic3RhdGUiOiJFTkFCTEVEIn1dLCJwaG9uZV9udW1iZXJfdmVyaWZpZWQiOnRydWUsImxvY2FsZSI6ImVuX1VTIiwibm9uY2UiOiJ2VGlqWXdIZHhlaERTR2VSVVg3ZE13IiwiYWNjb3VudF92ZXJpZmllZCI6dHJ1ZSwiYXVkIjoibG9sIiwiYWNyIjoiMCIsImxvbF9yZWdpb24iOlt7InVpZCI6MjQ4MDYxNDY1Nzc5NTg0MCwiY3VpZCI6MjQ4MDYxNDY1Nzc5NTg0MCwibHAiOmZhbHNlLCJjcGlkIjoiRVVXMSIsImFjdGl2ZSI6dHJ1ZSwicGlkIjoiRVVXMSJ9XSwicGxheWVyX2xvY2FsZSI6ImVuIiwiZXhwIjoxNjg0MzI4OTMxLCJpYXQiOjE2ODQyNDI1MzEsImFjY3QiOnsiZ2FtZV9uYW1lIjoiaGVjYXN1cyIsInRhZ19saW5lIjoiRVVXIn0sImFnZSI6MzQsImp0aSI6IjJNamFIbXhLSVRZIiwibG9naW5fY291bnRyeSI6ImZpbiJ9.G4EItGdbWiKClao5fYd7Eq_8oZARTMtNryZUMGbS0rqi8AsmQDjA6-oeDdraTK8XkVYU5ZpWc1TA9lVl3T5M2AJOHhpWbSKEPGryZQ_asBQQs1uzkv5S_6TQUnksZSJfaqFjFvVM-N8Vgpy9wScB0nIUdt3GRX3dfURgreOw4M8",
+        "isInLoginQueue": false,
+        "isNewPlayer": false,
+        "puuid": "7f80beaf-7d49-57cc-860c-8e0e5653311e",
+        "state": "LOGGING_OUT",
+        "summonerId": 146950506,
+        "userAuthToken": "",
+        "username": "jonsetzky1"
+    }

@@ -4,7 +4,7 @@ import { ClientStatus } from "../ClientStatus";
 import { Navbar } from "../Navbar";
 import { Outlet, useOutletContext, useRevalidator } from "react-router-dom";
 import { Settings } from "./Settings";
-import { FriendList } from "@/components/FriendList";
+import { FriendList } from "@/components/friends-list/FriendList";
 import { GameModePicker } from "@/components/GameModePicker";
 
 type RootContextType = {
