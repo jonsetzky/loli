@@ -32,12 +32,10 @@ export const RolePicker = ({
   });
   return (
     <Tooltip
-      id="role-picker"
       data-tooltip-place="right"
       classNameExtend="absolute z-50"
       delayHide={0}
       isOpen={visible}
-      openOnClick={true}
       noArrow={false}
     >
       <div ref={ref}>

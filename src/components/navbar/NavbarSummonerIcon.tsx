@@ -98,10 +98,10 @@ export const NavbarSummonerIcon = ({ summoner }: { summoner?: ISummoner }) => {
         uri={`/profileicon/${summoner?.profileIconId ?? "29"}.png`}
         data-context-menu
       />
-      <div className="xp-progress-bar relative">
-        <div className="xp-progress-bar-bg absolute w-full h-1 bg-cyan-900 bottom-0">
+      <div className="xp-progress-bar absolute w-full bottom-0 h-1">
+        <div className="xp-progress-bar-bg bg-cyan-900 h-full">
           <div
-            className={`xp-progress-bar-fg absolute h-1 bg-cyan-400 bottom-0`}
+            className={`xp-progress-bar-fg absolute h-full bg-cyan-400 bottom-0`}
             style={{ width: summoner?.percentCompleteForNextLevel }}
           ></div>
           <div className="xp-progress-bar-level absolute flex justify-center tracking-wide w-full bottom-0 text-sm select-none">

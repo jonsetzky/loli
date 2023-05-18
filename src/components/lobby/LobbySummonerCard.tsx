@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useId, useState } from "react";
 import { ILobby, IMember } from "./Lobby";
 import { AssetImage } from "../common/AssetImage";
 import { useUpdatableContent } from "@/updatableContent";
@@ -91,11 +91,12 @@ export const LobbySummonerCard = ({
     position: 0,
   });
 
+  const rpId = useId();
+
   if (member === null)
     return <div className={"flex flex-col basis-1/5 bg-neutral-900 "}></div>;
 
-  const memberIsLocal = () =>
-    lobby?.localMember.summonerId === member.summonerId;
+  const memberIsLocal = lobby?.localMember.summonerId === member.summonerId;
 
   const summoner = useUpdatableContent<ISummonerFriendInfo>(
     `/lol-hovercard/v1/friend-info-by-summoner/${member.summonerId}`
@@ -105,7 +106,7 @@ export const LobbySummonerCard = ({
   useEffect(() => {
     if (
       member.firstPositionPreference === member.secondPositionPreference &&
-      memberIsLocal()
+      memberIsLocal
     ) {
       setRoles(member.firstPositionPreference as Role, "unselected");
     }
@@ -128,6 +129,8 @@ export const LobbySummonerCard = ({
   };
 
   if (!summoner || !searchState) return <>loading</>;
+
+  // console.log(lobby?.localMember.summonerId, member.summonerId);
 
   return (
     <div
@@ -189,7 +192,7 @@ export const LobbySummonerCard = ({
           />
           {lobby?.gameConfig.showPositionSelector ? (
             <div className="flex flex-row grow justify-center">
-              {memberIsLocal() ? (
+              {memberIsLocal ? (
                 <RolePicker
                   current={
                     (rolePicker.position === 0
@@ -206,14 +209,14 @@ export const LobbySummonerCard = ({
                 <></>
               )}
               <img
-                data-tooltip-id="role-picker"
                 src={`./positions/position-${member.firstPositionPreference.toLowerCase()}.svg`}
                 className="h-6 primary-role"
                 style={{
                   filter: "brightness(0)",
                 }}
                 onClick={(e: any) => {
-                  setRolePicker((c) => ({ visible: true, position: 0 }));
+                  if (memberIsLocal)
+                    setRolePicker((c) => ({ visible: true, position: 0 }));
                 }}
               />{" "}
               {member.firstPositionPreference.toLowerCase() === "fill" ? (
@@ -221,7 +224,6 @@ export const LobbySummonerCard = ({
               ) : (
                 <div className="grid h-6 w-6 place-content-center">
                   <img
-                    data-tooltip-id="role-picker"
                     src={`./positions/position-${member.secondPositionPreference.toLowerCase()}.svg`}
                     className="h-4 place-self-center"
                     style={{
@@ -229,7 +231,8 @@ export const LobbySummonerCard = ({
                       opacity: "75%",
                     }}
                     onClick={() => {
-                      setRolePicker((c) => ({ visible: true, position: 1 }));
+                      if (memberIsLocal)
+                        setRolePicker((c) => ({ visible: true, position: 1 }));
                     }}
                   />
                 </div>

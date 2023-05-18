@@ -11,25 +11,25 @@ export const Drawer = ({
   children,
   visible,
   direction = "right",
-  childClassName,
   className,
+  baseClassName,
 }: {
   children?: any;
   visible?: boolean;
   direction?: "left" | "right" | "up" | "down";
-  childClassName?: string;
+  baseClassName?: string;
   className?: string;
 }) => {
   return (
-    <div className={" " + className}>
-      <div
-        className={
-          `transition-transform  ${visible ? "" : directions.get(direction)} ` +
-            childClassName ?? ""
-        }
-      >
-        {children}
-      </div>
+    <div
+      className={
+        "relative w-full h-full "
+        // `transition-transform z-50  ${
+        //   visible ? "" : directions.get(direction)
+        // } ` + className ?? ""
+      }
+    >
+      {children}
     </div>
   );
 };
