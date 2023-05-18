@@ -66,6 +66,7 @@ export const ContextMenu = ({
 
       if (allTargets[0] === target) {
         event.preventDefault();
+        // event.stopPropagation();
         // event.stopImmediatePropagation();
         return setContextData((prev) => ({
           visible: true,
@@ -103,7 +104,7 @@ export const ContextMenu = ({
       posX: containedPos[0],
       posY: containedPos[1],
     }));
-  }, [contextData.visible]);
+  }, [contextData.visible, contextData.posX, contextData.posY]);
 
   return (
     <CTXContextMenuVisibility.Provider

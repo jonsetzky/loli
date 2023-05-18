@@ -11,7 +11,7 @@ export const ContextMenuListItem = ({
   if (!children) return <>n/a</>;
   return (
     <div
-      className="p-1 pt-0.5 pb-0.5 tracking-wide font-light hover:bg-neutral-800 active:bg-white active:text-black active:font-semibold"
+      className="p-1 pt-0.5 pb-0.5 tracking-wide font-light whitespace-nowrap hover:bg-neutral-800 active:bg-white active:text-black active:font-semibold"
       onClick={(e) => {
         if (onClick) onClick(e);
         ctx.setVisible(false);
