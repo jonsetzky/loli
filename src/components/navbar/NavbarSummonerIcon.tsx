@@ -96,6 +96,7 @@ export const NavbarSummonerIcon = ({ summoner }: { summoner?: ISummoner }) => {
       <AssetImage
         id="navbar-summoner-icon"
         uri={`/profileicon/${summoner?.profileIconId ?? "29"}.png`}
+        data-context-menu
       />
       <div className="xp-progress-bar relative">
         <div className="xp-progress-bar-bg absolute w-full h-1 bg-cyan-900 bottom-0">

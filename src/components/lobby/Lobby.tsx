@@ -12,6 +12,9 @@ import { useRootContext } from "../../routes/Root";
 import { setPartyType } from "@/api/partyType";
 import { setLobbyQueueId } from "@/api/lobbyQueueId";
 import { cancelMatchSearch, matchSearch } from "@/api/searchMatch";
+import { ContextMenu } from "../context-menu/ContextMenu";
+import { ContextMenuList } from "../context-menu/ContextMenuList";
+import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 
 export interface IMember {
   allowedChangeActivity: boolean;
@@ -278,7 +281,22 @@ export const Lobby = () => {
       )}
 
       {/* <p className="bg-white">{JSON.stringify(members)}</p> */}
-      <div className="flex flex-col h-full bg-black text-white">
+      <div
+        id="lobby"
+        data-context-menu
+        className="flex flex-col h-full bg-black text-white"
+      >
+        <ContextMenu targetId="lobby" label="Lobby">
+          <ContextMenuList>
+            <ContextMenuListItem
+              onClick={() =>
+                window.electron.openExternal("/lol-lobby/v2/lobby")
+              }
+            >
+              Open in Browser
+            </ContextMenuListItem>
+          </ContextMenuList>
+        </ContextMenu>
         <div className="lobby-type-header flex flex-row justify-center w-full text-2xl bg-zinc-900">
           {/* <ReactDropdown options={playableQueues} value={playableQueues[0]} /> */}
           {/* <h1 className="p-2">

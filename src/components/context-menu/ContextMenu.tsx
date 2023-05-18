@@ -32,6 +32,13 @@ export const CTXContextMenuVisibility = createContext<{
   setVisible: (n: boolean) => {},
 });
 
+/**
+ * Target requires the following attributes:
+ * - id=\<id-here\>
+ * - data-context-menu
+ * @param param0
+ * @returns
+ */
 export const ContextMenu = ({
   targetId,
   children,
@@ -51,9 +58,15 @@ export const ContextMenu = ({
   useEffect(() => {
     const contextMenuEH = (event: MouseEvent) => {
       const target = document.getElementById(targetId);
+      const allTargets: HTMLElement[] = (
+        Array(...document.querySelectorAll("[data-context-menu]")).sort(
+          (a: any, b: any) => b.offsetTop - a.offsetTop
+        ) as HTMLElement[]
+      ).filter((e) => e.contains(event.target as any));
 
-      if (target && target.contains(event.target as any)) {
+      if (allTargets[0] === target) {
         event.preventDefault();
+        // event.stopImmediatePropagation();
         return setContextData((prev) => ({
           visible: true,
           posX: event.clientX,

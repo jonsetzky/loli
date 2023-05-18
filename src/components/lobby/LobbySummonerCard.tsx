@@ -7,6 +7,9 @@ import { Tooltip } from "../common/Tooltip";
 import { Role, RolePicker } from "./RolePicker";
 import { useSetting } from "@/setting";
 import { setRoles } from "@/api/lobbyRoles";
+import { ContextMenuList } from "../context-menu/ContextMenuList";
+import { ContextMenu } from "../context-menu/ContextMenu";
+import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 
 interface ISummonerFriendInfo {
   accountId: number;
@@ -119,7 +122,13 @@ export const LobbySummonerCard = ({
           : "")
       }
       id={member.summonerName}
+      data-context-menu
     >
+      <ContextMenu targetId={member.summonerName} label={member.summonerName}>
+        <ContextMenuList>
+          <ContextMenuListItem>😳</ContextMenuListItem>
+        </ContextMenuList>
+      </ContextMenu>
       <div className="flex justify-center text-sm">
         <div className="basis-1/3 flex row grow justify-end">
           <div className="flex flex-col justify-center">

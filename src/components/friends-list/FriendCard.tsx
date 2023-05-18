@@ -184,7 +184,12 @@ export const FriendCard = ({
           </div>
         </ContextMenuListItem>
       </ContextMenu>
-      <div key={"sus"} id={id} className="bg-black text-white no-drag">
+      <div
+        key={"sus"}
+        id={id}
+        data-context-menu
+        className="bg-black text-white no-drag"
+      >
         <div className="flex w-full">
           <div className="w-6">
             <AssetImage
