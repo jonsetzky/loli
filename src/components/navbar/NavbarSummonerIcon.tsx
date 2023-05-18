@@ -82,7 +82,14 @@ export const NavbarSummonerIcon = ({ summoner }: { summoner?: ISummoner }) => {
               )
             }
           >
-            Open in Browser
+            Open icon in Browser
+          </ContextMenuListItem>
+          <ContextMenuListItem
+            onClick={() =>
+              window.electron.openExternal("/lol-summoner/v1/current-summoner")
+            }
+          >
+            Open summoner in Browser
           </ContextMenuListItem>
         </ContextMenuList>
       </ContextMenu>

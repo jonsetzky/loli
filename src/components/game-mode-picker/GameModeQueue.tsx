@@ -1,4 +1,4 @@
-import { IQueue } from "@/routes/Lobby";
+import { IQueue } from "@/components/lobby/Lobby";
 import { useState } from "react";
 import { Drawer } from "../common/Drawer";
 

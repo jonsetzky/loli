@@ -1,14 +1,17 @@
 import { useUpdatableContent } from "@/updatableContent";
 import React, { useEffect, useState } from "react";
-import { LobbySummonerCard } from "../components/LobbySummonerCard";
+import { LobbySummonerCard } from "./LobbySummonerCard";
 import { ISummoner } from "electron/main/lcu/summoner";
-import { FullscreenNotification } from "../components/FullscreenNotification";
+import { FullscreenNotification } from "../FullscreenNotification";
 import { useNavigate } from "react-router-dom";
-import queues from "../assets/queues.json";
+import queues from "../../assets/queues.json";
 import ReactDropdown from "react-dropdown";
 import { ErrorPage } from "@/components/ErrorPage";
 import { GameModePicker } from "@/components/game-mode-picker/GameModePicker";
-import { useRootContext } from "./Root";
+import { useRootContext } from "../../routes/Root";
+import { setPartyType } from "@/api/partyType";
+import { setLobbyQueueId } from "@/api/lobbyQueueId";
+import { cancelMatchSearch, matchSearch } from "@/api/searchMatch";
 
 export interface IMember {
   allowedChangeActivity: boolean;
@@ -204,16 +207,6 @@ export interface IQueue {
 //   // showPositionSelector: boolean;
 // }
 
-const setLobbyQueueId = (id: number) => {
-  window.electron.getLcuUri("/lol-lobby/v2/lobby", "post", { queueId: id });
-};
-
-const setPartyType = (type: "open" | "closed") => {
-  console.log(
-    window.electron.getLcuUri("/lol-lobby/v2/lobby/partyType", "put", type)
-  );
-};
-
 export const Lobby = () => {
   // const ctx = useRootContext();
 
@@ -331,16 +324,8 @@ export const Lobby = () => {
                 : "bg-blue-400")
             }
             onClick={() => {
-              if (searchState?.searchState === "Invalid")
-                window.electron.getLcuUri(
-                  "/lol-lobby/v2/lobby/matchmaking/search",
-                  "post"
-                );
-              else
-                window.electron.getLcuUri(
-                  "/lol-lobby/v2/lobby/matchmaking/search",
-                  "delete"
-                );
+              if (searchState?.searchState === "Invalid") matchSearch();
+              else cancelMatchSearch();
             }}
           >
             {searchState?.searchState === "Invalid" ? "search" : "cancel"}
@@ -371,6 +356,7 @@ export const Lobby = () => {
                 member={m}
                 lobby={lobby ?? undefined}
                 searchState={searchState}
+                compact={lobby.gameConfig.maxLobbySize > 5}
               />
             ))}
 
@@ -379,7 +365,11 @@ export const Lobby = () => {
                 lobby.gameConfig.maxLobbySize - (lobby?.members.length ?? 0)
               ),
             ].map((x, i) => (
-              <LobbySummonerCard member={null} key={i} />
+              <LobbySummonerCard
+                member={null}
+                key={i}
+                compact={lobby.gameConfig.maxLobbySize > 5}
+              />
             ))}
           </div>
         </div>

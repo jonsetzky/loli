@@ -102,7 +102,7 @@ export const ContextMenu = ({
       {" "}
       <div
         ref={ref}
-        className="text-sm bg-black text-white leading-3 border-[1px] fixed z-50"
+        className="text-sm bg-black text-white leading-3 border-[1px] fixed z-[60]"
         style={{
           display: `${contextData.visible ? "block" : "none"}`,
           left: contextData.posX,

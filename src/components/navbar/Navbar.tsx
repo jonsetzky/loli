@@ -4,32 +4,26 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Lockfile } from "electron/main/lcu/lockfile";
 import { ISummoner } from "electron/main/lcu/summoner";
 import { Link } from "react-router-dom";
-import { Tooltip } from "./components/common/Tooltip";
-import { NavbarLink } from "./components/navbar/NavbarLink";
-import { AssetImage } from "./components/common/AssetImage";
-import { useSetting } from "./setting";
-import { Settings } from "./routes/Settings";
-import { NavbarSummonerIcon } from "./components/navbar/NavbarSummonerIcon";
+import { Tooltip } from "../common/Tooltip";
+import { NavbarLink } from "./NavbarLink";
+import { AssetImage } from "../common/AssetImage";
+import { useSetting } from "../../setting";
+import { Settings } from "../../routes/Settings";
+import { NavbarSummonerIcon } from "./NavbarSummonerIcon";
+import { useUpdatableContent } from "../../updatableContent";
 // import { Tooltip } from "react-tooltip";
 
 export const Navbar = () => {
   const [testVisible, setTestVisible] = useSetting("testSetting");
   const [settingsVisible, setSettingsVisible] = useState(false);
 
-  const [summoner, setSummoner] = useState<ISummoner>();
+  const summoner = useUpdatableContent<ISummoner>(
+    "/lol-summoner/v1/current-summoner"
+  );
+
   const [lockfile, setLockfile] = useState<Lockfile>();
 
   useEffect(() => {
-    window.electron.onLcuEvent(
-      "/lol-summoner/v1/current-summoner",
-      (e, type, data) => {
-        setSummoner(data);
-      }
-    );
-    window.electron
-      .getLcuUri("/lol-summoner/v1/current-summoner")
-      .then((newSummoner: ISummoner) => setSummoner(newSummoner));
-
     setInterval(() => {
       window.electron.getLockfile().then((lf) => setLockfile(lf));
     }, 1000);

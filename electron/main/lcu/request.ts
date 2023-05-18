@@ -28,7 +28,7 @@ export const request = (
       .put(url, typeof data === "string" ? '"' + data + '"' : data, config)
       .then((response) => response.data)
       .catch((e) => console.error("error at", endpoint, e.response.data));
-  console.log("data", typeof data);
+  // console.log("data", typeof data);
   return axios({ ...config, data, url })
     .then((response) => response.data)
     .catch((e) => console.error("error at", endpoint, e.response.data));
@@ -38,7 +38,7 @@ export const requestAsset = (
   lockfile: Lockfile,
   endpoint: string
 ): Promise<any> => {
-  console.log("rrequested: ", endpoint);
+  // console.log("rrequested: ", endpoint);
 
   return axios({
     method: "get",

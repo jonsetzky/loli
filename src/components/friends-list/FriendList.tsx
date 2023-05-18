@@ -92,7 +92,7 @@ export const FriendList = ({
 
   const toggleDrawer = () => setVisible(!visible);
   return (
-    <div className="absolute">
+    <div className="fixed z-30">
       <div className="flex flex-row flex-1 w-72">
         <Drawer
           visible={visible}

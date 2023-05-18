@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { ILobby, IMember } from "../routes/Lobby";
-import { AssetImage } from "./common/AssetImage";
+import { ILobby, IMember } from "./Lobby";
+import { AssetImage } from "../common/AssetImage";
 import { useUpdatableContent } from "@/updatableContent";
 import { ISummoner } from "electron/main/lcu/summoner";
-import { Tooltip } from "./common/Tooltip";
-import { RolePicker } from "./RolePicker";
+import { Tooltip } from "../common/Tooltip";
+import { Role, RolePicker } from "./RolePicker";
+import { useSetting } from "@/setting";
+import { setRoles } from "@/api/lobbyRoles";
 
 interface ISummonerFriendInfo {
   accountId: number;
@@ -71,25 +73,42 @@ export const LobbySummonerCard = ({
   member,
   lobby,
   searchState,
+  compact,
 }: {
   member: IMember | null;
   lobby?: ILobby;
   searchState?: any;
+  compact: boolean;
 }) => {
-  const [rolePicker, setRolePicker] = useState<"primary" | "secondary" | null>(
-    null
-  );
+  const [rolePicker, setRolePicker] = useState<{
+    visible: boolean;
+    position: 0 | 1;
+  }>({
+    visible: false,
+    position: 0,
+  });
 
   if (member === null)
     return <div className={"flex flex-col basis-1/5 bg-neutral-900 "}></div>;
+
+  const memberIsLocal = () =>
+    lobby?.localMember.summonerId === member.summonerId;
 
   const summoner = useUpdatableContent<ISummonerFriendInfo>(
     `/lol-hovercard/v1/friend-info-by-summoner/${member.summonerId}`
   );
 
-  if (!summoner || !searchState) return <>loading</>;
+  const [allowDoubleRole, setAllowDoubleRole] = useSetting("allowDoubleRole");
+  useEffect(() => {
+    if (
+      member.firstPositionPreference === member.secondPositionPreference &&
+      memberIsLocal()
+    ) {
+      setRoles(member.firstPositionPreference as Role, "unselected");
+    }
+  }, [allowDoubleRole]);
 
-  // console.log(member.secondPositionPreference);
+  if (!summoner || !searchState) return <>loading</>;
 
   return (
     <div
@@ -136,61 +155,41 @@ export const LobbySummonerCard = ({
           />
           {lobby?.gameConfig.showPositionSelector ? (
             <div className="flex flex-row grow justify-center">
-              {lobby?.localMember.summonerId === member.summonerId ? (
-                <Tooltip
-                  id="role-picker"
-                  data-tooltip-place="right"
-                  classNameExtend="absolute z-50"
-                  delayHide={0}
-                  isOpen={rolePicker !== null}
-                  openOnClick={true}
-                  noArrow={false}
-                >
-                  <div onMouseLeave={() => setRolePicker(null)}>
-                    <RolePicker
-                      currentRole={
-                        rolePicker === "primary"
-                          ? member.firstPositionPreference.toLowerCase()
-                          : rolePicker === "secondary"
-                          ? member.secondPositionPreference.toLowerCase()
-                          : undefined
-                      }
-                      onPickRole={(newRole) => {
-                        console.log("setting", rolePicker, "to", newRole);
-                        let newLobby = structuredClone(lobby);
-                        newLobby.localMember.firstPositionPreference = "MIDDLE";
+              {memberIsLocal() ? (
+                <RolePicker
+                  current={
+                    (rolePicker.position === 0
+                      ? member.firstPositionPreference.toLowerCase()
+                      : member.secondPositionPreference.toLowerCase()) as Role
+                  }
+                  setVisible={(n) =>
+                    setRolePicker((c) => ({ ...c, visible: n }))
+                  }
+                  visible={rolePicker.visible}
+                  setRole={(r) => {
+                    console.log("setting", rolePicker, "to", r);
+                    let newLobby = structuredClone(lobby);
+                    newLobby.localMember.firstPositionPreference = "MIDDLE";
 
-                        let newFirst =
-                          rolePicker === "primary"
-                            ? newRole
-                            : member.firstPositionPreference;
-                        let newSecond =
-                          rolePicker === "secondary"
-                            ? newRole
-                            : member.secondPositionPreference;
+                    let newFirst =
+                      rolePicker.position === 0
+                        ? r
+                        : member.firstPositionPreference;
+                    let newSecond =
+                      rolePicker.position === 1
+                        ? r
+                        : member.secondPositionPreference;
+                    if (
+                      newFirst.toUpperCase() === newSecond.toUpperCase() &&
+                      !allowDoubleRole
+                    ) {
+                      newFirst = member.secondPositionPreference;
+                      newSecond = member.firstPositionPreference;
+                    }
 
-                        // if (
-                        //   newFirst.toUpperCase() === newSecond.toUpperCase()
-                        // ) {
-                        //   newFirst = member.secondPositionPreference;
-                        //   newSecond = member.firstPositionPreference;
-                        // }
-
-                        window.electron
-                          .getLcuUri(
-                            "/lol-lobby/v2/lobby/members/localMember/position-preferences",
-                            "put",
-                            {
-                              firstPreference: newFirst.toUpperCase(),
-                              secondPreference: newSecond.toUpperCase(),
-                            }
-                          )
-                          .then((e: any) => console.log(e));
-                        setRolePicker(null);
-                      }}
-                    />
-                  </div>
-                </Tooltip>
+                    setRoles(newFirst as Role, newSecond as Role);
+                  }}
+                />
               ) : (
                 <></>
               )}
@@ -202,15 +201,13 @@ export const LobbySummonerCard = ({
                   filter: "brightness(0)",
                 }}
                 onClick={(e: any) => {
-                  setRolePicker("primary");
+                  setRolePicker((c) => ({ visible: true, position: 0 }));
                 }}
               />{" "}
-              {member.secondPositionPreference.toLowerCase() ===
-              "unselected" ? (
+              {member.firstPositionPreference.toLowerCase() === "fill" ? (
                 <></>
               ) : (
                 <div className="grid h-6 w-6 place-content-center">
-                  {" "}
                   <img
                     data-tooltip-id="role-picker"
                     src={`./positions/position-${member.secondPositionPreference.toLowerCase()}.svg`}
@@ -220,7 +217,7 @@ export const LobbySummonerCard = ({
                       opacity: "75%",
                     }}
                     onClick={() => {
-                      setRolePicker("secondary");
+                      setRolePicker((c) => ({ visible: true, position: 1 }));
                     }}
                   />
                 </div>

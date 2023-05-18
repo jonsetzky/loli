@@ -126,91 +126,93 @@ export interface IFriendHoverCard {
   summonerLevel: number;
 }
 
-export const FriendCard = memo(
-  ({
-    puuid,
-    setAvailability,
-  }: {
-    puuid: string;
-    setAvailability: (av: string | undefined) => void;
-  }) => {
-    const id = useId();
-    const [tooltip, setTooltip] = useState<string | null>(null);
+export interface IPlayerStatus {}
 
-    const friend = useUpdatableContent<IFriendHoverCard>(
-      "/lol-hovercard/v1/friend-info/" + puuid,
-      {
-        onUpdate: (f) => {
-          setAvailability(f.availability);
-          setTooltip(
-            Object.keys(f.lol ?? {}).length > 0
-              ? `${f.lol?.gameStatus} ${f.lol?.gameQueueType} as ${f.lol?.skinname}`
-              : null
-          );
-        },
-      }
+const playerStatusFromFriend = (hc: IFriendHoverCard | IFriend) => {};
+
+export const FriendCard = ({
+  puuid,
+  setAvailability,
+}: {
+  puuid: string;
+  setAvailability: (av: string | undefined) => void;
+}) => {
+  const id = useId();
+  const [tooltip, setTooltip] = useState<string | null>(null);
+
+  const friend = useUpdatableContent<IFriendHoverCard>(
+    "/lol-hovercard/v1/friend-info/" + puuid,
+    {
+      onUpdate: (f) => {
+        setAvailability(f.availability);
+        setTooltip(
+          Object.keys(f.lol ?? {}).length > 0
+            ? `${f.lol?.gameStatus} ${f.lol?.gameQueueType} as ${f.lol?.skinname}`
+            : null
+        );
+      },
+    }
+  );
+
+  useEffect(() => {
+    setTooltip(
+      Object.keys(friend?.lol ?? {}).length > 0
+        ? `${friend?.lol?.gameStatus} ${friend?.lol?.gameQueueType} as ${friend?.lol?.skinname}`
+        : null
     );
+  }, [friend]);
 
-    useEffect(() => {
-      setTooltip(
-        Object.keys(friend?.lol ?? {}).length > 0
-          ? `${friend?.lol?.gameStatus} ${friend?.lol?.gameQueueType} as ${friend?.lol?.skinname}`
-          : null
-      );
-    }, [friend]);
+  if (!friend) return <></>;
 
-    if (!friend) return <></>;
+  // console.log("rerendering", puuid);
 
-    // console.log("rerendering", puuid);
+  // console.log(friend.lol);
 
-    // console.log(friend.lol);
-
-    return (
-      <>
-        <ContextMenu targetId={id} label={friend.name}>
-          <ContextMenuList>
-            <ContextMenuListItem>hihh</ContextMenuListItem>
-          </ContextMenuList>
-          <ContextMenuListItem>
-            <div>
-              <ExternalLink
-                uri={`/lol-hovercard/v1/friend-info/${friend?.puuid}`}
-              >
-                View as JSON
-              </ExternalLink>
-            </div>
-          </ContextMenuListItem>
-        </ContextMenu>
-        <div key={"sus"} id={id} className="bg-black text-white no-drag">
-          <div className="flex w-full">
-            <div className="w-6">
-              <AssetImage
-                key={friend.icon}
-                uri={`/profileicon/${friend.icon}.png`}
-                placeholderSrc="/profileicon/29.png"
-              />
-            </div>
-            <div className="grow flex flex-row justify-start">
-              <div
-                data-tooltip-id="friend-info-tooltip"
-                data-tooltip-content={friend.puuid}
-              >
-                {friend.name}
-              </div>
-            </div>
-            <div
-              data-tooltip-id={tooltip !== null ? "status-tooltip" : ""}
-              data-tooltip-content={tooltip ?? ""}
-              data-tooltip-place="right"
-              className="text-xs"
+  return (
+    <>
+      <ContextMenu targetId={id} label={friend.name}>
+        <ContextMenuList>
+          <ContextMenuListItem>hihh</ContextMenuListItem>
+        </ContextMenuList>
+        <ContextMenuListItem>
+          <div>
+            <ExternalLink
+              uri={`/lol-hovercard/v1/friend-info/${friend?.puuid}`}
             >
-              {friend.availability.replace(/dnd/, "playing") +
-                " " +
-                friend.productName.replace(/league\s+of\s+legends/i, "")}
+              View as JSON
+            </ExternalLink>
+          </div>
+        </ContextMenuListItem>
+      </ContextMenu>
+      <div key={"sus"} id={id} className="bg-black text-white no-drag">
+        <div className="flex w-full">
+          <div className="w-6">
+            <AssetImage
+              key={friend.icon}
+              uri={`/profileicon/${friend.icon}.png`}
+              placeholderSrc="/profileicon/29.png"
+            />
+          </div>
+          <div className="grow flex flex-row justify-start">
+            <div
+              data-tooltip-id="friend-info-tooltip"
+              data-tooltip-content={friend.puuid}
+            >
+              {friend.name}
             </div>
           </div>
+          <div
+            data-tooltip-id={tooltip !== null ? "status-tooltip" : ""}
+            data-tooltip-content={tooltip ?? ""}
+            data-tooltip-place="right"
+            className="text-xs"
+          >
+            {friend.availability.replace(/dnd/, "playing") +
+              " " +
+              friend.productName.replace(/league\s+of\s+legends/i, "")}
+          </div>
         </div>
-      </>
-    );
-  }
-);
+      </div>
+    </>
+  );
+};

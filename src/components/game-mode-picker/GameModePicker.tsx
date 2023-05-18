@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { FullscreenNotification } from "../FullscreenNotification";
 import { useUpdatableContent } from "@/updatableContent";
-import { IQueue } from "@/routes/Lobby";
+import { IQueue } from "@/components/lobby/Lobby";
 import { ErrorPage } from "../ErrorPage";
 import ReactDropdown from "react-dropdown";
 import { sortText } from "@/sortText";

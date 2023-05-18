@@ -17,7 +17,7 @@ export const useUpdatableContent = <T>(
   uri: string,
   options?: UpdatableContentOptions<T>
 ) => {
-  const [content, setContent] = useState<T | null>();
+  const [content, setContent] = useState<T>();
 
   useEffect(() => {
     const destructors: (() => void)[] = [];

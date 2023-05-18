@@ -10,8 +10,8 @@ export const useClickOutsideListener = (
      */
     function handleClickOutside(event: MouseEvent) {
       const t = event.target as HTMLDivElement;
-      console.log(t.onclick);
-      console.log("ohhoh");
+      // console.log(t.onclick);
+      // console.log("ohhoh");
       if (ref.current && !ref.current.contains(event.target)) {
         callback(event);
       }

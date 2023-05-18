@@ -14,6 +14,11 @@ export const settings = {
     label: "Automatically restart client",
     default: true,
   },
+  allowDoubleRole: {
+    type: "boolean",
+    label: "Allow double role position in lobby",
+    default: false,
+  },
 } as const;
 
 export default settings;

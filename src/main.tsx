@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.scss";
-import { Navbar } from "./Navbar";
+import { Navbar } from "./components/navbar/Navbar";
 import {
   createBrowserRouter,
   RouterProvider,

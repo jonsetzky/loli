@@ -1,4 +1,4 @@
-import { Lobby } from "@/routes/Lobby";
+import { Lobby } from "@/components/lobby/Lobby";
 
 export const TestRoute = () => {
   // const [content, setContent] = useState("");

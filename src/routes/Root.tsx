@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ClientStatus as IClientStatus } from "electron/main/lcu/client";
 import { ClientStatus } from "../ClientStatus";
-import { Navbar } from "../Navbar";
+import { Navbar } from "../components/navbar/Navbar";
 import { Outlet, useOutletContext, useRevalidator } from "react-router-dom";
 import { FriendList } from "@/components/friends-list/FriendList";
 
@@ -26,10 +26,10 @@ export const Root = () => {
       <div className="flex flex-col h-full">
         <Navbar />
         <div className="h-full">
-          <FriendList
+          {/* <FriendList
             visible={friendsListVisible}
             setVisible={setFriendsListVisible}
-          />
+          /> */}
           <Outlet context={createRootContext()} />
         </div>
       </div>
