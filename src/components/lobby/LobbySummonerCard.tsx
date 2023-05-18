@@ -143,6 +143,15 @@ export const LobbySummonerCard = ({
       <ContextMenu targetId={member.summonerName} label={member.summonerName}>
         <ContextMenuList>
           <ContextMenuListItem>😳</ContextMenuListItem>
+          <ContextMenuListItem
+            onClick={() =>
+              window.electron.openExternal(
+                `/lol-hovercard/v1/friend-info-by-summoner/${member.summonerId}`
+              )
+            }
+          >
+            Open friend in Browser
+          </ContextMenuListItem>
         </ContextMenuList>
       </ContextMenu>
       <div className="flex justify-center text-sm">

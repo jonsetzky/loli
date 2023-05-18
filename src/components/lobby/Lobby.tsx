@@ -243,6 +243,9 @@ export const Lobby = () => {
       </>
     );
 
+  const searching = searchState?.searchState !== "Invalid";
+  const canSearchOrCancel = lobby.canStartActivity || searching;
+
   return (
     <>
       <GameModePicker
@@ -335,29 +338,26 @@ export const Lobby = () => {
         <div className="flex basis-[6%] m-1 justify-center">
           <div className="basis-full" />
           <button
-            className={
-              "uppercase text-sm p-1 font-semibold transition-colors text-black " +
-              (searchState?.searchState === "Invalid"
-                ? "bg-white"
-                : "bg-blue-400")
-            }
+            className={"btn font-bold " + (!searching ? "" : "bg-blue-400")}
             onClick={() => {
-              if (searchState?.searchState === "Invalid") matchSearch();
+              if (!searching) matchSearch();
               else cancelMatchSearch();
             }}
+            disabled={!canSearchOrCancel || !lobby.localMember.isLeader}
           >
-            {searchState?.searchState === "Invalid" ? "search" : "cancel"}
+            {!searching ? "search" : "cancel"}
           </button>
           <div className="flex justify-end basis-full">
             <button
               className={
-                "uppercase text-sm p-1 font-semibold transition-colors text-black w-[4.5rem] " +
+                "btn font-bold transition-colors whitespace-nowrap text-center w-28 " +
                 (lobby.partyType === "open" ? "bg-green-500" : "bg-red-400")
               }
               onClick={() => {
                 console.log("settings");
                 setPartyType(lobby.partyType === "open" ? "closed" : "open");
               }}
+              disabled={!lobby.localMember.isLeader}
             >
               {lobby.partyType === "open" ? "OPEN" : "CLOSED"}
             </button>

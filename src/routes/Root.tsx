@@ -26,10 +26,10 @@ export const Root = () => {
       <div className="flex flex-col h-full">
         <Navbar />
         <div className="h-full">
-          {/* <FriendList
+          <FriendList
             visible={friendsListVisible}
             setVisible={setFriendsListVisible}
-          /> */}
+          />
           <Outlet context={createRootContext()} />
         </div>
       </div>
