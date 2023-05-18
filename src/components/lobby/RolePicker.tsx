@@ -44,6 +44,7 @@ export const RolePicker = ({
         <div className="role-picker flex flex-row">
           {allRoles.map((role) => (
             <RoleIcon
+              key={role}
               position={role}
               invert={true}
               // opacity={currentRole.toLowerCase() === role ? 1 : 0.4}

@@ -111,6 +111,22 @@ export const LobbySummonerCard = ({
     }
   }, [allowDoubleRole]);
 
+  const setRole = (n: Role) => {
+    let roles = [
+      member.firstPositionPreference,
+      member.secondPositionPreference,
+    ];
+    roles[rolePicker.position] = n.toUpperCase();
+
+    if (roles[0] == roles[1] && !allowDoubleRole)
+      [roles[0], roles[1]] = [
+        member.secondPositionPreference,
+        member.firstPositionPreference,
+      ];
+
+    setRoles(roles[0] as Role, roles[1] as Role);
+  };
+
   if (!summoner || !searchState) return <>loading</>;
 
   return (
@@ -175,29 +191,7 @@ export const LobbySummonerCard = ({
                     setRolePicker((c) => ({ ...c, visible: n }))
                   }
                   visible={rolePicker.visible}
-                  setRole={(r) => {
-                    console.log("setting", rolePicker, "to", r);
-                    let newLobby = structuredClone(lobby);
-                    newLobby.localMember.firstPositionPreference = "MIDDLE";
-
-                    let newFirst =
-                      rolePicker.position === 0
-                        ? r
-                        : member.firstPositionPreference;
-                    let newSecond =
-                      rolePicker.position === 1
-                        ? r
-                        : member.secondPositionPreference;
-                    if (
-                      newFirst.toUpperCase() === newSecond.toUpperCase() &&
-                      !allowDoubleRole
-                    ) {
-                      newFirst = member.secondPositionPreference;
-                      newSecond = member.firstPositionPreference;
-                    }
-
-                    setRoles(newFirst as Role, newSecond as Role);
-                  }}
+                  setRole={setRole}
                 />
               ) : (
                 <></>
