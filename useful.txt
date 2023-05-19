@@ -1,5 +1,13 @@
+riot client https://riotclient.kebs.dev
+
 enabledqueueids
 	/lol-platform-config/v1/namespaces/ClientSystemStates
+
+eog
+    /lol-end-of-game/v1/eog-stats-block
+    /lol-end-of-game/v1/champion-mastery-updates
+    players still in eog
+        /lol-lobby/v2/party/eog-status
 
 disabled champions
     /lol-platform-config/v1/namespaces/DisabledChampions
@@ -46,6 +54,13 @@ session expiration could be found in one of these
     /riotclient/ux-state/request
     /riotclient/pre-shutdown/begin
 
+currency
+    /lol-inventory/v1/wallet?currencyTypes=["RP", "lol_blue_essence"]
+
+invite to lobby
+    /lol-lobby/v2/lobby/members/{summonerId}/grant-invite
+    /lol-lobby/v2/lobby/invitations
+
 inventory types
     CHAMPION
     TFT_MAP_SKIN
@@ -88,7 +103,53 @@ when session expires this happens:
         "username": "jonsetzky1"
     }
 
+custom game (practice tool)
+    /lol-lobby/v2/lobby
+    {
+        "customGameLobby": {
+            "configuration": {
+                "gameMode": "PRACTICETOOL",
+                "gameTypeConfig": {
+                    "id": 1
+                },
+                "teamSize": 5,
+                "mapId": 11
+            },
+            "lobbyName": "hecasusser",
+            "teamOne": [
+                {
+                    "autoFillEligible": true,
+                    "autoFillProtectedForPromos": true,
+                    "autoFillProtectedForSoloing": true,
+                    "autoFillProtectedForStreaking": true,
+                    "botChampionId": 0,
+                    "botDifficulty": "NONE",
+                    "canInviteOthers": true,
+                    "excludedPositionPreference": "string",
+                    "id": 0,
+                    "isBot": false,
+                    "isOwner": true,
+                    "isSpectator": false,
+                    "showPositionExcluder": true,
+                    "summonerInternalName": "hecasus"
+                }
+            ]
+        },
+        "isCustom": true,
+        "queueId": 0
+    }
 
+riotclient api
+    this command
+        WMIC PROCESS WHERE name="LeagueClient.exe" GET commandline
+    then get these from the output. one line should be one client
+        --riotclient-auth-token=gydgMGCEGu63jH2FXNFWKQ --riotclient-app-port=60681
+
+support for multiple clients open at the same time
+    this command
+        WMIC PROCESS WHERE name="LeagueClientUx.exe" GET commandline
+    then get these from the output. one line should be one client
+        --remoting-auth-token=t5u_SRm4f7I23shUOL3SkQ --app-port=60820
 
 
 ----------- USED -----------

@@ -1,5 +1,5 @@
 import React from "react";
-import { Tooltip } from "./common/Tooltip";
+import { Tooltip } from "./Tooltip";
 
 export const RoleIcon = (
   props: {
@@ -14,7 +14,7 @@ export const RoleIcon = (
       <Tooltip anchorSelect="">position</Tooltip>
       <img
         {...p}
-        src={`./positions/position-${position.toLowerCase()}.svg`}
+        src={`/positions/position-${position.toLowerCase()}.svg`}
         style={{
           filter: `brightness(${invert ? "1" : "0"}) grayscale(100%)`,
           opacity: opacity,

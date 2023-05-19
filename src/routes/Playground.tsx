@@ -11,7 +11,7 @@ export const Playground = () => {
         (test ? "bg-black text-white" : "bg-gray-400 text-black")
       }
     >
-      <div className="grid h-full w-full text-center place-content-center overflow-hidden">
+      <div className="grid h-full w-full text-center place-content-center overflow-hidden place-items-center">
         playground
         <div
           id="test-context-item"
@@ -30,11 +30,11 @@ export const Playground = () => {
             setRegalia({
               preferredBannerType: "blank",
               preferredCrestType: "prestige",
-              selectedPrestigeCrest: 2,
+              selectedPrestigeCrest: 1,
             })
           }
         >
-          change banner
+          set default crest & banner
         </div>
       </div>
     </div>

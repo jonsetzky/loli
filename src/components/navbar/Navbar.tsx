@@ -49,7 +49,7 @@ export const Navbar = () => {
             to="/test"
           >
             <div className="flex flex-col justify-center h-full">
-              <p className=" shadow-white">Test</p>
+              <p className=" shadow-white">Play</p>
             </div>
           </Link>
           <Link
@@ -155,7 +155,13 @@ export const Navbar = () => {
                               .replace(/password/, "pwd")
                               .replace(/protocol/, "proto")}
                           </td>
-                          <td className="select-all" draggable="false">
+                          <td
+                            className="select-all"
+                            draggable="false"
+                            onClick={() =>
+                              navigator.clipboard.writeText(String(e[1]))
+                            }
+                          >
                             {String(e[1])}
                           </td>
                         </tr>

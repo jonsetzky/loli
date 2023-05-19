@@ -10,6 +10,7 @@ import { setRoles } from "@/api/lobbyRoles";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
+import { RoleIcon } from "../common/RoleIcon";
 
 interface ISummonerFriendInfo {
   accountId: number;
@@ -208,29 +209,23 @@ export const LobbySummonerCard = ({
               ) : (
                 <></>
               )}
-              <img
-                src={`./positions/position-${member.firstPositionPreference.toLowerCase()}.svg`}
-                className="h-6 primary-role"
-                style={{
-                  filter: "brightness(0)",
-                }}
+              <RoleIcon
+                position={member.firstPositionPreference.toLowerCase()}
+                className="h-6"
                 onClick={(e: any) => {
                   if (memberIsLocal)
                     setRolePicker((c) => ({ visible: true, position: 0 }));
                 }}
-              />{" "}
+              />
               {member.firstPositionPreference.toLowerCase() === "fill" ? (
                 <></>
               ) : (
                 <div className="grid h-6 w-6 place-content-center">
-                  <img
-                    src={`./positions/position-${member.secondPositionPreference.toLowerCase()}.svg`}
-                    className="h-4 place-self-center"
-                    style={{
-                      filter: "brightness(0)",
-                      opacity: "75%",
-                    }}
-                    onClick={() => {
+                  {" "}
+                  <RoleIcon
+                    position={member.secondPositionPreference.toLowerCase()}
+                    className="h-4"
+                    onClick={(e: any) => {
                       if (memberIsLocal)
                         setRolePicker((c) => ({ visible: true, position: 1 }));
                     }}
@@ -249,9 +244,10 @@ export const LobbySummonerCard = ({
             <img
               src={
                 summoner !== undefined
-                  ? `./ranked-emblem/emblem-${summoner?.lol.rankedLeagueTier.toLowerCase()}.png`
+                  ? `/ranked-emblem/emblem-${summoner?.lol.rankedLeagueTier.toLowerCase()}.png`
                   : ""
               }
+              spellCheck
               className="absolute object-scale-down h-full scale-[3.7]"
             />
           </div>

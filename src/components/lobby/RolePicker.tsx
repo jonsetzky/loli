@@ -1,5 +1,5 @@
 import { useClickOutsideListener } from "@/clickOutside";
-import { RoleIcon } from "../RoleIcon";
+import { RoleIcon } from "../common/RoleIcon";
 import { Tooltip } from "../common/Tooltip";
 import { useRef } from "react";
 
