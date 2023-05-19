@@ -7,7 +7,7 @@ disabled champions
 rank info
     /lol-ranked/v1/ranked-stats/7f80beaf-7d49-57cc-860c-8e0e5653311e
 
-champ select
+champ select?
     /lol-lobby-team-builder/v1/lobby
 
 interesting uris
@@ -40,10 +40,6 @@ uris not found in https://lcu.vivide.re
     /lol-client-config/v3/client-config/lol.client_settings.rewards
     /lol-marketing-preferences/v1/ready
 
-friend list updates
-    /lol-hovercard/v1/friend-info-by-summoner/31696127
-    /lol-hovercard/v1/friend-info/124dd9f6-1c8d-5f62-97fb-09f776c136c0
-    /lol-chat/v1/friends/124dd9f6-1c8d-5f62-97fb-09f776c136c0@eu1.pvp.net
 
 session expiration could be found in one of these
     /process-control/v1/process
@@ -91,3 +87,13 @@ when session expires this happens:
         "userAuthToken": "",
         "username": "jonsetzky1"
     }
+
+
+
+
+----------- USED -----------
+
+friend list updates
+    /lol-hovercard/v1/friend-info-by-summoner/31696127
+    /lol-hovercard/v1/friend-info/124dd9f6-1c8d-5f62-97fb-09f776c136c0
+    /lol-chat/v1/friends/124dd9f6-1c8d-5f62-97fb-09f776c136c0@eu1.pvp.net

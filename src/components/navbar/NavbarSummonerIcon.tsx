@@ -50,6 +50,7 @@ export const NavbarSummonerIcon = ({ summoner }: { summoner?: ISummoner }) => {
             {" "}
             {ownedIconIds.map((id) => (
               <AssetImage
+                className="w-24"
                 uri={`/profileicon/${id}.png`}
                 onClick={(e) => {
                   e.stopPropagation();

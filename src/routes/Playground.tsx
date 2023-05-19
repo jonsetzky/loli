@@ -1,3 +1,4 @@
+import { setRegalia } from "@/api/regalia";
 import { ContextMenu } from "@/components/context-menu/ContextMenu";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -21,6 +22,20 @@ export const Playground = () => {
           right click me
         </div>
         <ContextMenu targetId="test-context-item">sus</ContextMenu>
+        <div
+          id="test-context-item"
+          data-context-menu
+          className="btn whitespace-nowrap"
+          onClick={() =>
+            setRegalia({
+              preferredBannerType: "blank",
+              preferredCrestType: "prestige",
+              selectedPrestigeCrest: 2,
+            })
+          }
+        >
+          change banner
+        </div>
       </div>
     </div>
   );
