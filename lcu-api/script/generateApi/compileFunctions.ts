@@ -136,40 +136,46 @@ const createFunctionUrl = (url: string, args: IFunctionArgument[]) => {
   return u;
 };
 
-const createFunctionNode = (f: IFunction) => {
-  const p = parseUri(f.url, f.http_method);
-
-  ts.factory.createCallExpression(
-    createIdentifier("_request"),
+const createParameter = (
+  name: string,
+  optional: boolean,
+  type: IType | string
+) =>
+  ts.factory.createParameterDeclaration(
     undefined,
+    undefined,
+    createIdentifier(name, true),
+    optional ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
+    typeof type === "string"
+      ? ts.factory.createTypeReferenceNode(type)
+      : type.type.length > 0
+      ? createTypeNodeFromType(type)
+      : ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
     undefined
   );
+
+const createFunctionNode = (f: IFunction) => {
+  const p = parseUri(f.url, f.http_method);
 
   return ts.factory.createFunctionDeclaration(
     [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
     undefined,
     p.method,
     undefined,
-    f.arguments.map((a) =>
-      ts.factory.createParameterDeclaration(
-        undefined,
-        undefined,
-        convertToValidSymbolName(a.name),
-        a.optional
-          ? ts.factory.createToken(ts.SyntaxKind.QuestionToken)
-          : undefined,
-        a.type.type.length > 0
-          ? createTypeNodeFromType(a.type)
-          : ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-        undefined
-      )
-    ),
+    [
+      createParameter("connector", false, "LCUConnector"),
+      ...f.arguments.map((a) => createParameter(a.name, a.optional, a.type)),
+    ],
     f.returns.type.length > 0 ? createTypeNodeFromType(f.returns) : undefined,
+
     ts.factory.createBlock(
       [
         ts.factory.createReturnStatement(
           ts.factory.createCallExpression(
-            createIdentifier("_request"),
+            ts.factory.createPropertyAccessExpression(
+              createIdentifier("connector"),
+              "request"
+            ),
             undefined,
             [
               createIdentifier(
@@ -242,17 +248,19 @@ export const compileFunctions2 = () => {
     });
 
   let out = "";
-  out += compiler.compileNode(
-    createImportStatement(
-      _d.types.map((t: any) => t.name),
-      CONFIG2.typesImport,
-      true
-    )
-  );
+  out +=
+    compiler.compileNode(
+      createImportStatement(
+        _d.types.map((t: any) => t.name),
+        CONFIG2.typesImport,
+        true
+      )
+    ) + "\n";
 
-  out += compiler.compileNode(
-    createImportStatement(["_request"], "./" + CONFIG2.requestImport)
-  );
+  out +=
+    compiler.compileNode(
+      createImportStatement(["LCUConnector"], CONFIG2.connectorImport)
+    ) + "\n";
 
   Object.entries(namespaceHierarchy).forEach(([ns, data]) => {
     out +=
