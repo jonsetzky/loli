@@ -5,7 +5,9 @@
   "module": "./dist/mjs/index.js",
   "private": true,
   "scripts": {
-    "build": "npx tsx ./index.ts && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json"
+    "build": "npx tsx ./script/generateApi/index.ts && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "install": "npm run build",
+    "uninstall": ""
   },
   "dependencies": {
     "axios": "^1.4.0"

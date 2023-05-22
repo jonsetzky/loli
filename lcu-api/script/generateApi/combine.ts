@@ -1,5 +1,5 @@
 import { readFile, readFileSync, writeFileSync } from "fs";
-import { CONFIG } from "./config";
+import { CONFIG2 } from "./config";
 
 export interface IType {
   elementType: string;
@@ -100,10 +100,8 @@ export const combine = () => {
    * Function information is better in the console. Other fields in
    * console are not as great as they are in full help.
    */
-  const fullHelp = JSON.parse(readFileSync(CONFIG.helpFiles.full).toString());
-  const consoleHelp = JSON.parse(
-    readFileSync(CONFIG.helpFiles.console).toString()
-  );
+  const fullHelp = JSON.parse(readFileSync(CONFIG2.help.full).toString());
+  const consoleHelp = JSON.parse(readFileSync(CONFIG2.help.console).toString());
 
   const help: IHelp = {
     events: [],
@@ -159,9 +157,9 @@ export const combine = () => {
     });
   });
 
-  return writeFileSync(CONFIG.helpFiles.combined, JSON.stringify(help));
+  return writeFileSync(CONFIG2.help.combined, JSON.stringify(help));
 };
 
 export const getCombinedHelp = () => {
-  return JSON.parse(readFileSync(CONFIG.helpFiles.combined).toString());
+  return JSON.parse(readFileSync(CONFIG2.help.combined).toString());
 };

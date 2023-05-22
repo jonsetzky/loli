@@ -2,7 +2,8 @@ import { readFileSync, writeFileSync } from "fs";
 import * as ts from "typescript";
 import { prettier } from "./prettier";
 import { IField, IStructType } from "./combine";
-import { CONFIG, joinPath } from "./config";
+import { CONFIG2, joinPath } from "./config";
+import { Compiler } from "./compile";
 
 const primitiveTypes = [
   "int64",
@@ -100,7 +101,8 @@ const createUnionType = (t: IStructType) =>
     )
   );
 
-const createType = (t: IStructType): ts.NodeArray<ts.Node> => {
+const createType = (t: IStructType): ts.Node[] => {
+  // console.log("1");
   const comment =
     t.description === ""
       ? null
@@ -109,27 +111,22 @@ const createType = (t: IStructType): ts.NodeArray<ts.Node> => {
             ts.factory.createJSDocText(t.description),
           ])
         );
+  // console.log("2");
   const type = t.values.length > 0 ? createUnionType(t) : createInterface(t);
 
-  return ts.factory.createNodeArray(comment ? [comment, type] : [type]);
+  return comment ? [comment, type] : [type];
 };
 
 export const compileTypes = () => {
-  const file = ts.createSourceFile(
-    "source.ts",
-    "",
-    ts.ScriptTarget.ESNext,
-    false,
-    ts.ScriptKind.TS
-  );
-  const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+  const compiler = new Compiler();
 
   let out = "";
 
-  const data = JSON.parse(readFileSync(CONFIG.helpFiles.combined).toString());
-  data.types.forEach((t: IStructType) => {
-    out += printer.printList(ts.ListFormat.MultiLine, createType(t), file);
-  });
+  const data = JSON.parse(readFileSync(CONFIG2.help.combined).toString());
 
-  writeFileSync(joinPath(CONFIG.distPath, CONFIG.typesFile), prettier(out));
+  data.types
+    .map((t: IStructType) => createType(t))
+    .forEach((t) => (out += compiler.compileList(t)));
+
+  writeFileSync(CONFIG2.typesPath, prettier(out));
 };
