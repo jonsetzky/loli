@@ -1,9 +1,13 @@
+import { createCustomGame, startCustomGameChampSelect } from "@/api/customGame";
 import { setRegalia } from "@/api/regalia";
+import { matchSearch } from "@/api/searchMatch";
 import { ContextMenu } from "@/components/context-menu/ContextMenu";
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate, useNavigationType } from "react-router-dom";
 
 export const Playground = () => {
   const [test, setTest] = useState(false);
+  const navigate = useNavigate();
   return (
     <div
       className={
@@ -35,6 +39,18 @@ export const Playground = () => {
           }
         >
           set default crest & banner
+        </div>
+        <div
+          id="test-context-item"
+          data-context-menu
+          className="btn whitespace-nowrap"
+          onClick={async () => {
+            await createCustomGame();
+            await startCustomGameChampSelect();
+            navigate("/test");
+          }}
+        >
+          start practice tool
         </div>
       </div>
     </div>

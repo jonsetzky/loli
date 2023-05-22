@@ -34,3 +34,6 @@ yarn.lock
 
 # data dragon
 public/dragontail
+
+# lcu api schema
+script/schema

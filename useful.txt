@@ -1,5 +1,11 @@
 riot client https://riotclient.kebs.dev
 
+lol install path can be found here
+    C:\ProgramData\Riot Games\Metadata\league_of_legends.live
+    process.env.ProgramData
+    if (platform() === "darwin") programData = "/Users/Shared";
+
+
 enabledqueueids
 	/lol-platform-config/v1/namespaces/ClientSystemStates
 

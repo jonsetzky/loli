@@ -7,6 +7,8 @@ import { startClient, isClientAlive } from "./lcu/client";
 import Store from "electron-store";
 import { LCU, LCUStatus } from "./lcu";
 import { request, requestAsset } from "./lcu/request";
+import * as lcu from "loli-lcu-api";
+
 import {
   SettingsKeys,
   SettingsValueType,
@@ -41,6 +43,8 @@ if (!app.requestSingleInstanceLock()) {
   app.quit();
   process.exit(0);
 }
+
+console.log("SUSUSUSUSUsS", lcu.chat.getMe());
 
 // Remove electron security warnings
 // This warning only shows in development mode

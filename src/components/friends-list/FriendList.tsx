@@ -93,11 +93,11 @@ export const FriendList = ({
   const toggleDrawer = () => setVisible(!visible);
   return (
     <>
-      <div className="absolute">
+      <div className="absolute w-0 h-0">
         <div
           className="relative flex flex-row transition-all w-72 h-[37rem] z-30 mt-4"
           style={{
-            right: visible ? "0%" : "100%",
+            right: visible ? "0rem" : "18rem",
           }}
         >
           <div

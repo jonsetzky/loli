@@ -1,0 +1,44 @@
+const lcuMethod = ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"] as const;
+type LCUMethod = (typeof lcuMethod)[number];
+
+type Endpoint = {
+  [key in LCUMethod]?: [Array<any>, any];
+};
+
+type EndpointTypes<T extends Endpoint> = T;
+
+type _LCUEndpoint<
+  E extends keyof LCUEndpoints,
+  M extends keyof LCUEndpoints[E]
+> = LCUEndpoints[E][M];
+
+type _First<T extends [any, any]> = T[0];
+type _Second<T extends [any, any]> = T[1];
+export type LCUEndpointArgs<
+  E extends keyof LCUEndpoints,
+  M extends keyof LCUEndpoints[E]
+> = _First<_LCUEndpoint<E, M>> extends any[]
+  ? _First<_LCUEndpoint<E, M>>
+  : never;
+export type LCUEndpointReturn<
+  E extends keyof LCUEndpoints,
+  M extends keyof LCUEndpoints[E]
+> = _Second<_LCUEndpoint<E, M>>;
+
+export type LCUEndpointUrl = keyof LCUEndpoints;
+export type LCUEndpointMethods<U extends LCUEndpointUrl> =
+  keyof LCUEndpoints[U];
+
+// export type LCUEndpoints = {
+//   "/lol-chat/v1/blocked-players/{id}": {
+//     DELETE: [[id: string], object];
+//     GET: [[id: string], LolChatBlockedPlayerResource];
+//   };
+
+//   const get = <E extends LCUEndpointUrl, M extends LCUEndpointMethods<E>>(
+//   url: E,
+//   method: M,
+//   ...args: LCUEndpointArgs<E, M>
+// ): LCUEndpointReturn<E, M> => {
+//   return {} as any;
+// };
