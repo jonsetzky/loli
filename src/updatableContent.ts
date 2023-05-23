@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { LCUConnector } from "./lcuConnector";
+import * as lcu from "loli-lcu-api";
 
 interface UpdatableContentOptions<T> {
   /**
@@ -51,4 +53,41 @@ export const useUpdatableContent = <T>(
   }, []);
 
   return content;
+};
+
+export const useLCUWatch = (<T>(
+  getResult: (conn: LCUConnector) => lcu.LCUResult<T>,
+  onChange?: (value: T) => void
+): (T | null) | void => {
+  const [value, setValue] = useState<T | null>(null);
+
+  useEffect(() => {
+    const conn = new LCUConnector();
+    const result = getResult(conn);
+    if (result.hasError()) return console.error(result.error);
+
+    const dest = result.watch((v) => {
+      if (onChange) return onChange(v);
+      setValue(v);
+    });
+
+    return dest;
+  }, []);
+
+  if (!onChange) return value;
+}) as (<T>(getResult: (conn: LCUConnector) => lcu.LCUResult<T>) => T | null) &
+  (<T>(
+    getResult: (conn: LCUConnector) => lcu.LCUResult<T>,
+    onChange: (value: T) => void
+  ) => void);
+
+export const fetchLCU = <T>(
+  getResult: (conn: LCUConnector) => lcu.LCUResult<T>,
+  onValue?: (value: T) => void
+) => {
+  const conn = new LCUConnector();
+  const result = getResult(conn);
+
+  if (result.hasError()) return console.error(result.error);
+  result.get().then((v) => (onValue ? onValue(v) : undefined));
 };

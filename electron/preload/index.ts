@@ -155,6 +155,33 @@ const electronHandler = {
   ): Destructor => {
     return createIpcListener(`settingChange:${key}`, callback);
   },
+
+  lcuRequest: (
+    url: string,
+    method: string,
+    args?:
+      | {
+          [key: string]: any;
+        }
+      | undefined
+  ): Promise<any> => ipcRenderer.invoke("lcuRequest", url, method, args),
+  lcuWatch: (
+    callback: (v: any) => void,
+    url: string,
+    method: string,
+    args?:
+      | {
+          [key: string]: any;
+        }
+      | undefined
+  ): Destructor => {
+    const dest = createIpcListener(`lcuWatchEvent:${url}`, callback);
+    const cbId = ipcRenderer.invoke("startLcuWatch", url);
+    return () => {
+      dest();
+      ipcRenderer.invoke("stopLcuWatch", cbId);
+    };
+  },
 };
 
 contextBridge.exposeInMainWorld("electron", electronHandler);

@@ -16,6 +16,7 @@ import {
   onSettingChange,
   setSetting,
 } from "./settings";
+import { LCUConnector } from "./lcu/v2/connector";
 
 // The built directory structure
 //
@@ -44,7 +45,16 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0);
 }
 
-console.log("SUSUSUSUSUsS", lcu.chat.getMe());
+// (async () => {
+//   const c = new LCUConnector();
+//   c.connect();
+
+//   c.on("connect", async () => {
+//     const resp = lcu.summoner.current_summoner.getSummonerProfile(c as any);
+//     if (!resp.hasError())
+//       resp.watch((p) => lcu.lobby.lobby_matchmaking.postSearch(c as any))();
+//   });
+// })();
 
 // Remove electron security warnings
 // This warning only shows in development mode
@@ -226,6 +236,47 @@ ipcMain.handle(
     return getSetting(key) as R;
   }
 );
+
+const conn = new LCUConnector();
+let watchers: ((...args: any[]) => any)[] = [];
+
+conn.on("connect", () => {
+  ipcMain.handle(
+    "lcuRequest",
+    async (
+      _event,
+      url: string,
+      method: string,
+      args?:
+        | {
+            [key: string]: any;
+          }
+        | undefined
+    ) => {
+      const resp = conn.request(url, method, args);
+      if (resp.hasError()) return { error: resp.error };
+      const v = await resp.get();
+      return v;
+    }
+  );
+
+  ipcMain.handle("startLcuWatch", (_event, url: string) => {
+    const cb = (uri: string, ...args: any[]) => {
+      if (uri === url) {
+        win?.webContents.send(`lcuWatchEvent:${url}`, args);
+      }
+    };
+    conn.on("uriupdate", cb);
+    return watchers.push(cb) - 1;
+  });
+
+  ipcMain.handle("stopLcuWatch", (_event, id: number) => {
+    const cb = watchers[id];
+    watchers = watchers.filter((c) => c !== cb);
+    conn.off("uriupdate", cb);
+  });
+});
+conn.connect();
 
 // setInterval(() => {
 //   win?.webContents.send(

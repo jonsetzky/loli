@@ -4,10 +4,18 @@ import { matchSearch } from "@/api/searchMatch";
 import { ContextMenu } from "@/components/context-menu/ContextMenu";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useNavigationType } from "react-router-dom";
+import * as lcu from "loli-lcu-api";
+
+const test = () => {};
+/**
+ *
+ * @returns Connector that only supports requests
+ */
 
 export const Playground = () => {
   const [test, setTest] = useState(false);
   const navigate = useNavigate();
+
   return (
     <div
       className={

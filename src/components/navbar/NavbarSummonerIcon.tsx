@@ -3,40 +3,26 @@ import { AssetImage } from "../common/AssetImage";
 import { ISummoner } from "electron/main/lcu/summoner";
 import { Tooltip } from "../common/Tooltip";
 import { FullscreenElement } from "../common/FullscreenElement";
-import { useUpdatableContent } from "@/updatableContent";
+import { fetchLCU, useLCUWatch, useUpdatableContent } from "@/updatableContent";
 import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
-
-export interface IIcon {
-  expirationDate: string;
-  f2p: boolean;
-  inventoryType: string;
-  itemId: number;
-  loyalty: boolean;
-  loyaltySources: any[];
-  owned: boolean;
-  ownershipType: string;
-  payload: any;
-  purchaseDate: string;
-  quantity: number;
-  rental: boolean;
-  uuid: string;
-  wins: number;
-}
+import * as lcu from "loli-lcu-api";
 
 const setSummonerIcon = (id: number) => {
-  window.electron.getLcuUri("/lol-summoner/v1/current-summoner/icon", "put", {
-    profileIconId: id,
-  });
+  fetchLCU((conn) =>
+    lcu.summoner.current_summoner.putIcon(conn, {
+      profileIconId: id,
+      inventoryToken: "",
+    })
+  );
 };
 
 export const NavbarSummonerIcon = ({ summoner }: { summoner?: ISummoner }) => {
-  const [iconEditorOpen, setIconEditorOpen] = useState(false);
-
-  const ownedIcons = useUpdatableContent<IIcon[]>(
-    "/lol-inventory/v2/inventory/SUMMONER_ICON"
+  const ownedIcons = useLCUWatch((conn) =>
+    lcu.inventory.getInventory(conn, "SUMMONER_ICON")
   );
+  const [iconEditorOpen, setIconEditorOpen] = useState(false);
   const ownedIconIds = ownedIcons?.map((i) => i.itemId);
 
   const iconEditor =

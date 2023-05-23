@@ -8,7 +8,11 @@ export const compileIndex = () => {
 
   let out = "";
 
-  [CONFIG2.functionsImport, CONFIG2.typesImport].forEach(
+  [
+    CONFIG2.functionsImport,
+    CONFIG2.typesImport,
+    CONFIG2.connectorImport,
+  ].forEach(
     (i) =>
       (out +=
         compiler.compileNode(
@@ -21,5 +25,6 @@ export const compileIndex = () => {
           )
         ) + "\n")
   );
+
   writeFileSync(CONFIG2.indexPath, out);
 };

@@ -8,7 +8,7 @@ const functionsFile = "functions.ts";
 const typesFile = "types.ts";
 const requestFile = "request.ts";
 const indexFile = "index.ts";
-const connectorFile = "connector.ts";
+const connectorFile = "connector.types.ts";
 
 const pathFilename = (str: string) => {
   return str?.split("\\")?.pop()?.split("/").pop() ?? "";

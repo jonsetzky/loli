@@ -37,6 +37,7 @@
     "react-tooltip": "^5.11.2",
     "sanitize.css": "^13.0.0",
     "sort-by": "^1.2.0",
+    "wmic": "^1.1.1",
     "ws": "^8.13.0"
   },
   "devDependencies": {

@@ -186,20 +186,18 @@ const createFunctionNode = (f: IFunction) => {
                 "`" + createFunctionUrl(f.url, f.arguments) + "`"
               ),
               ts.factory.createStringLiteral(f.http_method.toUpperCase()),
-              f.arguments.length === 1 && f.arguments[0].name === "body"
-                ? createIdentifier(f.arguments[0].name)
-                : ts.factory.createObjectLiteralExpression(
-                    f.arguments
-                      .filter((a) => !p.positionalArgs.includes(a.name))
-                      .map((a) =>
-                        convertToValidSymbolName(a.name) === a.name
-                          ? (createIdentifier(a.name) as any)
-                          : ts.factory.createPropertyAssignment(
-                              ts.factory.createStringLiteral(a.name),
-                              createIdentifier(a.name, true)
-                            )
-                      )
-                  ),
+              ts.factory.createObjectLiteralExpression(
+                f.arguments
+                  .filter((a) => !p.positionalArgs.includes(a.name))
+                  .map((a) =>
+                    convertToValidSymbolName(a.name) === a.name
+                      ? (createIdentifier(a.name) as any)
+                      : ts.factory.createPropertyAssignment(
+                          ts.factory.createStringLiteral(a.name),
+                          createIdentifier(a.name, true)
+                        )
+                  )
+              ),
             ]
           )
         ),
@@ -267,7 +265,7 @@ export const compileFunctions2 = () => {
     compiler.compileNode(
       createImportStatement(
         ["ILCUConnector", "LCUResult"],
-        CONFIG2.connectorImport,
+        CONFIG2.connectorImport + ".types",
         true
       )
     ) + "\n";
