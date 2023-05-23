@@ -1,29 +1,27 @@
 export type LCUConnectorRequestError = {
-  reason: "clientoffline";
+  reason: "clientoffline" | "httperror";
+  error: any;
 };
 
-export interface LCUErrorResult {
-  error: LCUConnectorRequestError;
-  hasError: () => this is LCUErrorResult;
-}
-export interface LCUSuccessResult<T> {
+export interface ILCUResult<T> {
   /**
-   * @returns Data from the request
+   * Rejects into LCUConnectorRequestError
+   * @returns
    */
   get: () => Promise<T>;
-  /**
-   * Sets a callback for the URI of the request. Called when the
-   * url receives an update. Callback is immediately called for data
-   * received from initial request.
-   * @returns Destructor to unwatch
-   */
-  watch: (callback: (value: T) => void) => Destructor;
-
-  hasError: () => this is LCUErrorResult;
+  watch: (
+    onUpdate: (
+      /**
+       * Rejects into LCUConnectorRequestError
+       * @returns
+       */
+      value: Promise<T>
+    ) => void
+  ) => Destructor;
 }
+
 type Destructor = () => void;
-export type LCUResult<T> = LCUSuccessResult<T> | LCUErrorResult;
 
 export interface ILCUConnector {
-  request: <T>(url: string, method: string, args?: any) => LCUResult<T>;
+  request: <T>(url: string, method: string, args?: any) => ILCUResult<T>;
 }

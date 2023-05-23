@@ -167,7 +167,7 @@ const createFunctionNode = (f: IFunction) => {
       ...f.arguments.map((a) => createParameter(a.name, a.optional, a.type)),
     ],
     f.returns.type.length > 0
-      ? ts.factory.createTypeReferenceNode("LCUResult", [
+      ? ts.factory.createTypeReferenceNode("ILCUResult", [
           createTypeNodeFromType(f.returns),
         ])
       : undefined,
@@ -266,7 +266,7 @@ export const compileFunctions2 = () => {
   out +=
     compiler.compileNode(
       createImportStatement(
-        ["ILCUConnector", "LCUResult"],
+        ["ILCUConnector", "ILCUResult"],
         CONFIG2.connectorImport,
         true
       )

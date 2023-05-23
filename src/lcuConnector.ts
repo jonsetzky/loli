@@ -5,25 +5,15 @@ export class LCUConnector implements lcu.ILCUConnector {
     url: string,
     method: string,
     args?: { [key: string]: any } | undefined
-  ): lcu.LCUResult<T> {
-    const response = window.electron.lcuRequest(url, method, args).then((r) => {
-      Object.keys(r).includes("error");
-      if (Object.keys(r).includes("error")) {
-        const out = { error: r.error, hasError: () => "error" in out };
-        return out;
-      }
-      return r;
-    });
-    console.log(response);
+  ): lcu.ILCUResult<T> {
+    const response = window.electron.lcuRequest(url, method, args);
 
-    const out: lcu.LCUResult<any> = {
+    const out: lcu.ILCUResult<T> = {
       get: () => response,
-      watch: (callback: (value: any) => void) => {
-        const dest = window.electron.lcuWatch(callback, url, method, args);
-        response.then((r) => callback(r));
-        return dest;
+      watch: (callback) => {
+        callback(response);
+        return window.electron.lcuWatch(callback, url, method, args);
       },
-      hasError: () => "error" in out,
     };
     return out;
   }

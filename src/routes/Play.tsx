@@ -2,9 +2,10 @@ import { setLobbyQueueId } from "@/api/lobbyQueueId";
 import { ErrorPage } from "@/components/ErrorPage";
 import { GameModePicker } from "@/components/game-mode-picker/GameModePicker";
 import { Lobby } from "@/components/lobby/Lobby";
-import { useUpdatableContent } from "@/updatableContent";
 import { useEffect, useState } from "react";
 import { Outlet, Route, useNavigate } from "react-router-dom";
+import * as lcu from "loli-lcu-api";
+import { fetchLCU, useLCUWatch, useLCUWatch2 } from "@/updatableContent";
 
 enum MapAssetNames {
   CHAMP_SELECT_BACKGROUND_SOUND = "champ-select-background-sound",
@@ -54,142 +55,38 @@ interface ITeamParticipant {
   teamParticipantId: number;
 }
 
-interface IGameFlow {
-  gameClient: {
-    observerServerIp: string;
-    observerServerPort: number;
-    running: boolean;
-    serverIp: string;
-    serverPort: number;
-    visible: boolean;
-  };
-  gameData: {
-    gameId: number;
-    gameName: string;
-    isCustomGame: boolean;
-    password: string;
-    playerChampionSelections: {
-      championId: number;
-      selectedSkinIndex: number;
-      spell1Id: number;
-      spell2Id: number;
-      summonerInternalName: string;
-    }[];
-    queue: {
-      allowablePremadeSizes: number[];
-      areFreeChampionsAllowed: boolean;
-      assetMutator: string;
-      category: "PvP" | "Custom" | string;
-      championsRequiredToPlay: number;
-      description: string;
-      detailedDescription: string;
-      gameMode: string;
-      gameTypeConfig: {
-        advancedLearningQuests: boolean;
-        allowTrades: boolean;
-        banMode: string;
-        banTimerDuration: number;
-        battleBoost: boolean;
-        crossTeamChampionPool: boolean;
-        deathMatch: boolean;
-        doNotRemove: boolean;
-        duplicatePick: boolean;
-        exclusivePick: boolean;
-        id: number;
-        learningQuests: boolean;
-        mainPickTimerDuration: number;
-        maxAllowableBans: number;
-        name: string;
-        onboardCoopBeginner: boolean;
-        pickMode: string;
-        postPickTimerDuration: number;
-        reroll: number;
-        teamChampionPool: number;
-      };
-      id: number;
-      isRanked: boolean;
-      isTeamBuilderManaged: boolean;
-      lastToggledOffTime: number;
-      lastToggledOnTime: number;
-      mapId: number;
-      maximumParticipantListSize: number;
-      minLevel: number;
-      minimumParticipantListSize: number;
-      name: string;
-      numPlayersPerTeam: number;
-      queueAvailability: "Available" | string;
-      queueRewards: {
-        isChampionPointsEnabled: boolean;
-        isIpEnabled: boolean;
-        isXpEnabled: boolean;
-        partySizeIpRewards: any[];
-      };
-      removalFromGameAllowed: boolean;
-      removalFromGameDelayMinutes: number;
-      shortName: string;
-      showPositionSelector: boolean;
-      spectatorEnabled: boolean;
-      type: string;
-    };
-    spectatorsAllowed: boolean;
-    teamOne: ITeamParticipant[];
-    teamTwo: ITeamParticipant[];
-  };
-  gameDodge: {
-    dodgeIds: any[];
-    phase: "None" | string;
-    state: "Invalid" | string;
-  };
-  map: {
-    assets: {
-      [key in MapAssetNames]: string;
-    };
-    categorizedContentBundles: any;
-    description: string;
-    gameMode: string;
-    gameModeName: string;
-    gameModeShortName: string;
-    gameMutator: string;
-    id: number;
-    isRGM: boolean;
-    mapStringId: string;
-    name: string;
-    perPositionDisallowedSummonerSpells: any;
-    perPositionRequiredSummonerSpells: any;
-    platformId: string;
-    platformName: string;
-    properties: {
-      suppressRunesMasteriesPerks: boolean;
-    };
-  };
-  phase:
-    | "Lobby"
-    | "Matchmaking"
-    | "ReadyCheck"
-    | "ChampSelect"
-    | "GameStart"
-    | "InProgress"
-    | "WaitingForStats"
-    | "PreEndOfGame"
-    | "EndOfGame";
-  // this is missing the eog phase
-}
-
 export const Play = () => {
-  const gfStatus = useUpdatableContent<IGameFlow>("/lol-gameflow/v1/session");
+  // const [gfStatus] = useLCUWatch((c) => lcu.gameflow.getSession(c));
+  const gfStatus = useLCUWatch2(fetchLCU(lcu.gameflow.getSession));
+  // const gfAvailability = useLCUWatch((c) => lcu.gameflow.getAvailability(c));
+  // const gfStatus = useLCUWatch((c) => lcu.gameflow.getSession(c));
+
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!gfStatus) return navigate("lobby");
     navigate(
-      gfStatus?.phase !== undefined
-        ? gfStatus.phase
-            .toLowerCase()
-            .replace(/matchmaking|readycheck|gamestart|none/, "lobby")
-            .replace(/waitingforstats/, "preendofgame")
-        : "lobby" // lobby handles having no lobby
+      gfStatus.phase
+        .toLowerCase()
+        .replace(/matchmaking|readycheck|gamestart|none/, "lobby")
+        .replace(/waitingforstats/, "preendofgame")
     );
-    console.log(gfStatus?.phase, gfStatus);
-  }, [gfStatus]);
+  }, []);
+
+  // useEffect(() => {
+  //   console.log(gfAvailability);
+  //   const gfStatus = useLCUWatch((c) => lcu.gameflow.getSession(c));
+  //   if (!gfStatus) return;
+  //   navigate(
+  //     gfStatus.phase !== undefined
+  //       ? gfStatus.phase
+  //           .toLowerCase()
+  //           .replace(/matchmaking|readycheck|gamestart|none/, "lobby")
+  //           .replace(/waitingforstats/, "preendofgame")
+  //       : "lobby" // lobby handles having no lobby
+  //   );
+  //   console.log(gfStatus.phase, gfStatus);
+  // }, [gfAvailability]);
 
   return <Outlet />;
 };

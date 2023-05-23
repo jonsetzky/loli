@@ -9,9 +9,9 @@ import WebSocket from "ws";
 import {
   LCUConnectorRequestError,
   ILCUConnector,
-  LCUSuccessResult,
-  LCUResult,
+  ILCUResult,
 } from "loli-lcu-api/src/connector.types";
+import * as lcu from "loli-lcu-api";
 
 export type LCUConnectorEvent = keyof LCUConnectorEventCallbacks;
 export type LCUConnectorCallback<E extends LCUConnectorEvent> =
@@ -22,7 +22,7 @@ export type LCUConnectorEventCallbacks = {
   disconnect: () => void;
   lcuoffline: () => void;
   lcuonline: () => void;
-  uriupdate: (uri: string, ...args: any[]) => void;
+  uriupdate: (...args: any[]) => void;
 };
 
 export type Connection = {
@@ -79,6 +79,34 @@ const readLockfile = async (): Promise<Connection> => {
   };
 };
 
+type Destructor = () => void;
+type CreateListenerFunc<T> = (callback: (v: Promise<T>) => void) => Destructor;
+
+class LCUResult<T> implements ILCUResult<T> {
+  get: () => Promise<T>;
+  watch: (onUpdate: (value: Promise<T>) => void) => () => void;
+  constructor(
+    cl: CreateListenerFunc<T>,
+    resultPromise: Promise<T>,
+    url: string
+  ) {
+    this.get = () => resultPromise.then((v) => v);
+    this.watch = (onUpdate) => {
+      onUpdate(resultPromise.then((v) => v));
+      const destructor = cl(onUpdate);
+      return destructor;
+    };
+  }
+
+  static error = (
+    cl: CreateListenerFunc<any>,
+    reason: LCUConnectorRequestError["reason"],
+    url: string
+  ) => {
+    return new LCUResult(cl, Promise.reject({ reason }), url);
+  };
+}
+
 export class LCUConnector implements ILCUConnector {
   private eventEmitter: EventEmitter = new EventEmitter();
 
@@ -96,22 +124,33 @@ export class LCUConnector implements ILCUConnector {
   private tryConnecting? = false;
   private connection?: Connection;
 
-  private emit = <E extends LCUConnectorEvent>(
+  private emit = <E extends LCUConnectorEvent | `uriupdate:${string}`>(
     name: E,
-    ...args: Parameters<LCUConnectorCallback<E>>
-  ) => this.eventEmitter.emit(name, ...args);
+    ...args: E extends `uriupdate:${string}`
+      ? Parameters<LCUConnectorCallback<"uriupdate">>
+      : E extends LCUConnectorEvent
+      ? Parameters<LCUConnectorCallback<E>>
+      : never
+  ) => {
+    // console.log("emitting", name);
+    this.eventEmitter.emit(name, ...args);
+  };
 
   request = <T>(
     url: string,
     method: string,
     args?: { [key: string]: any }
-  ): LCUResult<T> => {
+  ): ILCUResult<T> => {
+    const createListener = (cb: (v: Promise<T>) => void): Destructor => {
+      const c = (uri: string, args: Promise<T>) =>
+        uri === url ? cb(args) : undefined;
+
+      this.on(`uriupdate:${url}`, c);
+      return () => this.off(`uriupdate:${url}`, c);
+    };
+
     if (!this.connection) {
-      const out = {
-        error: { reason: "clientoffline" },
-        hasError: () => "error" in out,
-      } as const;
-      return out;
+      return LCUResult.error(createListener, "clientoffline", url);
     }
 
     const config: AxiosRequestConfig<any> = {
@@ -129,37 +168,66 @@ export class LCUConnector implements ILCUConnector {
       },
       data: args,
     };
-    const request = axios.request<T>(config);
 
-    return {
-      get: async () => (await request).data,
-      watch: (callback) => {
-        const cb = (u: string, v: T) => {
-          if (u === url) callback(v);
-        };
-        request.then((r) => callback(r.data));
-        this.on("uriupdate", cb);
-        return () => this.off("uriupdate", cb);
-      },
-      hasError: () => "error" in this,
-    };
+    const value = axios
+      .request<T>(config)
+      .then((v) => v.data)
+      .catch((error) =>
+        Promise.reject({
+          reason: "httperror",
+          error: {
+            url: error.request.path,
+            data: error.data,
+            status: error.status,
+            message: error.message,
+            response: {
+              status: error.response.status,
+              statusText: error.response.statusText,
+              data: error.response.data,
+            },
+          },
+        })
+      );
+
+    return new LCUResult(createListener, value, url);
   };
 
-  on = <E extends LCUConnectorEvent>(
+  on = <E extends LCUConnectorEvent | `uriupdate:${string}`>(
     event: E,
     callback: (
-      ...p: Parameters<LCUConnectorCallback<E>>
-    ) => ReturnType<LCUConnectorCallback<E>>
+      ...args: E extends `uriupdate:${string}`
+        ? Parameters<LCUConnectorCallback<"uriupdate">>
+        : E extends LCUConnectorEvent
+        ? Parameters<LCUConnectorCallback<E>>
+        : never
+    ) => ReturnType<
+      E extends `uriupdate:${string}`
+        ? LCUConnectorCallback<"uriupdate">
+        : E extends LCUConnectorEvent
+        ? LCUConnectorCallback<E>
+        : never
+    >
   ): LCUConnector => {
+    console.log("listening", event);
     this.eventEmitter.on(event, callback as any);
     return this;
   };
 
-  off = <E extends LCUConnectorEvent>(
+  off = <E extends LCUConnectorEvent | `uriupdate:${string}`>(
     event: E,
     callback: (
-      ...p: Parameters<LCUConnectorCallback<E>>
-    ) => ReturnType<LCUConnectorCallback<E>>
+      ...args: E extends `uriupdate:${string}`
+        ? Parameters<LCUConnectorCallback<"uriupdate">>
+        : E extends LCUConnectorEvent
+        ? Parameters<LCUConnectorCallback<E>>
+        : never
+    ) => ReturnType<
+      E extends `uriupdate:${string}`
+        ? LCUConnectorCallback<"uriupdate">
+        : E extends LCUConnectorEvent
+        ? LCUConnectorCallback<E>
+        : never
+    >
   ): LCUConnector => {
     this.eventEmitter.off(event, callback as any);
     return this;
@@ -232,7 +300,7 @@ export class LCUConnector implements ILCUConnector {
           packet.toString() ?? ""
         );
 
-        c.emit("uriupdate", data.uri, data.data);
+        c.emit(`uriupdate:${data.uri}`, data.data);
       });
 
       while (this.connection) {

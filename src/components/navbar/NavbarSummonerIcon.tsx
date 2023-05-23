@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AssetImage } from "../common/AssetImage";
 import { ISummoner } from "electron/main/lcu/summoner";
 import { Tooltip } from "../common/Tooltip";
 import { FullscreenElement } from "../common/FullscreenElement";
-import { fetchLCU, useLCUWatch, useUpdatableContent } from "@/updatableContent";
+import { fetchLCU, useLCUWatch, useLCUWatch2 } from "@/updatableContent";
 import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
@@ -18,10 +18,20 @@ const setSummonerIcon = (id: number) => {
   );
 };
 
-export const NavbarSummonerIcon = ({ summoner }: { summoner?: ISummoner }) => {
-  const ownedIcons = useLCUWatch((conn) =>
-    lcu.inventory.getInventory(conn, "SUMMONER_ICON")
+export const NavbarSummonerIcon = ({
+  summoner,
+}: {
+  summoner: lcu.LolSummonerSummoner | null;
+}) => {
+  const ownedIcons = useLCUWatch2(
+    fetchLCU(lcu.inventory.getInventory, "SUMMONER_ICON"),
+    (err) => console.error(err)
   );
+
+  useEffect(() => {
+    console.log("icons changed", summoner);
+  }, [summoner]);
+
   const [iconEditorOpen, setIconEditorOpen] = useState(false);
   const ownedIconIds = ownedIcons?.map((i) => i.itemId);
 

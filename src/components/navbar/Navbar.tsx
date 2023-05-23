@@ -10,16 +10,18 @@ import { AssetImage } from "../common/AssetImage";
 import { useSetting } from "../../setting";
 import { Settings } from "../../routes/Settings";
 import { NavbarSummonerIcon } from "./NavbarSummonerIcon";
-import { useUpdatableContent } from "../../updatableContent";
+import { fetchLCU, useLCUWatch, useLCUWatch2 } from "@/updatableContent";
 // import { Tooltip } from "react-tooltip";
+
+import * as lcu from "loli-lcu-api";
 
 export const Navbar = () => {
   const [testVisible, setTestVisible] = useSetting("testSetting");
   const [settingsVisible, setSettingsVisible] = useState(false);
 
-  const summoner = useUpdatableContent<ISummoner>(
-    "/lol-summoner/v1/current-summoner"
-  );
+  const summoner = useLCUWatch2(fetchLCU(lcu.summoner.getCurrentSummoner));
+
+  // const summoner = useLCUWatch((conn) => lcu.summoner.getCurrentSummoner(conn));
 
   const [lockfile, setLockfile] = useState<Lockfile>();
 

@@ -55,39 +55,53 @@ export const useUpdatableContent = <T>(
   return content;
 };
 
-export const useLCUWatch = (<T>(
-  getResult: (conn: LCUConnector) => lcu.LCUResult<T>,
-  onChange?: (value: T) => void
-): (T | null) | void => {
+export function fetchLCU<T, A extends any[]>(
+  lcuFn: (connector: lcu.ILCUConnector, ...args: A) => lcu.ILCUResult<T>,
+  ...args: A
+): lcu.ILCUResult<T> {
+  return lcuFn(new LCUConnector(), ...args);
+}
+
+export const useLCUWatch2 = <T, E>(
+  result: lcu.ILCUResult<T>,
+  onError?: (err: lcu.LCUConnectorRequestError) => E
+) => {
   const [value, setValue] = useState<T | null>(null);
+
+  useEffect(
+    () =>
+      result.watch((v) =>
+        v.then(setValue).catch((e) => {
+          if (onError) onError(e);
+          setValue(null);
+        })
+      ),
+    []
+  );
+  return value;
+};
+
+export const useLCUWatch = <T, E>(
+  getResult: (conn: LCUConnector) => lcu.ILCUResult<T>,
+  onError?: (err: lcu.LCUConnectorRequestError) => E
+): [T | null, E | null] => {
+  const [value, setValue] = useState<T | null>(null);
+  const [errValue, setErrValue] = useState<E | null>(null);
 
   useEffect(() => {
     const conn = new LCUConnector();
-    const result = getResult(conn);
-    if (result.hasError()) return console.error(result.error);
-
-    const dest = result.watch((v) => {
-      if (onChange) return onChange(v);
-      setValue(v);
+    const dest = getResult(conn).watch((v) => {
+      v.then((s) => {
+        setValue(s);
+        setErrValue(null);
+      }).catch((e) => {
+        setErrValue(onError ? onError(e) : null);
+        setValue(null);
+      });
     });
 
     return dest;
   }, []);
 
-  if (!onChange) return value;
-}) as (<T>(getResult: (conn: LCUConnector) => lcu.LCUResult<T>) => T | null) &
-  (<T>(
-    getResult: (conn: LCUConnector) => lcu.LCUResult<T>,
-    onChange: (value: T) => void
-  ) => void);
-
-export const fetchLCU = <T>(
-  getResult: (conn: LCUConnector) => lcu.LCUResult<T>,
-  onValue?: (value: T) => void
-) => {
-  const conn = new LCUConnector();
-  const result = getResult(conn);
-
-  if (result.hasError()) return console.error(result.error);
-  result.get().then((v) => (onValue ? onValue(v) : undefined));
+  return [value, errValue];
 };

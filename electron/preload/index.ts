@@ -164,7 +164,14 @@ const electronHandler = {
           [key: string]: any;
         }
       | undefined
-  ): Promise<any> => ipcRenderer.invoke("lcuRequest", url, method, args),
+  ): Promise<any> =>
+    ipcRenderer
+      .invoke("lcuRequest", url, method, args)
+      .then((v) =>
+        Object.keys(v).includes("lcuApiError")
+          ? Promise.reject(v.lcuApiError)
+          : v
+      ),
   lcuWatch: (
     callback: (v: any) => void,
     url: string,
@@ -175,7 +182,11 @@ const electronHandler = {
         }
       | undefined
   ): Destructor => {
-    const dest = createIpcListener(`lcuWatchEvent:${url}`, callback);
+    const dest = createIpcListener(`lcuWatchEvent:${url}`, (e, a) => {
+      return Object.keys(a).includes("lcuApiError")
+        ? callback(Promise.reject(a.lcuApiError))
+        : callback(Promise.resolve(a));
+    });
     const cbId = ipcRenderer.invoke("startLcuWatch", url);
     return () => {
       dest();
