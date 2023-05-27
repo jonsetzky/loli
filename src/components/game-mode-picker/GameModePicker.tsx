@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { FullscreenNotification } from "../FullscreenNotification";
-import { useLCUWatch2, useUpdatableContent } from "@/updatableContent";
+import { useLCUWatch2 } from "@/updatableContent";
 import { ErrorPage } from "../ErrorPage";
 import ReactDropdown from "react-dropdown";
 import { sortText } from "@/sortText";

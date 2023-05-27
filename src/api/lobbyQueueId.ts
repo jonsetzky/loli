@@ -1,3 +1,6 @@
+import { fetchLCU } from "@/updatableContent";
+import * as lcu from "loli-lcu-api";
+
 export const setLobbyQueueId = (id: number) => {
-  window.electron.getLcuUri("/lol-lobby/v2/lobby", "post", { queueId: id });
+  fetchLCU(lcu.lobby.postLobby, { queueId: id, isCustom: false });
 };

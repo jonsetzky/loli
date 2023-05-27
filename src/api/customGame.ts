@@ -1,15 +1,17 @@
+import { fetchLCU } from "@/updatableContent";
+import * as lcu from "loli-lcu-api";
+
 export const createCustomGame = async () => {
-  return await window.electron.getLcuUri("/lol-lobby/v2/lobby", "post", {
+  return await fetchLCU(lcu.lobby.postLobby, {
     customGameLobby: {
       configuration: {
         gameMode: "PRACTICETOOL",
         gameTypeConfig: {
           id: 1,
-          gameModeOverride: "CLASSIC",
-        },
+        } as any,
         teamSize: 5,
         mapId: 11,
-      },
+      } as any,
       lobbyName: "hecasusser",
       teamOne: [
         {
@@ -29,22 +31,16 @@ export const createCustomGame = async () => {
           summonerInternalName: "hecasus",
         },
       ],
-    },
+    } as any,
     isCustom: true,
     queueId: 0,
-  });
+  }).get();
 };
 
 export const startCustomGameChampSelect = async () => {
-  return await window.electron.getLcuUri(
-    "/lol-lobby/v1/lobby/custom/start-champ-select",
-    "post"
-  );
+  return await fetchLCU(lcu.lobby.lobby_custom.postStartChampSelect).get();
 };
 
 export const cancelCustomGameChampSelect = async () => {
-  return await window.electron.getLcuUri(
-    "/lol-lobby/v1/lobby/custom/cancel-champ-select",
-    "post"
-  );
+  return await fetchLCU(lcu.lobby.lobby_custom.postCancelChampSelect).get();
 };

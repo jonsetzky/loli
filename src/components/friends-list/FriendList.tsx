@@ -1,19 +1,9 @@
-import { useUpdatableContent } from "@/updatableContent";
+import { useLCUWatch, useLCUWatch2 } from "@/updatableContent";
 import React, { useEffect, useRef, useState } from "react";
-import { FriendCard, IFriend } from "./FriendCard";
+import { FriendCard } from "./FriendCard";
 import { Drawer } from "../common/Drawer";
 import { Tooltip } from "../common/Tooltip";
-
-interface IFriendCounts {
-  numFriends: number;
-  numFriendsAvailable: number;
-  numFriendsAway: number;
-  numFriendsInChampSelect: number;
-  numFriendsInGame: number;
-  numFriendsInQueue: number;
-  numFriendsMobile: number;
-  numFriendsOnline: number;
-}
+import * as lcu from "loli-lcu-api";
 
 const availabilities = [
   "offline",
@@ -41,7 +31,17 @@ export const FriendList = ({
   const [friendsList, setFriendsList] = useState<JSX.Element[]>();
   const avs = useRef(new Map<string, string>());
 
-  const friends = useUpdatableContent<IFriend[]>("/lol-chat/v1/friends");
+  const friends = useLCUWatch2(lcu.chat.getFriends, (err) =>
+    console.error("error getting friends", err)
+  );
+
+  /**
+   * Friend count is updated when a single friend is updated, use the friend
+   * count in friendcard elements to update them
+   */
+  const friendCounts = useLCUWatch2(lcu.chat.getFriendCounts, (err) =>
+    console.error("error getting friend counts", err)
+  );
 
   const getFriendCardAvNumber = (fc: JSX.Element) => {
     const num = availabilityToNumber(
@@ -73,22 +73,8 @@ export const FriendList = ({
     );
   };
 
-  /**
-   * Friend count is updated when a single friend is updated, use the friend
-   * count in friendcard elements to update them
-   */
-  const friendCounts = useUpdatableContent<IFriendCounts>(
-    "/lol-chat/v1/friend-counts",
-    { onUpdate: () => reorder() }
-  );
-
-  useEffect(() => {
-    createFriendsList();
-  }, [friends]);
-
-  useEffect(() => {
-    reorder();
-  }, [friendsList, friendCounts]);
+  useEffect(() => createFriendsList(), [friends]);
+  useEffect(() => reorder(), [friendsList, friendCounts]);
 
   const toggleDrawer = () => setVisible(!visible);
   return (

@@ -38,30 +38,9 @@ export const Navbar = () => {
       <div className="Navbar bg-black text-white flex flex-row z-40 h-24">
         <NavbarSummonerIcon summoner={summoner} />
         <div id="drag-region" className="flex flex-row grow">
-          <Link
-            className="shrink uppercase text-1xl font-light text-center hover:text-glow no-drag pr-4 pl-4"
-            to="/"
-          >
-            <div className="flex flex-col justify-center h-full">
-              <p className=" shadow-white">Home</p>
-            </div>
-          </Link>
-          <Link
-            className="shrink uppercase text-1xl font-light text-center hover:text-glow no-drag pr-4 pl-4"
-            to="/test"
-          >
-            <div className="flex flex-col justify-center h-full">
-              <p className=" shadow-white">Play</p>
-            </div>
-          </Link>
-          <Link
-            className="shrink uppercase text-1xl font-light text-center hover:text-glow no-drag pr-4 pl-4"
-            to="/playground"
-          >
-            <div className="flex flex-col justify-center h-full">
-              <p className=" shadow-white">Playground</p>
-            </div>
-          </Link>
+          <NavbarLink to="/">Home</NavbarLink>
+          <NavbarLink to="/test">Play</NavbarLink>
+          <NavbarLink to="/playground">Playground</NavbarLink>
           <NavbarLink to="/setups">Setups</NavbarLink>
           <button className="grid place-content-center h-full p-5">
             <div

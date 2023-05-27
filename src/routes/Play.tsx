@@ -80,7 +80,7 @@ export const Play = () => {
         .replace(/matchmaking|readycheck|gamestart|none/, "lobby")
         .replace(/waitingforstats/, "preendofgame")
     );
-  }, [match]);
+  }, [match, gfStatus]);
 
   // useEffect(() => {
   //   console.log(gfAvailability);
@@ -98,7 +98,7 @@ export const Play = () => {
   // }, [gfAvailability]);
 
   return (
-    <div className="h-full w-full bg-black">
+    <div className="h-full w-full bg-black text-white">
       <Outlet />
     </div>
   );

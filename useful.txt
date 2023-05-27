@@ -1,3 +1,13 @@
+per champion setups
+    - runes
+    - item sets
+    - spells
+    - wards/skins/emotes
+    - possibly binds (quick cast on/off for specific spells on specific champions)
+
+persistent settings across accounts
+    readonly files https://stackoverflow.com/questions/29130242/nodejs-fs-mode-manipulation-in-windows-read-only-attribute
+
 riot client https://riotclient.kebs.dev
 
 lol install path can be found here
@@ -15,14 +25,8 @@ eog
     players still in eog
         /lol-lobby/v2/party/eog-status
 
-disabled champions
-    /lol-platform-config/v1/namespaces/DisabledChampions
-
 rank info
     /lol-ranked/v1/ranked-stats/7f80beaf-7d49-57cc-860c-8e0e5653311e
-
-champ select?
-    /lol-lobby-team-builder/v1/lobby
 
 interesting uris
     /lol-lobby/v2/eligibility/initial-configuration-complete

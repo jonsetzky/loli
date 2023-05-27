@@ -96,26 +96,6 @@ const parseUri = (uri: string, http_method: string): TypeProps => {
   return out;
 };
 
-const parseNamespaces2 = (
-  uri: string,
-  http_method: string
-): { namespace?: string; subNamespace?: string; method: string } => {
-  //   console.log(uri);
-  const m = uri.match(/^(?:\/([^\/]+))?(?:\/v\d)?(?:\/(.+))?(?:\/([^\/]+))$/);
-  const namespace = m
-    ?.at(1)
-    ?.replace(/[^a-zA-Z0-9_$]/g, "_")
-    .replace("lol_", "");
-  const subNamespace = m?.at(2)?.replace(/[^a-zA-Z0-9_$]/g, "_");
-
-  let method = convertToValidSymbolName(m?.at(3) ?? "");
-  method =
-    http_method.toLowerCase() + method[0].toUpperCase() + method.substring(1);
-  if (method.length < 1) console.error("error parsing", uri);
-  //   console.log(uri);
-  return { namespace, subNamespace, method };
-};
-
 const createImportStatement = (
   imports: string[],
   file: string,
@@ -168,6 +148,9 @@ const createParameter = (
 
 const createFunctionNode = (f: IFunction) => {
   const p = parseUri(f.url, f.http_method);
+  const nonPosArgs = f.arguments.filter(
+    (a) => !p.positionalArgs.includes(a.name)
+  );
 
   return ts.factory.createFunctionDeclaration(
     [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
@@ -198,19 +181,17 @@ const createFunctionNode = (f: IFunction) => {
                 "`" + createFunctionUrl(f.url, f.arguments) + "`"
               ),
               ts.factory.createStringLiteral(f.http_method.toUpperCase()),
-              f.arguments.length === 1 && f.arguments[0].name === "body"
-                ? createIdentifier(f.arguments[0].name)
+              nonPosArgs.length === 1
+                ? createIdentifier(nonPosArgs[0].name, true)
                 : ts.factory.createObjectLiteralExpression(
-                    f.arguments
-                      .filter((a) => !p.positionalArgs.includes(a.name))
-                      .map((a) =>
-                        convertToValidSymbolName(a.name) === a.name
-                          ? (createIdentifier(a.name) as any)
-                          : ts.factory.createPropertyAssignment(
-                              ts.factory.createStringLiteral(a.name),
-                              createIdentifier(a.name, true)
-                            )
-                      )
+                    nonPosArgs.map((a) =>
+                      convertToValidSymbolName(a.name) === a.name
+                        ? (createIdentifier(a.name) as any)
+                        : ts.factory.createPropertyAssignment(
+                            ts.factory.createStringLiteral(a.name),
+                            createIdentifier(a.name, true)
+                          )
+                    )
                   ),
             ]
           )

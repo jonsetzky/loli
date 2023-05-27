@@ -1,10 +1,6 @@
 import React, { useEffect, useId, useState } from "react";
 import { AssetImage } from "../common/AssetImage";
-import {
-  fetchLCU,
-  useLCUWatch2,
-  useUpdatableContent,
-} from "@/updatableContent";
+import { fetchLCU, useLCUWatch2 } from "@/updatableContent";
 import { ISummoner } from "electron/main/lcu/summoner";
 import { Tooltip } from "../common/Tooltip";
 import { Role, RolePicker } from "./RolePicker";
@@ -34,8 +30,6 @@ export const LobbySummonerCard = ({
     visible: false,
     position: 0,
   });
-
-  const rpId = useId();
 
   if (member === null)
     return <div className={"flex flex-col basis-1/5 bg-neutral-900 "}></div>;

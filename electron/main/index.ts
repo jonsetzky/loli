@@ -17,6 +17,7 @@ import {
   setSetting,
 } from "./settings";
 import { LCUConnector } from "./lcu/v2/connector";
+import { writeFileSync } from "original-fs";
 
 // The built directory structure
 //

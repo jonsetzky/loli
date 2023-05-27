@@ -1,158 +1,89 @@
-import { useUpdatableContent } from "@/updatableContent";
+import { fetchLCU, useLCUWatch2 } from "@/updatableContent";
 import React, { useEffect, useState } from "react";
 import { ErrorPage } from "../ErrorPage";
 import { AssetImage } from "../common/AssetImage";
 import champions from "@/assets/champion.json";
 import { cancelCustomGameChampSelect } from "@/api/customGame";
 import * as lcu from "loli-lcu-api";
-
-export interface IChampSelectTeamParticipant {
-  assignedPosition: string;
-  cellId: number;
-  championId: number;
-  championPickIntent: number;
-  entitledFeatureType: string;
-  nameVisibilityType: string;
-  obfuscatedPuuid: string;
-  obfuscatedSummonerId: number;
-  puuid: string;
-  selectedSkinId: number;
-  spell1Id: number;
-  spell2Id: number;
-  summonerId: number;
-  team: number;
-  wardSkinId: number;
-}
-
-export interface IChampSelectSession {
-  actions: {
-    actorCellId: number;
-    championId: number;
-    completed: boolean;
-    id: number;
-    isAllyAction: boolean;
-    isInProgress: boolean;
-    pickTurn: number;
-    type: string;
-  }[][];
-
-  allowBattleBoost: boolean;
-  allowDuplicatePicks: boolean;
-  allowLockedEvents: boolean;
-  allowRerolling: boolean;
-  allowSkinSelection: boolean;
-  bans: {
-    myTeamBans: any[]; // number?
-    numBans: number;
-    theirTeamBans: any[]; // number?
-  };
-  benchChampions: any[];
-  benchEnabled: boolean;
-  boostableSkinCount: number;
-  chatDetails: {
-    mucJwtDto: {
-      channelClaim: string;
-      domain: string;
-      jwt: string;
-      targetRegion: string;
-    };
-    multiUserChatId: string;
-    multiUserChatPassword: string;
-  };
-  counter: number;
-  entitledFeatureState: {
-    additionalRerolls: number;
-    unlockedSkinIds: any[]; // number?
-  };
-  gameId: number;
-  hasSimultaneousBans: boolean;
-  hasSimultaneousPicks: boolean;
-  isCustomGame: boolean;
-  isSpectating: boolean;
-  localPlayerCellId: number;
-  lockedEventIndex: number;
-  myTeam: IChampSelectTeamParticipant[];
-  pickOrderSwaps: any[];
-  recoveryCounter: number;
-  rerollsRemaining: number;
-  skipChampionSelect: boolean;
-  theirTeam: IChampSelectTeamParticipant[];
-  timer: {
-    adjustedTimeLeftInPhase: number;
-    internalNowInEpochMs: number;
-    isInfinite: boolean;
-    phase: string;
-    totalTimeInPhase: number;
-  };
-  trades: any[];
-}
-
-interface IGridChampion {
-  disabled: boolean;
-  freeToPlay: boolean;
-  freeToPlayForQueue: boolean;
-  freeToPlayReward: boolean;
-  id: number;
-  masteryChestGranted: boolean;
-  masteryLevel: number;
-  masteryPoints: number;
-  name: string;
-  owned: boolean;
-  positionsFavorited: string[];
-  rented: boolean;
-  roles: string[];
-  selectionStatus: {
-    banIntented: boolean;
-    banIntentedByMe: boolean;
-    isBanned: boolean;
-    pickIntented: boolean;
-    pickIntentedByMe: boolean;
-    pickIntentedPosition: string;
-    pickedByOtherOrBanned: boolean;
-    selectedByMe: boolean;
-  };
-  squarePortraitPath: string;
-}
+import { sortText } from "@/sortText";
 
 const getChampionIconId = (id: number) => {
   return Object.values(champions.data).find((c) => c.key === String(id))
     ?.id as string;
 };
 
-const createNowForExternalTime = (et: number) => {
-  const d = et - Date.now();
-  return () => Date.now() + d;
-};
-
 export const ChampSelect = () => {
-  const session = useUpdatableContent<IChampSelectSession>(
-    "/lol-champ-select/v1/session"
-  );
-  const lobby = useUpdatableContent<lcu.LolLobbyLobbyDto>(
-    "/lol-lobby/v2/lobby"
-  );
+  const session = useLCUWatch2(lcu.champ_select.getSession, console.error);
+  const lobby = useLCUWatch2(lcu.lobby.getLobby, console.error);
+  const [championMastery, setChampionMastery] = useState<
+    lcu.LolCollectionsCollectionsChampionMastery[] | null
+  >();
 
-  const hoverChampion = (id: number, lockIn: boolean = false) => {
-    const pickAction = session?.actions[0].find((a) => a.type === "pick");
-    window.electron.getLcuUri(
-      "/lol-champ-select/v1/session/actions/" + String(pickAction?.id),
-      "patch",
-      {
-        completed: lockIn,
-        championId: id,
-      }
+  useEffect(() => {
+    if (!session) return;
+    const me = session?.myTeam.find(
+      (m) => m.cellId === session.localPlayerCellId
     );
+    if (!me) return;
+    fetchLCU(
+      lcu.collections.inventories.getChampionMasteryBySummonerId,
+      me.summonerId
+    )
+      .get()
+      .then((cm) => {
+        console.log("mastery", cm);
+        setChampionMastery(cm);
+      });
+  }, [session]);
+
+  // championMastery[0];
+  const hoverChampion = (id: number, lockIn: boolean = false) => {
+    console.log("trying to hover", id);
+    if (!session) return;
+    const pickAction: lcu.LolChampSelectChampSelectAction = (
+      session.actions[0] as any
+    ).find(
+      (a: lcu.LolChampSelectChampSelectAction) =>
+        a.type === "pick" && a.actorCellId === session.localPlayerCellId
+    );
+
+    console.log(pickAction);
+    fetchLCU(lcu.champ_select.session.patchActionsById, pickAction.id, {
+      ...pickAction,
+      championId: id,
+      completed: lockIn,
+    })
+      .get()
+      .then((v: any) => console.log("got ", v))
+      .catch((v: any) => console.log("got err ", v));
   };
 
-  const allGridChamps = useUpdatableContent<IGridChampion[]>(
-    "/lol-champ-select/v1/all-grid-champions"
+  const allGridChamps = useLCUWatch2(
+    lcu.champ_select.getAllGridChampions,
+    console.error
   );
 
-  const pickableChampions = useUpdatableContent<number[]>(
-    "/lol-champ-select/v1/pickable-champion-ids"
+  const pickableChampions = useLCUWatch2(
+    lcu.champ_select.getPickableChampionIds,
+    console.error
   );
 
   const [timeLeft, setTimeLeft] = useState(0);
+
+  let hovering = false;
+  useEffect(() => {
+    console.log("ses", session);
+    console.log("oooooooooo", session?.myTeam[0].championId);
+    if (!session || hovering) return;
+
+    session.localPlayerCellId;
+    const me = session.myTeam.find(
+      (m) => m.cellId === session.localPlayerCellId
+    );
+    if (me === undefined) return;
+
+    if (me.championId === 0) hoverChampion(120);
+  }, [session]);
 
   useEffect(() => {
     if (!session) return;
@@ -168,7 +99,7 @@ export const ChampSelect = () => {
   if (!session) return <ErrorPage>loading champ select</ErrorPage>;
   return (
     <>
-      <div className="h-24" />
+      <div className="h-24 " />
       <div>{(timeLeft / 1000).toFixed(1)}</div>
 
       <div>
@@ -186,13 +117,25 @@ export const ChampSelect = () => {
         )}
       </div>
       <div className="grid grid-cols-9">
-        {allGridChamps?.map((c) => (
-          <AssetImage
-            className=""
-            uri={`/champion/${getChampionIconId(c.id)}.png`}
-            onClick={() => hoverChampion(c.id)}
-          />
-        ))}
+        {allGridChamps
+          ?.sort(
+            (a, b) =>
+              a.name.localeCompare(b.name) -
+              (a.positionsFavorited.length * 10) /
+                (a.positionsFavorited.length || 1) +
+              (b.positionsFavorited.length * 10) /
+                (b.positionsFavorited.length || 1)
+          )
+          // ?.sort((a, b) => {
+          //   return b.masteryPoints - a.masteryPoints;
+          // })
+          ?.map((c) => (
+            <AssetImage
+              className=""
+              uri={`/champion/${getChampionIconId(c.id)}.png`}
+              onClick={() => hoverChampion(c.id)}
+            />
+          ))}
         {/* {pickableChampions
           ?.map(
             (c) =>

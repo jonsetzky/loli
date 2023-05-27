@@ -72,6 +72,11 @@ const router = createBrowserRouter([
       {
         path: "/setups",
         element: <Setups />,
+        children: [
+          {
+            path: "champions",
+          },
+        ],
       },
       {
         path: "/playground",

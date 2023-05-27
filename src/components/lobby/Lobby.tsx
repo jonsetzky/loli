@@ -1,4 +1,4 @@
-import { useLCUWatch2, useUpdatableContent } from "@/updatableContent";
+import { useLCUWatch2 } from "@/updatableContent";
 import React, { useEffect, useState } from "react";
 import { LobbySummonerCard } from "./LobbySummonerCard";
 import { ISummoner } from "electron/main/lcu/summoner";

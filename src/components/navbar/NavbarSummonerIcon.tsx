@@ -29,9 +29,9 @@ export const NavbarSummonerIcon = ({
     "SUMMONER_ICON"
   );
 
-  useEffect(() => {
-    console.log("icons changed", summoner);
-  }, [summoner]);
+  // useEffect(() => {
+  //   console.log("icons changed", summoner);
+  // }, [summoner]);
 
   const [iconEditorOpen, setIconEditorOpen] = useState(false);
   const ownedIconIds = ownedIcons?.map((i) => i.itemId);
