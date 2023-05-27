@@ -15,6 +15,9 @@ type StrToType<T extends string> = T extends "boolean"
 
 const store = new Store();
 const changeEmitter = new EventEmitter();
+new Store({
+  name: "settings",
+});
 
 export type SettingsKeys = keyof SettingsSchema;
 export type SettingsValueType<K extends SettingsKeys> = StrToType<

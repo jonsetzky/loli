@@ -16,6 +16,7 @@ import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 import * as lcu from "loli-lcu-api";
+import { startCustomGameChampSelect } from "@/api/customGame";
 
 export const Lobby = () => {
   // const ctx = useRootContext();
@@ -57,6 +58,20 @@ export const Lobby = () => {
 
   const searching = searchState?.searchState !== "Invalid";
   const canSearchOrCancel = lobby.canStartActivity || searching;
+
+  let searchButton = (
+    <button
+      className={"btn font-bold " + (!searching ? "" : "bg-blue-400")}
+      onClick={() => {
+        if (lobby.gameConfig.isCustom) return startCustomGameChampSelect();
+        if (!searching) matchSearch();
+        else cancelMatchSearch();
+      }}
+      disabled={!canSearchOrCancel || !lobby.localMember.isLeader}
+    >
+      {!searching ? (lobby.gameConfig.isCustom ? "start" : "search") : "cancel"}
+    </button>
+  );
 
   return (
     <>
@@ -126,10 +141,12 @@ export const Lobby = () => {
           onMouseLeave={() => setArrowVisible(false)}
           onClick={() => setQueuePickerVisible(true)}
         >
-          {
-            queues.find((q) => q.queueId === lobby.gameConfig.queueId)
-              ?.description
-          }
+          {lobby.gameConfig.gameMode}
+          {queues.find((q) => q.queueId === lobby.gameConfig.queueId)
+            ? " - " +
+              queues.find((q) => q.queueId === lobby.gameConfig.queueId)
+                ?.description
+            : ""}
           <div className="relative">
             <div className="absolute w-full h-full top-1.5 left-1">
               {arrowVisible ? (
@@ -149,16 +166,7 @@ export const Lobby = () => {
         </div>
         <div className="flex basis-[6%] m-1 justify-center">
           <div className="basis-full" />
-          <button
-            className={"btn font-bold " + (!searching ? "" : "bg-blue-400")}
-            onClick={() => {
-              if (!searching) matchSearch();
-              else cancelMatchSearch();
-            }}
-            disabled={!canSearchOrCancel || !lobby.localMember.isLeader}
-          >
-            {!searching ? "search" : "cancel"}
-          </button>
+          {searchButton}
           <div className="flex justify-end basis-full">
             <button
               className={

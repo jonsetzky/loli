@@ -1,12 +1,12 @@
-import { IQueue } from "@/components/lobby/Lobby";
 import { useState } from "react";
 import { Drawer } from "../common/Drawer";
+import * as lcu from "loli-lcu-api";
 
 export const GameModeQueue = ({
   queue,
   onSelect,
 }: {
-  queue: IQueue;
+  queue: lcu.LolGameQueuesQueue;
   onSelect: (queueId: number) => void;
 }) => {
   const [arrowVisible, setArrowVisible] = useState(false);

@@ -14,6 +14,7 @@ import { useClickOutsideListener } from "@/clickOutside";
 import { GameModeQueue } from "./GameModeQueue";
 import { GameMode } from "./GameMode";
 import * as lcu from "loli-lcu-api";
+import { createCustomGame } from "@/api/customGame";
 
 export const GameModePicker = ({
   gameMode,
@@ -103,6 +104,14 @@ export const GameModePicker = ({
               {gameModes.map((gm) => (
                 <GameMode key={gm} name={gm} {...{ current, setCurrent }} />
               ))}
+              <GameMode
+                name="Practice"
+                current={""}
+                setCurrent={() => {
+                  createCustomGame();
+                  setVisible(false);
+                }}
+              />
             </div>
 
             <div className="flex flex-col ml-3 w-full">

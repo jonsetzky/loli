@@ -115,7 +115,11 @@ export const FriendList = ({
           </div>
         </div>
 
-        <Tooltip id="status-tooltip" classNameExtend="" delayShow={70} />
+        <Tooltip
+          id="status-tooltip"
+          classNameExtend="absolute"
+          delayShow={70}
+        />
       </div>
     </>
     // {/*<Tooltip

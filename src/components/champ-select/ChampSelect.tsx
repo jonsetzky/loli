@@ -72,8 +72,6 @@ export const ChampSelect = () => {
 
   let hovering = false;
   useEffect(() => {
-    console.log("ses", session);
-    console.log("oooooooooo", session?.myTeam[0].championId);
     if (!session || hovering) return;
 
     session.localPlayerCellId;
