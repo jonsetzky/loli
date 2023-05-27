@@ -1,4 +1,4 @@
-import { useLCUWatch2 } from "@/updatableContent";
+import { fetchLCU, useLCUWatch2 } from "@/updatableContent";
 import React, { memo, useEffect, useId, useState } from "react";
 import { AssetImage } from "../common/AssetImage";
 import { ExternalLink } from "@/ExternalLink";
@@ -41,7 +41,21 @@ export const FriendCard = ({
     <>
       <ContextMenu targetId={id} label={friend.name}>
         <ContextMenuList>
-          <ContextMenuListItem>hihh</ContextMenuListItem>
+          <ContextMenuListItem
+            onClick={() => {
+              fetchLCU(lcu.lobby.lobby.postInvitations, [
+                {
+                  toSummonerId: friend.summonerId,
+                } as any,
+              ])
+                .get()
+                .catch((err) =>
+                  console.error("error inviting", friend.name, err)
+                );
+            }}
+          >
+            Invite to Lobby
+          </ContextMenuListItem>
         </ContextMenuList>
         <ContextMenuListItem>
           <div>

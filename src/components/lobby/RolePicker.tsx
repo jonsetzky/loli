@@ -32,30 +32,30 @@ export const RolePicker = ({
   });
   return (
     <Tooltip
+      id="role-picker"
       data-tooltip-place="right"
-      classNameExtend="absolute z-50"
+      classNameExtend="absolute bg-black border flex flex-row gap-2"
       delayHide={0}
       isOpen={visible}
       noArrow={false}
+      openOnClick={true}
     >
-      <div ref={ref}>
-        <div className="role-picker flex flex-row">
-          {allRoles.map((role) => (
-            <RoleIcon
-              key={role}
-              position={role}
-              invert={true}
-              // opacity={currentRole.toLowerCase() === role ? 1 : 0.4}
-              className={`${
-                current === role ? "opacity-100" : "opacity-40"
-              } hover:opacity-60`}
-              onClick={() => {
-                setRole(role);
-                setVisible(false);
-              }}
-            />
-          ))}
-        </div>
+      <div ref={ref} className="flex flex-row gap-2">
+        {allRoles.map((role) => (
+          <RoleIcon
+            key={role}
+            position={role}
+            invert={true}
+            // opacity={currentRole.toLowerCase() === role ? 1 : 0.4}
+            className={`w-6 ${
+              current === role ? "opacity-100" : "opacity-40"
+            } hover:opacity-60`}
+            onClick={() => {
+              setRole(role);
+              setVisible(false);
+            }}
+          />
+        ))}
       </div>
     </Tooltip>
   );

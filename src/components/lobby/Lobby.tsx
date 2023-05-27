@@ -183,11 +183,8 @@ export const Lobby = () => {
             </button>
           </div>
         </div>
-        <div className="flex flex-row h-full">
-          <div
-            className="flex flex-col p-1 gap-1 basis-72 h-full"
-            key={lobby?.partyId}
-          >
+        <div className="flex flex-row h-full p-1 gap-1">
+          <div className="flex flex-col gap-1 basis-72" key={lobby?.partyId}>
             {lobby?.members.map((m) => (
               <LobbySummonerCard
                 key={m.summonerId}
@@ -209,6 +206,21 @@ export const Lobby = () => {
                 compact={lobby.gameConfig.maxLobbySize > 5}
               />
             ))}
+          </div>
+          <div className="border w-36 h-[5.7rem] flex flex-col p-1 pt-0 pb-0 text-neutral-200">
+            <h1 className="shrink">Invited</h1>
+            <div className="overflow-y-scroll text-xs text-white">
+              {lobby.invitations
+                .filter(
+                  (i) =>
+                    lobby.members.find(
+                      (m) => m.summonerId === i.toSummonerId
+                    ) === undefined
+                )
+                .map((i) => (
+                  <p>{i.toSummonerName}</p>
+                ))}
+            </div>
           </div>
         </div>
       </div>

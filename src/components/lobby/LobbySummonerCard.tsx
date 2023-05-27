@@ -75,7 +75,7 @@ export const LobbySummonerCard = ({
   return (
     <div
       className={
-        "flex flex-col basis-1/5 bg-white text-black " +
+        "flex flex-col bg-white text-black basis-[3.5rem] " +
         (searchState.searchState === "Invalid" && !member.ready
           ? "opacity-25"
           : "")
@@ -149,6 +149,9 @@ export const LobbySummonerCard = ({
                 <></>
               )}
               <RoleIcon
+                {...{
+                  "data-tooltip-id": memberIsLocal ? "role-picker" : undefined,
+                }}
                 position={member.firstPositionPreference.toLowerCase()}
                 className="h-6"
                 onClick={(e: any) => {
@@ -162,6 +165,11 @@ export const LobbySummonerCard = ({
                 <div className="grid h-6 w-6 place-content-center">
                   {" "}
                   <RoleIcon
+                    {...{
+                      "data-tooltip-id": memberIsLocal
+                        ? "role-picker"
+                        : undefined,
+                    }}
                     position={member.secondPositionPreference.toLowerCase()}
                     className="h-4"
                     onClick={(e: any) => {
