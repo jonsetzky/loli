@@ -1,7 +1,10 @@
 import React, { useEffect, useId, useState } from "react";
-import { ILobby, IMember } from "./Lobby";
 import { AssetImage } from "../common/AssetImage";
-import { useUpdatableContent } from "@/updatableContent";
+import {
+  fetchLCU,
+  useLCUWatch2,
+  useUpdatableContent,
+} from "@/updatableContent";
 import { ISummoner } from "electron/main/lcu/summoner";
 import { Tooltip } from "../common/Tooltip";
 import { Role, RolePicker } from "./RolePicker";
@@ -11,67 +14,7 @@ import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 import { RoleIcon } from "../common/RoleIcon";
-
-interface ISummonerFriendInfo {
-  accountId: number;
-  availability: string;
-  gameName: string;
-  gameTag: string;
-  icon: number;
-  id: string;
-  lol: {
-    bannerIdSelected: string;
-    challengeCrystalLevel: string;
-    challengePoints: string;
-    challengeTitleSelected: string;
-    challengeTokensSelected: string;
-    championId: string;
-    companionId: string;
-    damageSkinId: string;
-    gameId: string;
-    gameMode: string;
-    gameQueueType: string;
-    gameStatus: string;
-    iconOverride: string;
-    isObservable: string;
-    level: string;
-    mapId: string;
-    mapSkinId: string;
-    masteryScore: string;
-    pty: string;
-    puuid: string;
-    queueId: string;
-    rankedLeagueDivision: string;
-    rankedLeagueQueue: string;
-    rankedLeagueTier: string;
-    rankedLosses: string;
-    rankedPrevSeasonDivision: string;
-    rankedPrevSeasonTier: string;
-    rankedSplitRewardLevel: string;
-    rankedWins: string;
-    regalia: string;
-    skinVariant: string;
-    skinname: string;
-    timeStamp: string;
-  };
-  masteryScore: number;
-  name: string;
-  note: string;
-  partySummoners: string[];
-  patchline: string;
-  platformId: string;
-  product: string;
-  productName: string;
-  puuid: string;
-  remotePlatform: boolean;
-  remoteProduct: boolean;
-  remoteProductBackdropUrl: string;
-  remoteProductIconUrl: string;
-  statusMessage: string;
-  summonerIcon: number;
-  summonerId: number;
-  summonerLevel: number;
-}
+import * as lcu from "loli-lcu-api";
 
 export const LobbySummonerCard = ({
   member,
@@ -79,8 +22,8 @@ export const LobbySummonerCard = ({
   searchState,
   compact,
 }: {
-  member: IMember | null;
-  lobby?: ILobby;
+  member: lcu.LolLobbyLobbyParticipantDto | null;
+  lobby?: lcu.LolLobbyLobbyDto;
   searchState?: any;
   compact: boolean;
 }) => {
@@ -99,8 +42,10 @@ export const LobbySummonerCard = ({
 
   const memberIsLocal = lobby?.localMember.summonerId === member.summonerId;
 
-  const summoner = useUpdatableContent<ISummonerFriendInfo>(
-    `/lol-hovercard/v1/friend-info-by-summoner/${member.summonerId}`
+  const summoner = useLCUWatch2(
+    lcu.hovercard.getFriendInfoBySummonerBySummonerId,
+    (err) => console.error("error", err),
+    member.summonerId
   );
 
   const [allowDoubleRole, setAllowDoubleRole] = useSetting("allowDoubleRole");
@@ -244,7 +189,7 @@ export const LobbySummonerCard = ({
             <img
               src={
                 summoner !== undefined
-                  ? `/ranked-emblem/emblem-${summoner?.lol.rankedLeagueTier.toLowerCase()}.png`
+                  ? `/ranked-emblem/emblem-${summoner?.lol.rankedLeagueTier?.toLowerCase()}.png`
                   : ""
               }
               spellCheck

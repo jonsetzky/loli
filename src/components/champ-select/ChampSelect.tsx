@@ -2,10 +2,9 @@ import { useUpdatableContent } from "@/updatableContent";
 import React, { useEffect, useState } from "react";
 import { ErrorPage } from "../ErrorPage";
 import { AssetImage } from "../common/AssetImage";
-
 import champions from "@/assets/champion.json";
-import { ILobby } from "../lobby/Lobby";
 import { cancelCustomGameChampSelect } from "@/api/customGame";
+import * as lcu from "loli-lcu-api";
 
 export interface IChampSelectTeamParticipant {
   assignedPosition: string;
@@ -129,7 +128,9 @@ export const ChampSelect = () => {
   const session = useUpdatableContent<IChampSelectSession>(
     "/lol-champ-select/v1/session"
   );
-  const lobby = useUpdatableContent<ILobby>("/lol-lobby/v2/lobby");
+  const lobby = useUpdatableContent<lcu.LolLobbyLobbyDto>(
+    "/lol-lobby/v2/lobby"
+  );
 
   const hoverChampion = (id: number, lockIn: boolean = false) => {
     const pickAction = session?.actions[0].find((a) => a.type === "pick");

@@ -37,3 +37,6 @@ public/dragontail
 
 # lcu api schema
 script/schema
+
+# tests
+coverage/

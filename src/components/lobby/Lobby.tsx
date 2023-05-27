@@ -1,4 +1,4 @@
-import { useUpdatableContent } from "@/updatableContent";
+import { useLCUWatch2, useUpdatableContent } from "@/updatableContent";
 import React, { useEffect, useState } from "react";
 import { LobbySummonerCard } from "./LobbySummonerCard";
 import { ISummoner } from "electron/main/lcu/summoner";
@@ -15,200 +15,7 @@ import { cancelMatchSearch, matchSearch } from "@/api/searchMatch";
 import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
-
-export interface IMember {
-  allowedChangeActivity: boolean;
-  allowedInviteOthers: boolean;
-  allowedKickOthers: boolean;
-  allowedStartActivity: boolean;
-  allowedToggleInvite: boolean;
-  autoFillEligible: boolean;
-  autoFillProtectedForPromos: boolean;
-  autoFillProtectedForSoloing: boolean;
-  autoFillProtectedForStreaking: boolean;
-  botChampionId: number;
-  botDifficulty: string;
-  botId: string;
-  firstPositionPreference: string;
-  isBot: boolean;
-  isLeader: boolean;
-  isSpectator: boolean;
-  primaryChampionPreference: number;
-  puuid: string;
-  ready: boolean;
-  secondPositionPreference: string;
-  secondaryChampionPreference: number;
-  showGhostedBanner: boolean;
-  summonerIconId: number;
-  summonerId: number;
-  summonerInternalName: string;
-  summonerLevel: number;
-  summonerName: string;
-  teamId: number;
-}
-export interface ILobby {
-  canStartActivity: boolean;
-  gameConfig: {
-    allowablePremadeSizes: number[];
-    customLobbyName: string;
-    customMutatorName: string;
-    customRewardsDisabledReasons: any[];
-    customSpectatorPolicy: string;
-    customSpectators: any[];
-    customTeam100: any[];
-    customTeam200: any[];
-    gameMode: string;
-    isCustom: boolean;
-    isLobbyFull: boolean;
-    isTeamBuilderManaged: boolean;
-    mapId: number;
-    maxHumanPlayers: number;
-    maxLobbySize: number;
-    maxTeamSize: number;
-    pickType: string;
-    premadeSizeAllowed: boolean;
-    queueId: number;
-    shouldForceScarcePositionSelection: boolean;
-    showPositionSelector: boolean;
-  };
-  invitations: {
-    invitationId: string;
-    invitationType: string;
-    state: string;
-    timestamp: string;
-    toSummonerId: number;
-    toSummonerName: string;
-  }[];
-  localMember: {
-    allowedChangeActivity: boolean;
-    allowedInviteOthers: boolean;
-    allowedKickOthers: boolean;
-    allowedStartActivity: boolean;
-    allowedToggleInvite: boolean;
-    autoFillEligible: boolean;
-    autoFillProtectedForPromos: boolean;
-    autoFillProtectedForSoloing: boolean;
-    autoFillProtectedForStreaking: boolean;
-    botChampionId: number;
-    botDifficulty: string;
-    botId: string;
-    firstPositionPreference: string;
-    isBot: boolean;
-    isLeader: boolean;
-    isSpectator: boolean;
-    primaryChampionPreference: number;
-    puuid: string;
-    ready: boolean;
-    secondPositionPreference: string;
-    secondaryChampionPreference: number;
-    showGhostedBanner: boolean;
-    summonerIconId: number;
-    summonerId: number;
-    summonerInternalName: string;
-    summonerLevel: number;
-    summonerName: string;
-    teamId: number;
-  };
-  members: IMember[];
-  mucJwtDto: {
-    channelClaim: string;
-    domain: string;
-    jwt: string;
-    targetRegion: string;
-  };
-  multiUserChatId: string;
-  multiUserChatPassword: string;
-  partyId: string;
-  partyType: string;
-  restrictions: any[];
-  scarcePositions: any[];
-  warnings: any[];
-}
-
-export interface IQueue {
-  allowablePremadeSizes: number[];
-  areFreeChampionsAllowed: boolean;
-  assetMutator: string;
-  category: string;
-  championsRequiredToPlay: number;
-  description: string;
-  detailedDescription: string;
-  gameMode: string;
-  gameTypeConfig: {
-    advancedLearningQuests: boolean;
-    allowTrades: boolean;
-    banMode: string;
-    banTimerDuration: number;
-    battleBoost: boolean;
-    crossTeamChampionPool: boolean;
-    deathMatch: boolean;
-    doNotRemove: boolean;
-    duplicatePick: boolean;
-    exclusivePick: boolean;
-    gameModeOverride: any;
-    id: number;
-    learningQuests: boolean;
-    mainPickTimerDuration: number;
-    maxAllowableBans: number;
-    name: string;
-    numPlayersPerTeamOverride: any;
-    onboardCoopBeginner: boolean;
-    pickMode: string;
-    postPickTimerDuration: number;
-    reroll: boolean;
-    teamChampionPool: boolean;
-  };
-  id: number;
-  isRanked: boolean;
-  isTeamBuilderManaged: boolean;
-  lastToggledOffTime: number;
-  lastToggledOnTime: number;
-  mapId: number;
-  maxDivisionForPremadeSize2: string;
-  maxTierForPremadeSize2: string;
-  maximumParticipantListSize: number;
-  minLevel: number;
-  minimumParticipantListSize: number;
-  name: string;
-  numPlayersPerTeam: number;
-  queueAvailability: string;
-  queueRewards: {
-    isChampionPointsEnabled: boolean;
-    isIpEnabled: boolean;
-    isXpEnabled: boolean;
-    partySizeIpRewards: any[];
-  };
-  removalFromGameAllowed: boolean;
-  removalFromGameDelayMinutes: number;
-  shortName: string;
-  showPositionSelector: boolean;
-  spectatorEnabled: boolean;
-  type: string;
-}
-
-// export interface ILobbyGameConfig {
-//   // allowablePremadeSizes?: number[];
-//   // customLobbyName?: string;
-//   // customMutatorName?: string;
-//   // customRewardsDisabledReasons: any[];
-//   // customSpectatorPolicy: string;
-//   // customSpectators: any[];
-//   // customTeam100: any[];
-//   // customTeam200: any[];
-//   // gameMode?: string;
-//   // isCustom?: boolean;
-//   // isLobbyFull: boolean;
-//   // isTeamBuilderManaged: boolean;
-//   // ?mapId: number;
-//   // maxHumanPlayers: number;
-//   // maxLobbySize: number;
-//   // maxTeamSize: number;
-//   // pickType: string;
-//   // premadeSizeAllowed: boolean;
-//   queueId: number;
-//   // shouldForceScarcePositionSelection: boolean;
-//   // showPositionSelector: boolean;
-// }
+import * as lcu from "loli-lcu-api";
 
 export const Lobby = () => {
   // const ctx = useRootContext();
@@ -217,12 +24,17 @@ export const Lobby = () => {
   const [arrowVisible, setArrowVisible] = useState(false);
   const [queuePickerVisible, setQueuePickerVisible] = useState(false);
 
-  const lobby = useUpdatableContent<ILobby>("/lol-lobby/v2/lobby");
-  const searchState = useUpdatableContent<any>(
-    "/lol-lobby/v2/lobby/matchmaking/search-state"
+  const lobby = useLCUWatch2(lcu.lobby.getLobby, (err) =>
+    err.error.response.status === 404
+      ? undefined
+      : console.error("error getting lobby", err)
   );
 
-  if (!searchState) return <ErrorPage>loading</ErrorPage>;
+  const searchState = useLCUWatch2(
+    lcu.lobby.lobby_matchmaking.getSearchState,
+    (err) => console.error("error getting search state", err)
+  );
+
   if (!lobby)
     return (
       <>

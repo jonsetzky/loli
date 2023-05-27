@@ -19,7 +19,7 @@ export const Navbar = () => {
   const [testVisible, setTestVisible] = useSetting("testSetting");
   const [settingsVisible, setSettingsVisible] = useState(false);
 
-  const summoner = useLCUWatch2(fetchLCU(lcu.summoner.getCurrentSummoner));
+  const summoner = useLCUWatch2(lcu.summoner.getCurrentSummoner);
 
   // const summoner = useLCUWatch((conn) => lcu.summoner.getCurrentSummoner(conn));
 

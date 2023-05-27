@@ -25,3 +25,24 @@ export class Compiler {
       this.file
     );
 }
+
+export const convertToValidSymbolName = (input: string): string => {
+  // Replace invalid characters with underscores
+  const sanitized = input.replace(/[^a-zA-Z0-9_$]/g, "@&_");
+
+  // Convert to camel case
+  const parts = sanitized.split("@&_");
+  const camelCaseParts = parts.map((part, index) => {
+    if (index === 0) {
+      return part;
+    }
+    return part.charAt(0).toUpperCase() + part.slice(1);
+  });
+
+  return camelCaseParts.join("");
+};
+
+export const createIdentifier = (s: string, sanitize: boolean = false) =>
+  sanitize
+    ? ts.factory.createIdentifier(convertToValidSymbolName(s))
+    : ts.factory.createIdentifier(s);

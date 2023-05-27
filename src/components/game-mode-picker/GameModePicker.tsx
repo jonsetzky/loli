@@ -6,119 +6,14 @@ import React, {
   useState,
 } from "react";
 import { FullscreenNotification } from "../FullscreenNotification";
-import { useUpdatableContent } from "@/updatableContent";
-import { IQueue } from "@/components/lobby/Lobby";
+import { useLCUWatch2, useUpdatableContent } from "@/updatableContent";
 import { ErrorPage } from "../ErrorPage";
 import ReactDropdown from "react-dropdown";
 import { sortText } from "@/sortText";
 import { useClickOutsideListener } from "@/clickOutside";
 import { GameModeQueue } from "./GameModeQueue";
 import { GameMode } from "./GameMode";
-
-export interface IMap {
-  assets: {
-    [key: string]: string;
-  };
-  categorizedContentBundles: any;
-  description: string;
-  gameMode: string;
-  gameModeDescription: string;
-  gameModeName: string;
-  gameModeShortName: string;
-  gameMutator: string;
-  id: number;
-  isDefault: boolean;
-  isRGM: boolean;
-  locStrings: {
-    tutorial_subheader: string;
-    tutorial_title: string;
-  };
-  mapStringId: string;
-  name: string;
-  perPositionDisallowedSummonerSpells: any;
-  perPositionRequiredSummonerSpells: any;
-  platformId: string;
-  platformName: string;
-  properties: {
-    suppressRunesMasteriesPerks: boolean;
-  };
-  tutorialCards: {
-    description: string;
-    footer: string;
-    header: string;
-    imagePath: string;
-  }[];
-}
-
-const Label = ({ text }: any) => (
-  <div className="btn text-xs whitespace-nowrap tracking-tight font-bold">
-    {text}
-  </div>
-);
-
-const QueueCard = ({ queue, map }: { queue?: IQueue; map?: IMap }) => {
-  return (
-    <div className="flex flex-row">
-      <Label text={queue?.gameMode} />
-      <Label text={map?.name} />
-      <Label text={queue?.description} />
-      <Label text={queue?.category} />
-      {queue?.isRanked ? <Label text="Ranked" /> : <></>}
-    </div>
-  );
-};
-
-const GameModeDropdown = ({
-  name,
-  queues,
-}: {
-  name: string;
-  /**
-   * Queues for this gamemode
-   */
-  queues: IQueue[];
-}) => {
-  const [open, setOpen] = useState(false);
-  const id = useId();
-  const ref = useRef(null);
-
-  useClickOutsideListener(ref, (e: any) => {
-    if (e.target?.className.includes("gamemode-button")) {
-      // e.currentTarget.onclick.apply();
-      setOpen(false);
-    }
-  });
-
-  return (
-    <div ref={ref}>
-      <button
-        className="gamemode-button btn text-sm tracking-normal font-bold bg-white text-black"
-        onClick={() => setOpen((c) => !c)}
-      >
-        {name}
-      </button>
-      {!open ? (
-        <></>
-      ) : (
-        <div className="flex flex-col text-xs whitespace-nowrap tracking-tight font-bold bg-black text-white ml-5">
-          {queues.map((q) => (
-            <div>syus</div>
-            // <div className="leading-8 p-0.5 text-lg">{q.name}</div>
-          ))}
-        </div>
-      )}
-      {/* <ReactDropdown
-        ref={ref}
-        value={_name}
-        options={queues.map((q) => q.name)}
-        onChange={(arg) => setName(name)}
-        menuClassName="leading-8 p-2 text-lg"
-        className="text-xs whitespace-nowrap tracking-tight font-bold bg-black text-white"
-        controlClassName="hidden" //"btn text-sm tracking-normal font-bold bg-white text-black"
-      /> */}
-    </div>
-  );
-};
+import * as lcu from "loli-lcu-api";
 
 export const GameModePicker = ({
   gameMode,
@@ -134,10 +29,14 @@ export const GameModePicker = ({
 }) => {
   const [current, setCurrent] = useState<string | null>(gameMode);
 
-  const queueInfo = useUpdatableContent<IQueue[]>("/lol-game-queues/v1/queues");
-  const mapInfo = useUpdatableContent<IMap[]>("/lol-maps/v1/maps");
+  // const queueInfo = useLCUWatch2(lcu.game_queues.getQueues, (err) =>
+  //   console.error("error getting queue info", err), 1
+  // );
 
-  if (!queueInfo || !mapInfo) return <ErrorPage>Loading</ErrorPage>;
+  const queueInfo = useLCUWatch2(lcu.game_queues.getQueues);
+  const mapInfo = useLCUWatch2(lcu.maps.getMaps);
+
+  if (!queueInfo || !mapInfo) return <></>;
 
   const allAvailableQueues = queueInfo?.filter(
     (q) => q.queueAvailability === "Available"

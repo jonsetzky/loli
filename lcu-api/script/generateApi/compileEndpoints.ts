@@ -11,28 +11,11 @@ import {
 import { writeFileSync } from "fs";
 import { isPrimitive, primToTsType } from "./compileTypes";
 import { CONFIG2, joinPath } from "./config";
-import { Compiler } from "./compile";
-
-const convertToValidSymbolName = (input: string): string => {
-  // Replace invalid characters with underscores
-  const sanitized = input.replace(/[^a-zA-Z0-9_$]/g, "@&_");
-
-  // Convert to camel case
-  const parts = sanitized.split("@&_");
-  const camelCaseParts = parts.map((part, index) => {
-    if (index === 0) {
-      return part;
-    }
-    return part.charAt(0).toUpperCase() + part.slice(1);
-  });
-
-  return camelCaseParts.join("");
-};
-
-const createIdentifier = (s: string, sanitize: boolean = false) =>
-  sanitize
-    ? ts.factory.createIdentifier(convertToValidSymbolName(s))
-    : ts.factory.createIdentifier(s);
+import {
+  Compiler,
+  convertToValidSymbolName,
+  createIdentifier,
+} from "./compile";
 
 const createTypeNodeFromType = (t: IType): ts.TypeNode => {
   const ifPrimToTsType = (t: any) => (isPrimitive(t) ? primToTsType(t) : t);
@@ -213,7 +196,7 @@ const createNamespaceNode = (
 ) => {
   return ts.factory.createModuleDeclaration(
     [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-    ts.factory.createIdentifier(name),
+    createIdentifier(name),
     ts.factory.createModuleBlock(
       Object.entries(ns)
         // .filter(([n, v]) => v.name !== undefined)

@@ -12,7 +12,7 @@ export class LCUConnector implements lcu.ILCUConnector {
       get: () => response,
       watch: (callback) => {
         callback(response);
-        return window.electron.lcuWatch(callback, url, method, args);
+        return window.electron.lcuWatch(callback, url);
       },
     };
     return out;

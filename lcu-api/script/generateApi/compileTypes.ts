@@ -3,7 +3,7 @@ import * as ts from "typescript";
 import { prettier } from "./prettier";
 import { IField, IStructType } from "./combine";
 import { CONFIG2, joinPath } from "./config";
-import { Compiler } from "./compile";
+import { Compiler, createIdentifier } from "./compile";
 
 const primitiveTypes = [
   "int64",
@@ -53,19 +53,21 @@ const createProperty = (f: IField) => {
   let type: any = ts.factory.createTypeReferenceNode(
     ifPrimToTsType(f.type.type)
   );
+
   if (f.type.type === "map")
-    type = ts.factory.createTypeReferenceNode("Map", [
-      ts.factory.createTypeReferenceNode("string"),
-      ts.factory.createTypeReferenceNode(ifPrimToTsType(f.type.elementType)),
+    type = ts.factory.createTypeLiteralNode([
+      ts.factory.createPropertySignature(
+        undefined,
+        ts.factory.createComputedPropertyName(createIdentifier("key: string")),
+        undefined,
+        ts.factory.createTypeReferenceNode(ifPrimToTsType(f.type.elementType))
+      ),
     ]);
 
   if (f.type.type === "vector")
     type = ts.factory.createArrayTypeNode(
       ts.factory.createTypeReferenceNode(ifPrimToTsType(f.type.elementType))
     );
-
-  const hasElements = ["vector", "map"].includes(f.type.type);
-
   return ts.factory.createPropertySignature(
     undefined,
     '"' + f.name + '"',

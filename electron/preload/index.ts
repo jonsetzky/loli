@@ -172,26 +172,14 @@ const electronHandler = {
           ? Promise.reject(v.lcuApiError)
           : v
       ),
-  lcuWatch: (
-    callback: (v: any) => void,
-    url: string,
-    method: string,
-    args?:
-      | {
-          [key: string]: any;
-        }
-      | undefined
-  ): Destructor => {
-    const dest = createIpcListener(`lcuWatchEvent:${url}`, (e, a) => {
+  lcuWatch: (callback: (v: any) => void, url: string): Destructor => {
+    return createIpcListener(`lcuWatchEvent:${url}`, (e, a) => {
+      // console.log("got event at", url, a);
+      if (!a) return callback(Promise.resolve(null));
       return Object.keys(a).includes("lcuApiError")
         ? callback(Promise.reject(a.lcuApiError))
         : callback(Promise.resolve(a));
     });
-    const cbId = ipcRenderer.invoke("startLcuWatch", url);
-    return () => {
-      dest();
-      ipcRenderer.invoke("stopLcuWatch", cbId);
-    };
   },
 };
 
@@ -208,4 +196,4 @@ window.onmessage = (ev) => {
   ev.data.payload === "removeLoading" && removeLoading();
 };
 
-setTimeout(removeLoading, 4999);
+// setTimeout(removeLoading, 4999);

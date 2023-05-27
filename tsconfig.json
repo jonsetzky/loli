@@ -20,6 +20,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "electron"],
+  "include": ["src", "electron", "jest.config.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

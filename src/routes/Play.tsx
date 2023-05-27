@@ -3,9 +3,17 @@ import { ErrorPage } from "@/components/ErrorPage";
 import { GameModePicker } from "@/components/game-mode-picker/GameModePicker";
 import { Lobby } from "@/components/lobby/Lobby";
 import { useEffect, useState } from "react";
-import { Outlet, Route, useNavigate } from "react-router-dom";
+import {
+  Outlet,
+  Route,
+  useLoaderData,
+  useLocation,
+  useNavigate,
+  useRouteLoaderData,
+} from "react-router-dom";
 import * as lcu from "loli-lcu-api";
 import { fetchLCU, useLCUWatch, useLCUWatch2 } from "@/updatableContent";
+import { useMatch } from "react-router-dom";
 
 enum MapAssetNames {
   CHAMP_SELECT_BACKGROUND_SOUND = "champ-select-background-sound",
@@ -56,22 +64,23 @@ interface ITeamParticipant {
 }
 
 export const Play = () => {
-  // const [gfStatus] = useLCUWatch((c) => lcu.gameflow.getSession(c));
-  const gfStatus = useLCUWatch2(fetchLCU(lcu.gameflow.getSession));
-  // const gfAvailability = useLCUWatch((c) => lcu.gameflow.getAvailability(c));
-  // const gfStatus = useLCUWatch((c) => lcu.gameflow.getSession(c));
-
+  const gfStatus = useLCUWatch2(lcu.gameflow.getSession);
   const navigate = useNavigate();
+  const location = useLocation();
+  // const router = useRouteMatch();
+  const match = useMatch("/test");
 
   useEffect(() => {
+    if (!location.pathname.match(/^\/test/)) return;
     if (!gfStatus) return navigate("lobby");
+    console.log(gfStatus.phase);
     navigate(
       gfStatus.phase
         .toLowerCase()
         .replace(/matchmaking|readycheck|gamestart|none/, "lobby")
         .replace(/waitingforstats/, "preendofgame")
     );
-  }, []);
+  }, [match]);
 
   // useEffect(() => {
   //   console.log(gfAvailability);
@@ -88,5 +97,9 @@ export const Play = () => {
   //   console.log(gfStatus.phase, gfStatus);
   // }, [gfAvailability]);
 
-  return <Outlet />;
+  return (
+    <div className="h-full w-full bg-black">
+      <Outlet />
+    </div>
+  );
 };

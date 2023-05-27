@@ -11,28 +11,11 @@ import {
 import { writeFileSync } from "fs";
 import { isPrimitive, primToTsType } from "./compileTypes";
 import { CONFIG2, joinPath } from "./config";
-import { Compiler } from "./compile";
-
-const convertToValidSymbolName = (input: string): string => {
-  // Replace invalid characters with underscores
-  const sanitized = input.replace(/[^a-zA-Z0-9_$]/g, "@&_");
-
-  // Convert to camel case
-  const parts = sanitized.split("@&_");
-  const camelCaseParts = parts.map((part, index) => {
-    if (index === 0) {
-      return part;
-    }
-    return part.charAt(0).toUpperCase() + part.slice(1);
-  });
-
-  return camelCaseParts.join("");
-};
-
-const createIdentifier = (s: string, sanitize: boolean = false) =>
-  sanitize
-    ? ts.factory.createIdentifier(convertToValidSymbolName(s))
-    : ts.factory.createIdentifier(s);
+import {
+  Compiler,
+  convertToValidSymbolName,
+  createIdentifier,
+} from "./compile";
 
 const createTypeNodeFromType = (t: IType): ts.TypeNode => {
   const ifPrimToTsType = (t: any) => (isPrimitive(t) ? primToTsType(t) : t);
@@ -56,7 +39,7 @@ const parsePositionalArguments = (uri: string): string[] => {
   let m = u.match(/\/\{([\S]+?)\}/);
   let [mf, mn] = [m?.at(0), m?.at(1)];
   while (mf && mn) {
-    positionalArgs.push(mn);
+    positionalArgs.push(mn.replace("+path", "path"));
     u = u.replace(mf, "");
     m = u.match(/\/\{([\S]+?)\}/);
     [mf, mn] = [m?.at(0), m?.at(1)];
@@ -71,7 +54,49 @@ interface TypeProps {
   method: string;
 }
 
+const upperFirstCharacter = (str: string) =>
+  str.at(0)?.toUpperCase() + str.substring(1);
+
 const parseNamespaces = (
+  uri: string,
+  http_method: string
+): { namespace?: string; subNamespace?: string; method: string } => {
+  //   console.log(uri);
+  const m = uri.match(/^(?:\/([^\/]+))?(?:\/v\d)?(?:\/(.+))?(?:\/([^\/]+))$/);
+  const namespace = m
+    ?.at(1)
+    ?.replace(/[^a-zA-Z0-9_$]/g, "_")
+    .replace("lol_", "");
+  const subNamespace = m?.at(2)?.replace(/[^a-zA-Z0-9_$]/g, "_");
+
+  let method = convertToValidSymbolName(m?.at(3) ?? "");
+
+  method = http_method.toLowerCase() + upperFirstCharacter(method);
+  if (method.length < 1) console.error("error parsing", uri);
+  //   console.log(uri);
+  return { namespace, subNamespace, method };
+};
+
+const parseUri = (uri: string, http_method: string): TypeProps => {
+  let positionalArgs: string[] = parsePositionalArguments(uri);
+  let u = uri;
+  positionalArgs.forEach((a) => {
+    u = u.replace(`/{${a}}`, "");
+  });
+
+  const out: TypeProps = {
+    positionalArgs,
+    ...parseNamespaces(u, http_method),
+  };
+
+  const lastArg = positionalArgs.at(-1);
+  if (lastArg)
+    out.method += convertToValidSymbolName(`By${upperFirstCharacter(lastArg)}`);
+
+  return out;
+};
+
+const parseNamespaces2 = (
   uri: string,
   http_method: string
 ): { namespace?: string; subNamespace?: string; method: string } => {
@@ -89,19 +114,6 @@ const parseNamespaces = (
   if (method.length < 1) console.error("error parsing", uri);
   //   console.log(uri);
   return { namespace, subNamespace, method };
-};
-
-const parseUri = (uri: string, http_method: string): TypeProps => {
-  let positionalArgs: string[] = parsePositionalArguments(uri);
-  let u = uri;
-  positionalArgs.forEach((a) => {
-    u = u.replace(`/{${a}}`, "");
-  });
-
-  return {
-    positionalArgs,
-    ...parseNamespaces(u, http_method),
-  };
 };
 
 const createImportStatement = (
@@ -215,7 +227,7 @@ const createNamespaceNode = (
 ) => {
   return ts.factory.createModuleDeclaration(
     [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-    ts.factory.createIdentifier(name),
+    createIdentifier(name),
     ts.factory.createModuleBlock(
       Object.entries(ns)
         // .filter(([n, v]) => v.name !== undefined)
@@ -252,6 +264,10 @@ export const compileFunctions2 = () => {
       if (!namespaceHierarchy[ns][sns]) namespaceHierarchy[ns][sns] = {};
       namespaceHierarchy[ns][sns][m] = f;
     });
+  writeFileSync(
+    joinPath(CONFIG2.helpPath, "functions-hierarchy.json"),
+    JSON.stringify(namespaceHierarchy)
+  );
 
   let out = "";
   out +=

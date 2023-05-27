@@ -24,8 +24,9 @@ export const NavbarSummonerIcon = ({
   summoner: lcu.LolSummonerSummoner | null;
 }) => {
   const ownedIcons = useLCUWatch2(
-    fetchLCU(lcu.inventory.getInventory, "SUMMONER_ICON"),
-    (err) => console.error(err)
+    lcu.inventory.getInventoryByInventoryType,
+    (err) => console.error(err),
+    "SUMMONER_ICON"
   );
 
   useEffect(() => {

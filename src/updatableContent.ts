@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { LCUConnector } from "./lcuConnector";
 import * as lcu from "loli-lcu-api";
+import { ipcRenderer } from "electron";
 
 interface UpdatableContentOptions<T> {
   /**
@@ -55,29 +56,36 @@ export const useUpdatableContent = <T>(
   return content;
 };
 
+export type LCUFN<T, A extends any[]> = (
+  connector: lcu.ILCUConnector,
+  ...args: A
+) => lcu.ILCUResult<T>;
+
 export function fetchLCU<T, A extends any[]>(
-  lcuFn: (connector: lcu.ILCUConnector, ...args: A) => lcu.ILCUResult<T>,
+  lcuFn: LCUFN<T, A>,
   ...args: A
 ): lcu.ILCUResult<T> {
   return lcuFn(new LCUConnector(), ...args);
 }
 
-export const useLCUWatch2 = <T, E>(
-  result: lcu.ILCUResult<T>,
-  onError?: (err: lcu.LCUConnectorRequestError) => E
+export const useLCUWatch2 = <T, E, A extends any[]>(
+  lcuFn: LCUFN<T, A>,
+  onError?: (err: lcu.LCUConnectorRequestError) => E,
+  ...args: A
 ) => {
   const [value, setValue] = useState<T | null>(null);
 
-  useEffect(
-    () =>
-      result.watch((v) =>
-        v.then(setValue).catch((e) => {
-          if (onError) onError(e);
-          setValue(null);
-        })
-      ),
-    []
-  );
+  useEffect(() => {
+    const conn = new LCUConnector();
+
+    return lcuFn(conn, ...args).watch((v) =>
+      v.then(setValue).catch((e) => {
+        if (onError) onError(e);
+        setValue(null);
+      })
+    );
+  }, []);
+
   return value;
 };
 

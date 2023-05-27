@@ -22,7 +22,7 @@ export type LCUConnectorEventCallbacks = {
   disconnect: () => void;
   lcuoffline: () => void;
   lcuonline: () => void;
-  uriupdate: (...args: any[]) => void;
+  uriupdate: (uri: string, arg: any) => void;
 };
 
 export type Connection = {
@@ -124,13 +124,9 @@ export class LCUConnector implements ILCUConnector {
   private tryConnecting? = false;
   private connection?: Connection;
 
-  private emit = <E extends LCUConnectorEvent | `uriupdate:${string}`>(
+  private emit = <E extends LCUConnectorEvent>(
     name: E,
-    ...args: E extends `uriupdate:${string}`
-      ? Parameters<LCUConnectorCallback<"uriupdate">>
-      : E extends LCUConnectorEvent
-      ? Parameters<LCUConnectorCallback<E>>
-      : never
+    ...args: Parameters<LCUConnectorCallback<E>>
   ) => {
     // console.log("emitting", name);
     this.eventEmitter.emit(name, ...args);
@@ -145,13 +141,12 @@ export class LCUConnector implements ILCUConnector {
       const c = (uri: string, args: Promise<T>) =>
         uri === url ? cb(args) : undefined;
 
-      this.on(`uriupdate:${url}`, c);
-      return () => this.off(`uriupdate:${url}`, c);
+      this.on(`uriupdate`, c);
+      return () => this.off(`uriupdate`, c);
     };
 
-    if (!this.connection) {
+    if (!this.connection)
       return LCUResult.error(createListener, "clientoffline", url);
-    }
 
     const config: AxiosRequestConfig<any> = {
       url: `https://127.0.0.1:${this.connection.port}${url}`,
@@ -213,22 +208,13 @@ export class LCUConnector implements ILCUConnector {
     return this;
   };
 
-  off = <E extends LCUConnectorEvent | `uriupdate:${string}`>(
+  off = <E extends LCUConnectorEvent>(
     event: E,
     callback: (
-      ...args: E extends `uriupdate:${string}`
-        ? Parameters<LCUConnectorCallback<"uriupdate">>
-        : E extends LCUConnectorEvent
-        ? Parameters<LCUConnectorCallback<E>>
-        : never
-    ) => ReturnType<
-      E extends `uriupdate:${string}`
-        ? LCUConnectorCallback<"uriupdate">
-        : E extends LCUConnectorEvent
-        ? LCUConnectorCallback<E>
-        : never
-    >
+      ...args: Parameters<LCUConnectorCallback<E>>
+    ) => ReturnType<LCUConnectorCallback<E>>
   ): LCUConnector => {
+    console.log("nolistening", event);
     this.eventEmitter.off(event, callback as any);
     return this;
   };
@@ -300,7 +286,7 @@ export class LCUConnector implements ILCUConnector {
           packet.toString() ?? ""
         );
 
-        c.emit(`uriupdate:${data.uri}`, data.data);
+        c.emit(`uriupdate`, data.uri, data.data);
       });
 
       while (this.connection) {
@@ -315,4 +301,8 @@ export class LCUConnector implements ILCUConnector {
     this.connection = undefined;
     this.emit("disconnect");
   };
+
+  constructor() {
+    this.eventEmitter.setMaxListeners(3);
+  }
 }

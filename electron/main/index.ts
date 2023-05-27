@@ -73,9 +73,6 @@ async function createWindow() {
     icon: join(process.env.PUBLIC, "favicon.ico"),
     webPreferences: {
       preload,
-      // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
-      // Consider using contextBridge.exposeInMainWorld
-      // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
       nodeIntegration: true,
       contextIsolation: true,
     },
@@ -238,42 +235,28 @@ ipcMain.handle(
 );
 
 const conn = new LCUConnector();
-let watchers: ((id: number) => void)[] = [];
 
-conn.on("connect", () => {
-  ipcMain.handle(
-    "lcuRequest",
-    async (_event, url: string, method: string, args?: any) => {
-      {
-        const out = await conn
-          .request(url, method, args)
-          .get()
-          .catch((e) => ({ lcuApiError: e }));
-        // console.log(out?.lcuApiError?.error.response);
-        return out;
+conn
+  .on("connect", () => {
+    ipcMain.handle(
+      "lcuRequest",
+      async (_event, url: string, method: string, args?: any) => {
+        {
+          const out = await conn
+            .request(url, method, args)
+            .get()
+            .catch((e) => ({ lcuApiError: e }));
+          // console.log(out?.lcuApiError?.error.response);
+          return out;
+        }
       }
-    }
-    // .then((v) => v)
-    // .catch((e) => ({ lcuApiError: e }))
-  );
-
-  ipcMain.handle("startLcuWatch", (_event, url: string) => {
-    const cb = (arg: any) => {
-      win?.webContents.send(`lcuWatchEvent:${url}`, arg);
-    };
-    conn.on(`uriupdate:${url}`, cb);
-    return (
-      watchers.push((id) => {
-        conn.off(`uriupdate:${url}`, cb);
-        watchers.splice(id, 1);
-      }) - 1
+      // .then((v) => v)
+      // .catch((e) => ({ lcuApiError: e }))
     );
-  });
-
-  ipcMain.handle("stopLcuWatch", (_event, id: number) => {
-    watchers.at(id)?.(id);
-  });
-});
+  })
+  .on("uriupdate", (uri, data) =>
+    win?.webContents.send(`lcuWatchEvent:${uri}`, data)
+  );
 conn.connect();
 
 // setInterval(() => {

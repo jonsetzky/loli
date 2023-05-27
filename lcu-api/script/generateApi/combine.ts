@@ -1,5 +1,6 @@
 import { readFile, readFileSync, writeFileSync } from "fs";
 import { CONFIG2 } from "./config";
+import { convertToValidSymbolName } from "./compile";
 
 export interface IType {
   elementType: string;
@@ -62,22 +63,6 @@ export interface IHelp {
   functions: IFunction[];
   types: IStructType[];
 }
-
-const convertToValidSymbolName = (input: string): string => {
-  // Replace invalid characters with underscores
-  const sanitized = input.replace(/[^a-zA-Z0-9_$]/g, "@&_");
-
-  // Convert to camel case
-  const parts = sanitized.split("@&_");
-  const camelCaseParts = parts.map((part, index) => {
-    if (index === 0) {
-      return part;
-    }
-    return part.charAt(0).toUpperCase() + part.slice(1);
-  });
-
-  return camelCaseParts.join("");
-};
 
 const sanitizeType = (t: IType): IType => ({
   type: convertToValidSymbolName(t.type),
