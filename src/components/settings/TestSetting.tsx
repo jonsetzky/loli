@@ -1,4 +1,4 @@
-import { useSetting } from "@/setting";
+import { useSetting } from "@/hooks/settings";
 import settings from "@/assets/settings";
 import { SettingsKeys } from "electron/main/settings";
 import React, { useId } from "react";

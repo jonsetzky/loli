@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useSyncExternalStore } from "react";
-import { FullscreenNotification } from "./components/FullscreenNotification";
+import { FullscreenNotification } from "./FullscreenNotification";
 import { useLoaderData } from "react-router-dom";
 import type { LCUStatus } from "electron/main/lcu";
 

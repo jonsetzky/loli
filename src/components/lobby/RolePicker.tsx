@@ -1,4 +1,4 @@
-import { useClickOutsideListener } from "@/clickOutside";
+import { useClickOutsideListener } from "@/hooks/clickOutside";
 import { RoleIcon } from "../common/RoleIcon";
 import { Tooltip } from "../common/Tooltip";
 import { useRef } from "react";

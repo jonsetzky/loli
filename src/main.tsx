@@ -11,9 +11,11 @@ import {
   useRouteError,
   useRouteLoaderData,
   useLocation,
+  NavLink,
+  Link,
 } from "react-router-dom";
 import { Play } from "./routes/Play";
-import { ClientStatus } from "./ClientStatus";
+import { ClientStatus } from "./components/ClientStatus";
 import { Root } from "./routes/Root";
 import { ClientStatus as IClientStatus } from "electron/main/lcu/client";
 import { Home } from "./routes/Home";
@@ -30,7 +32,16 @@ const ErrorElement = () => {
   const loc = useLocation();
   const err = useRouteError();
   console.log(err);
-  return <ErrorPage>{(err as any).data}</ErrorPage>;
+  return (
+    <ErrorPage>
+      <div className="flex flex-col">
+        <div>{(err as any).data}</div>
+        <div>
+          <Link to="/">Go to Home</Link>
+        </div>
+      </div>
+    </ErrorPage>
+  );
 };
 
 const router = createBrowserRouter([

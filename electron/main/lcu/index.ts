@@ -5,7 +5,6 @@ import fs from "fs";
 import { readFileSync } from "fs";
 import { WebSocket } from "ws";
 import { BrowserWindow } from "electron";
-import { ISummoner } from "./summoner";
 import { request } from "./request";
 import { isClientAlive, startClient } from "./client";
 import { getSetting, offSettingChange, onSettingChange } from "../settings";

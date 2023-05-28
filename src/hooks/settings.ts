@@ -11,14 +11,11 @@ export const useSetting = <
 
   useEffect(() => {
     window.electron.getSetting<K, R>(key).then((v) => setValue(v));
-    const destructListener = window.electron.onSettingChange<K, R>(
-      key,
-      (e, v) => {
-        console.log("setting setting:", key, v);
-        setValue(v);
-      }
-    );
-    return destructListener;
+    const dest = window.electron.onSettingChange<K, R>(key, (e, v) => {
+      console.log("setting setting:", key, v);
+      setValue(v);
+    });
+    return dest;
   }, []);
 
   const setSetting = (value: R) => {

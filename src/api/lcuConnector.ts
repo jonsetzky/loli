@@ -1,5 +1,8 @@
 import * as lcu from "loli-lcu-api";
 
+/**
+ * Implements connector for lcu functions utilizing electron ipc
+ */
 export class LCUConnector implements lcu.ILCUConnector {
   request<T>(
     url: string,

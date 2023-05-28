@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { AssetImage } from "../common/AssetImage";
-import { ISummoner } from "electron/main/lcu/summoner";
 import { Tooltip } from "../common/Tooltip";
 import { FullscreenElement } from "../common/FullscreenElement";
-import { fetchLCU, useLCUWatch, useLCUWatch2 } from "@/updatableContent";
+import { fetchLCU, useLCUWatch } from "@/hooks/updatableContent";
 import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
@@ -23,7 +22,7 @@ export const NavbarSummonerIcon = ({
 }: {
   summoner: lcu.LolSummonerSummoner | null;
 }) => {
-  const ownedIcons = useLCUWatch2(
+  const ownedIcons = useLCUWatch(
     lcu.inventory.getInventoryByInventoryType,
     (err) => console.error(err),
     "SUMMONER_ICON"

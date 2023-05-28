@@ -1,4 +1,4 @@
-import { useLCUWatch, useLCUWatch2 } from "@/updatableContent";
+import { useLCUWatch } from "@/hooks/updatableContent";
 import React, { useEffect, useRef, useState } from "react";
 import { FriendCard } from "./FriendCard";
 import { Drawer } from "../common/Drawer";
@@ -31,7 +31,7 @@ export const FriendList = ({
   const [friendsList, setFriendsList] = useState<JSX.Element[]>();
   const avs = useRef(new Map<string, string>());
 
-  const friends = useLCUWatch2(lcu.chat.getFriends, (err) =>
+  const friends = useLCUWatch(lcu.chat.getFriends, (err) =>
     console.error("error getting friends", err)
   );
 
@@ -39,7 +39,7 @@ export const FriendList = ({
    * Friend count is updated when a single friend is updated, use the friend
    * count in friendcard elements to update them
    */
-  const friendCounts = useLCUWatch2(lcu.chat.getFriendCounts, (err) =>
+  const friendCounts = useLCUWatch(lcu.chat.getFriendCounts, (err) =>
     console.error("error getting friend counts", err)
   );
 

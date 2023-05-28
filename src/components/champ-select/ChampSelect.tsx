@@ -1,11 +1,11 @@
-import { fetchLCU, useLCUWatch2 } from "@/updatableContent";
+import { fetchLCU, useLCUWatch } from "@/hooks/updatableContent";
 import React, { useEffect, useState } from "react";
 import { ErrorPage } from "../ErrorPage";
 import { AssetImage } from "../common/AssetImage";
 import champions from "@/assets/champion.json";
-import { cancelCustomGameChampSelect } from "@/api/customGame";
+import { cancelCustomGameChampSelect } from "@/api/lobby/customGame";
 import * as lcu from "loli-lcu-api";
-import { sortText } from "@/sortText";
+import { sortText } from "@/util";
 
 const getChampionIconId = (id: number) => {
   return Object.values(champions.data).find((c) => c.key === String(id))
@@ -13,8 +13,8 @@ const getChampionIconId = (id: number) => {
 };
 
 export const ChampSelect = () => {
-  const session = useLCUWatch2(lcu.champ_select.getSession, console.error);
-  const lobby = useLCUWatch2(lcu.lobby.getLobby, console.error);
+  const session = useLCUWatch(lcu.champ_select.getSession, console.error);
+  const lobby = useLCUWatch(lcu.lobby.getLobby, console.error);
   const [championMastery, setChampionMastery] = useState<
     lcu.LolCollectionsCollectionsChampionMastery[] | null
   >();
@@ -58,12 +58,12 @@ export const ChampSelect = () => {
       .catch((v: any) => console.log("got err ", v));
   };
 
-  const allGridChamps = useLCUWatch2(
+  const allGridChamps = useLCUWatch(
     lcu.champ_select.getAllGridChampions,
     console.error
   );
 
-  const pickableChampions = useLCUWatch2(
+  const pickableChampions = useLCUWatch(
     lcu.champ_select.getPickableChampionIds,
     console.error
   );

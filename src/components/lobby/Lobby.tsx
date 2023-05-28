@@ -1,7 +1,6 @@
-import { useLCUWatch2 } from "@/updatableContent";
+import { useLCUWatch } from "@/hooks/updatableContent";
 import React, { useEffect, useState } from "react";
 import { LobbySummonerCard } from "./LobbySummonerCard";
-import { ISummoner } from "electron/main/lcu/summoner";
 import { FullscreenNotification } from "../FullscreenNotification";
 import { useNavigate } from "react-router-dom";
 import queues from "../../assets/queues.json";
@@ -9,14 +8,14 @@ import ReactDropdown from "react-dropdown";
 import { ErrorPage } from "@/components/ErrorPage";
 import { GameModePicker } from "@/components/game-mode-picker/GameModePicker";
 import { useRootContext } from "../../routes/Root";
-import { setPartyType } from "@/api/partyType";
-import { setLobbyQueueId } from "@/api/lobbyQueueId";
-import { cancelMatchSearch, matchSearch } from "@/api/searchMatch";
+import { setPartyType } from "@/api/lobby/party";
+import { setLobbyQueueId } from "@/api/lobby/queue";
+import { cancelMatchSearch, matchSearch } from "@/api/lobby/search";
 import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 import * as lcu from "loli-lcu-api";
-import { startCustomGameChampSelect } from "@/api/customGame";
+import { startCustomGameChampSelect } from "@/api/lobby/customGame";
 
 export const Lobby = () => {
   // const ctx = useRootContext();
@@ -25,13 +24,13 @@ export const Lobby = () => {
   const [arrowVisible, setArrowVisible] = useState(false);
   const [queuePickerVisible, setQueuePickerVisible] = useState(false);
 
-  const lobby = useLCUWatch2(lcu.lobby.getLobby, (err) =>
+  const lobby = useLCUWatch(lcu.lobby.getLobby, (err) =>
     err.error.response.status === 404
       ? undefined
       : console.error("error getting lobby", err)
   );
 
-  const searchState = useLCUWatch2(
+  const searchState = useLCUWatch(
     lcu.lobby.lobby_matchmaking.getSearchState,
     (err) => console.error("error getting search state", err)
   );

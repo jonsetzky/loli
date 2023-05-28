@@ -1,11 +1,10 @@
 import React, { useEffect, useId, useState } from "react";
 import { AssetImage } from "../common/AssetImage";
-import { fetchLCU, useLCUWatch2 } from "@/updatableContent";
-import { ISummoner } from "electron/main/lcu/summoner";
+import { fetchLCU, useLCUWatch } from "@/hooks/updatableContent";
 import { Tooltip } from "../common/Tooltip";
 import { Role, RolePicker } from "./RolePicker";
-import { useSetting } from "@/setting";
-import { setRoles } from "@/api/lobbyRoles";
+import { useSetting } from "@/hooks/settings";
+import { setRoles } from "@/api/lobby/roles";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
@@ -36,7 +35,7 @@ export const LobbySummonerCard = ({
 
   const memberIsLocal = lobby?.localMember.summonerId === member.summonerId;
 
-  const summoner = useLCUWatch2(
+  const summoner = useLCUWatch(
     lcu.hovercard.getFriendInfoBySummonerBySummonerId,
     (err) => console.error("error", err),
     member.summonerId

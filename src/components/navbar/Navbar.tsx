@@ -7,10 +7,10 @@ import { Link } from "react-router-dom";
 import { Tooltip } from "../common/Tooltip";
 import { NavbarLink } from "./NavbarLink";
 import { AssetImage } from "../common/AssetImage";
-import { useSetting } from "../../setting";
+import { useSetting } from "../../hooks/settings";
 import { Settings } from "../../routes/Settings";
 import { NavbarSummonerIcon } from "./NavbarSummonerIcon";
-import { fetchLCU, useLCUWatch, useLCUWatch2 } from "@/updatableContent";
+import { fetchLCU, useLCUWatch } from "@/hooks/updatableContent";
 // import { Tooltip } from "react-tooltip";
 
 import * as lcu from "loli-lcu-api";
@@ -19,7 +19,7 @@ export const Navbar = () => {
   const [testVisible, setTestVisible] = useSetting("testSetting");
   const [settingsVisible, setSettingsVisible] = useState(false);
 
-  const summoner = useLCUWatch2(lcu.summoner.getCurrentSummoner);
+  const summoner = useLCUWatch(lcu.summoner.getCurrentSummoner);
 
   // const summoner = useLCUWatch((conn) => lcu.summoner.getCurrentSummoner(conn));
 

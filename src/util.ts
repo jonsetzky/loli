@@ -1,5 +1,3 @@
-import { BanknotesIcon } from "@heroicons/react/24/solid";
-
 export const sortText = <T = undefined>(
   ...[priority, map]: T extends string
     ? [string[], ((i: T) => string)?]

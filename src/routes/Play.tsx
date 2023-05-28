@@ -1,4 +1,4 @@
-import { setLobbyQueueId } from "@/api/lobbyQueueId";
+import { setLobbyQueueId } from "@/api/lobby/queue";
 import { ErrorPage } from "@/components/ErrorPage";
 import { GameModePicker } from "@/components/game-mode-picker/GameModePicker";
 import { Lobby } from "@/components/lobby/Lobby";
@@ -12,7 +12,7 @@ import {
   useRouteLoaderData,
 } from "react-router-dom";
 import * as lcu from "loli-lcu-api";
-import { fetchLCU, useLCUWatch, useLCUWatch2 } from "@/updatableContent";
+import { fetchLCU, useLCUWatch } from "@/hooks/updatableContent";
 import { useMatch } from "react-router-dom";
 
 enum MapAssetNames {
@@ -64,7 +64,7 @@ interface ITeamParticipant {
 }
 
 export const Play = () => {
-  const gfStatus = useLCUWatch2(lcu.gameflow.getSession);
+  const gfStatus = useLCUWatch(lcu.gameflow.getSession);
   const navigate = useNavigate();
   const location = useLocation();
   // const router = useRouteMatch();

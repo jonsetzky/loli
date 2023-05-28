@@ -6,15 +6,15 @@ import React, {
   useState,
 } from "react";
 import { FullscreenNotification } from "../FullscreenNotification";
-import { useLCUWatch2 } from "@/updatableContent";
+import { useLCUWatch } from "@/hooks/updatableContent";
 import { ErrorPage } from "../ErrorPage";
 import ReactDropdown from "react-dropdown";
-import { sortText } from "@/sortText";
-import { useClickOutsideListener } from "@/clickOutside";
+import { sortText } from "@/util";
+import { useClickOutsideListener } from "@/hooks/clickOutside";
 import { GameModeQueue } from "./GameModeQueue";
 import { GameMode } from "./GameMode";
 import * as lcu from "loli-lcu-api";
-import { createCustomGame } from "@/api/customGame";
+import { createCustomGame } from "@/api/lobby/customGame";
 
 export const GameModePicker = ({
   gameMode,
@@ -34,8 +34,8 @@ export const GameModePicker = ({
   //   console.error("error getting queue info", err), 1
   // );
 
-  const queueInfo = useLCUWatch2(lcu.game_queues.getQueues);
-  const mapInfo = useLCUWatch2(lcu.maps.getMaps);
+  const queueInfo = useLCUWatch(lcu.game_queues.getQueues);
+  const mapInfo = useLCUWatch(lcu.maps.getMaps);
 
   if (!queueInfo || !mapInfo) return <></>;
 

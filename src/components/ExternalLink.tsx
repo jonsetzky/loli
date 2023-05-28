@@ -1,5 +1,4 @@
 import React from "react";
-import { useLockfile } from "./lockfile";
 import type { Lockfile } from "electron/main/lcu/lockfile";
 
 export const ExternalLink = ({

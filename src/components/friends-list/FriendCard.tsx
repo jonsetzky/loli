@@ -1,7 +1,7 @@
-import { fetchLCU, useLCUWatch2 } from "@/updatableContent";
+import { fetchLCU, useLCUWatch } from "@/hooks/updatableContent";
 import React, { memo, useEffect, useId, useState } from "react";
 import { AssetImage } from "../common/AssetImage";
-import { ExternalLink } from "@/ExternalLink";
+import { ExternalLink } from "@/components/ExternalLink";
 import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
@@ -17,7 +17,7 @@ export const FriendCard = ({
   const id = useId();
   const [tooltip, setTooltip] = useState<string | null>(null);
 
-  const friend = useLCUWatch2(
+  const friend = useLCUWatch(
     lcu.hovercard.getFriendInfoByPuuid,
     (err) => console.error("error getting friend info", err),
     puuid

@@ -1,4 +1,4 @@
-import { fetchLCU } from "@/updatableContent";
+import { fetchLCU } from "@/hooks/updatableContent";
 import * as lcu from "loli-lcu-api";
 
 export const setLobbyQueueId = (id: number) => {

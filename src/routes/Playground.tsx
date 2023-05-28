@@ -1,6 +1,9 @@
-import { createCustomGame, startCustomGameChampSelect } from "@/api/customGame";
-import { setRegalia } from "@/api/regalia";
-import { matchSearch } from "@/api/searchMatch";
+import {
+  createCustomGame,
+  startCustomGameChampSelect,
+} from "@/api/lobby/customGame";
+import { setRegalia } from "@/api/social/regalia";
+import { matchSearch } from "@/api/lobby/search";
 import { ContextMenu } from "@/components/context-menu/ContextMenu";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useNavigationType } from "react-router-dom";
