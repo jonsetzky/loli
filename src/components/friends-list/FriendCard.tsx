@@ -7,7 +7,7 @@ import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 import * as lcu from "loli-lcu-api";
 import { AssetSprite } from "../common/AssetSprite";
-import pfpData from "../../../public/dragontail/latest/data/en_GB/profileicon.json";
+import pfpData from "@/assets/dragontail/data/en_GB/profileicon.json";
 
 export const FriendCard = ({
   puuid,

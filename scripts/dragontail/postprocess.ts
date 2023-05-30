@@ -15,11 +15,13 @@ export const dragontailPostProcess = (dir: string) => {
   const patchDir = readdirSync(dir).find((d) => d.match(/^lolpatch_/));
   if (patchDir) rmSync(d(patchDir), { recursive: true, force: true });
 
-  renameSync(d("languages.json"), d(`${version}/languages.json`));
+  renameSync(d("languages.json"), d(`${version}/data/languages.json`));
   rmSync(d("languages.js"));
 
   rmSync(d(version, "js"), { recursive: true, force: true });
   rmSync(d(version, "css"), { recursive: true, force: true });
+  rmSync(d(version, "manifest.js"));
+  rmSync(d(version, "manifest.json"));
 
   readdirSync(d("img")).forEach((imgDir) => {
     let ext = "";

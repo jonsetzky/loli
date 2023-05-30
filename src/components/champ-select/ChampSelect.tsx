@@ -6,7 +6,7 @@ import champions from "@/assets/champion.json";
 import { cancelCustomGameChampSelect } from "@/api/lobby/customGame";
 import * as lcu from "loli-lcu-api";
 import { sortText } from "@/util";
-import championData from "../../../public/dragontail/latest/data/en_GB/champion.json";
+import championData from "@/assets/dragontail/data/en_GB/champion.json";
 import { AssetSprite } from "../common/AssetSprite";
 
 const getChampionIconId = (id: number) => {

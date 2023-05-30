@@ -6,11 +6,16 @@ import cliProgress from "cli-progress";
 import path from "path";
 import { dragontailPostProcess } from "./postprocess";
 import { copy } from "fs-extra";
-import { readFileSync, writeFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { setup } from "./setup";
 
 interface VersionsManifest {
   latest: string;
 }
+
+const ensureDir = (p: string) => {
+  if (!existsSync(p)) mkdirSync(p, { recursive: true });
+};
 
 const editVersionsManifest = (
   fn: (manifest: VersionsManifest | undefined) => VersionsManifest
@@ -25,7 +30,7 @@ const editVersionsManifest = (
 };
 
 const dragontailFolder = (...p: string[]): string =>
-  path.join("./public/dragontail", ...p);
+  path.join("./dragontail", ...p);
 
 const main = async () => {
   if (!(await checkDragontailUpdates())) {
@@ -33,21 +38,30 @@ const main = async () => {
     return;
   }
 
+  setup(".");
+
   const latest = await getLatestVersion();
   console.log("Downloading version", latest);
   console.log("URL", await getDragontailUrlByVersion(latest as any));
 
   await downloadTgz(
     await getDragontailUrlByVersion(latest as any),
-    dragontailFolder(latest)
+    dragontailFolder("temp")
   );
 
-  dragontailPostProcess(dragontailFolder(latest));
+  dragontailPostProcess(dragontailFolder("temp"));
 
-  copy(dragontailFolder(latest, latest), "./public/dragontail/latest", {
+  writeFileSync(dragontailFolder("version"), latest);
+
+  copy(
+    dragontailFolder("temp", latest, "data"),
+    "./src/assets/dragontail/data",
+    { overwrite: true }
+  );
+
+  copy(dragontailFolder("temp", latest, "img"), "./public/dragontail/img", {
     overwrite: true,
   });
-  editVersionsManifest((m) => ({ ...m, latest }));
 };
 
 if (require.main === module) {

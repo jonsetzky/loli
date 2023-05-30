@@ -7,7 +7,7 @@ import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 import * as lcu from "loli-lcu-api";
-import pfpData from "../../../public/dragontail/latest/data/en_GB/profileicon.json";
+import pfpData from "@/assets/dragontail/data/en_GB/profileicon.json";
 import { AssetSprite } from "../common/AssetSprite";
 
 const setSummonerIcon = (id: number) => {

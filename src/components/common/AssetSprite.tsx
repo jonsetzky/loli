@@ -28,7 +28,7 @@ export const AssetSprite = ({
       style={{
         height: px(h),
         width: px(w),
-        backgroundImage: `url('/dragontail/latest/img/sprite/${sprite}')`,
+        backgroundImage: `url('/dragontail/img/sprite/${sprite}')`,
         backgroundPositionX: px(-x),
         backgroundPositionY: px(-y),
         zoom: scale ?? 1,

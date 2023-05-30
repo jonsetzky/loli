@@ -1,9 +1,8 @@
 {
   "name": "loli",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "main": "dist-electron/main/index.js",
-  "description": "Electron Vite React boilerplate.",
-  "author": "草鞋没号 <308487730@qq.com>",
+  "description": "Improves the league of legends client.",
   "license": "MIT",
   "private": true,
   "debug": {
@@ -20,7 +19,7 @@
     "test": "jest",
     "test:watch": "jest --watch-all",
     "dragontail:update": "npx tsx ./scripts/dragontail/update.ts",
-    "dragontail:check": "npx tsx ./scripts/dragontail/check.ts"
+    "dragontail:clean": "npx tsx ./scripts/dragontail/clean.ts"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^1.0.3",

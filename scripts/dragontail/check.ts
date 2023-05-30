@@ -1,6 +1,6 @@
 import axios from "axios";
 import { getLatestVersion } from "./latest";
-import { readdirSync, readFileSync } from "fs";
+import { readdirSync, readFileSync, existsSync } from "fs";
 import { DragontailVersion } from "./dragontail";
 import semver from "semver";
 
@@ -18,6 +18,7 @@ const findGreatestVersion = (
  * Returns true if there are updates available
  */
 export const checkDragontailUpdates = async (): Promise<boolean> => {
+  if (!existsSync("./dragontail/version")) return true;
   const latest = await getLatestVersion();
   //   const current = findGreatestVersion(
   //     readdirSync("./public/dragontail", {
@@ -26,9 +27,7 @@ export const checkDragontailUpdates = async (): Promise<boolean> => {
   //       .map((d) => d.toString())
   //       .filter((d) => d.match(/^\d+\.\d+\.\d+$/))
   //   );
-  const current = JSON.parse(
-    readFileSync("./public/dragontail/versions.json").toString()
-  ).latest;
+  const current = readFileSync("./dragontail/version").toString();
 
   return semver.gt(latest, current);
 };
