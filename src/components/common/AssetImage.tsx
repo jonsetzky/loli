@@ -10,8 +10,8 @@ export const AssetImage = ({
 }: { uri: string } & LazyLoadImageProps) => {
   return (
     <LazyLoadImage
-      placeholderSrc={`/dragontail/13.9.1/img${placeholderSrc}`}
-      src={`/dragontail/13.9.1/img${uri}`}
+      placeholderSrc={`/dragontail/latest/img${placeholderSrc}`}
+      src={`/dragontail/latest/img${uri}`}
       {...p}
     />
     // <img

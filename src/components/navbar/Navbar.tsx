@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { XMarkIcon, Cog6ToothIcon } from "@heroicons/react/24/solid";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Lockfile } from "electron/main/lcu/lockfile";
-import { ISummoner } from "electron/main/lcu/summoner";
 import { Link } from "react-router-dom";
 import { Tooltip } from "../common/Tooltip";
 import { NavbarLink } from "./NavbarLink";
