@@ -6,6 +6,8 @@ import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 import * as lcu from "loli-lcu-api";
+import { AssetSprite } from "../common/AssetSprite";
+import pfpData from "../../../public/dragontail/latest/data/en_GB/profileicon.json";
 
 export const FriendCard = ({
   puuid,
@@ -74,13 +76,25 @@ export const FriendCard = ({
         className="bg-black text-white no-drag"
       >
         <div className="flex w-full">
-          <div className="w-6">
-            <AssetImage
+          {(() => {
+            const pfpd = Object.entries(pfpData.data).find(
+              ([id, data]) => id === String(friend.icon)
+            )?.[1];
+            if (!pfpd) {
+              console.error("couldn't find profile icon with id", friend.icon);
+              return <></>;
+            }
+            return (
+              <div className="w-6 " key={friend.icon}>
+                <AssetSprite {...pfpd.image} scale={0.5} />
+              </div>
+            );
+          })()}
+          {/* <AssetImage
               key={friend.icon}
               uri={`/profileicon/${friend.icon}.png`}
               placeholderSrc="/profileicon/29.png"
-            />
-          </div>
+            /> */}
           <div className="grow flex flex-row justify-start">
             <div
               data-tooltip-id="friend-info-tooltip"

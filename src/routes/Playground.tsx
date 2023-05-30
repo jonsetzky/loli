@@ -8,6 +8,7 @@ import { ContextMenu } from "@/components/context-menu/ContextMenu";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useNavigationType } from "react-router-dom";
 import * as lcu from "loli-lcu-api";
+import { AssetSprite } from "@/components/common/AssetSprite";
 
 const test = () => {};
 /**

@@ -7,6 +7,8 @@ import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 import * as lcu from "loli-lcu-api";
+import pfpData from "../../../public/dragontail/latest/data/en_GB/profileicon.json";
+import { AssetSprite } from "../common/AssetSprite";
 
 const setSummonerIcon = (id: number) => {
   fetchLCU((conn) =>
@@ -44,17 +46,31 @@ export const NavbarSummonerIcon = ({
         <div className="ml-24 mr-24 mt-36 mb-36 overflow-y-scroll">
           <div className="grid grid-cols-7">
             {" "}
-            {ownedIconIds.map((id) => (
-              <AssetImage
-                className="w-24"
-                uri={`/profileicon/${id}.png`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSummonerIcon(id);
-                  setIconEditorOpen(false);
-                }}
-              />
-            ))}
+            {ownedIconIds.map((id) => {
+              const pfpd = Object.entries(pfpData.data).find(
+                ([i, data]) => i === String(id)
+              )?.[1];
+              if (!pfpd) {
+                console.error("couldn't find profile icon with id", id);
+                return <div className="w-24"></div>;
+              }
+
+              return (
+                <>
+                  <AssetSprite
+                    data-context-menu
+                    id={`summoner-icon-editor-icon-${id}`}
+                    {...pfpd.image}
+                    scale={1.2}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSummonerIcon(id);
+                      setIconEditorOpen(false);
+                    }}
+                  />
+                </>
+              );
+            })}
           </div>
         </div>
       </FullscreenElement>

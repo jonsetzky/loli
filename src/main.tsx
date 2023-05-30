@@ -37,7 +37,9 @@ const ErrorElement = () => {
       <div className="flex flex-col">
         <div>{(err as any).data}</div>
         <div>
-          <Link to="/">Go to Home</Link>
+          <Link to="/" className="btn">
+            Go to Home
+          </Link>
         </div>
       </div>
     </ErrorPage>

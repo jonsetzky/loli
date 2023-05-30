@@ -6,6 +6,8 @@ import champions from "@/assets/champion.json";
 import { cancelCustomGameChampSelect } from "@/api/lobby/customGame";
 import * as lcu from "loli-lcu-api";
 import { sortText } from "@/util";
+import championData from "../../../public/dragontail/latest/data/en_GB/champion.json";
+import { AssetSprite } from "../common/AssetSprite";
 
 const getChampionIconId = (id: number) => {
   return Object.values(champions.data).find((c) => c.key === String(id))
@@ -114,7 +116,7 @@ export const ChampSelect = () => {
           </button>
         )}
       </div>
-      <div className="grid grid-cols-9">
+      <div className="grid grid-cols-7">
         {allGridChamps
           ?.sort(
             (a, b) =>
@@ -127,13 +129,28 @@ export const ChampSelect = () => {
           // ?.sort((a, b) => {
           //   return b.masteryPoints - a.masteryPoints;
           // })
-          ?.map((c) => (
-            <AssetImage
-              className=""
-              uri={`/champion/${getChampionIconId(c.id)}.png`}
-              onClick={() => hoverChampion(c.id)}
-            />
-          ))}
+          ?.map((c) => {
+            const cd = Object.entries(championData.data).find(
+              ([name, value]) => Number.parseInt(value.key) === c.id
+            )?.[1];
+            if (!cd)
+              return (
+                <div
+                  className="bg-slate-700"
+                  style={{ width: "48px", height: "48px" }}
+                />
+              );
+            return (
+              <AssetSprite {...cd.image} onClick={() => hoverChampion(c.id)} />
+            );
+            // return '(
+            //   <AssetImage
+            //     className=""
+            //     uri={`/champion/${getChampionIconId(c.id)}.png`}
+            //     onClick={() => hoverChampion(c.id)}
+            //   />
+            // );'
+          })}
         {/* {pickableChampions
           ?.map(
             (c) =>
