@@ -4,10 +4,11 @@ import https from "https";
 import fs from "fs";
 import { readFileSync } from "fs";
 import { WebSocket } from "ws";
-import { BrowserWindow } from "electron";
+import { BrowserWindow, app } from "electron";
 import { request } from "./request";
 import { isClientAlive, startClient } from "./client";
 import { getSetting, offSettingChange, onSettingChange } from "../settings";
+import path from "path";
 
 export type LCUStatus =
   | "starting"
@@ -58,7 +59,7 @@ export class LCU {
       while ((await isClientAlive()).online && !connected) {
         const newWs = new WebSocket(`wss://127.0.0.1:${lockfile.port}`, {
           // auth: "Basic " + authString,
-          ca: readFileSync("./riotgames.pem"),
+          ca: readFileSync(path.join(process.env.PUBLIC, "riotgames.pem")),
           headers: {
             Authorization: "Basic " + authString,
           },

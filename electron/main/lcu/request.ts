@@ -2,7 +2,8 @@ import axios, { AxiosRequestConfig } from "axios";
 import { Lockfile } from "./lockfile";
 import { readFileSync } from "fs";
 import https from "https";
-
+import { app } from "electron";
+import path from "path";
 export const request = (
   lockfile: Lockfile,
   endpoint: string,
@@ -17,7 +18,7 @@ export const request = (
       username: "riot",
     },
     httpsAgent: new https.Agent({
-      ca: readFileSync("./riotgames.pem"),
+      ca: readFileSync(path.join(process.env.PUBLIC, "riotgames.pem")),
     }),
     headers: {
       "Content-Type": "application/json",
@@ -48,7 +49,7 @@ export const requestAsset = (
       username: "riot",
     },
     httpsAgent: new https.Agent({
-      ca: readFileSync("./riotgames.pem"),
+      ca: readFileSync(path.join(process.env.PUBLIC, "riotgames.pem")),
     }),
     responseType: "arraybuffer",
   })

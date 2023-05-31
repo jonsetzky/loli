@@ -16,7 +16,7 @@ import {
   onSettingChange,
   setSetting,
 } from "./settings";
-import { LCUConnector } from "./lcu/v2/connector";
+import { LCUAssetConnector, LCUConnector } from "./lcu/v2/connector";
 import { writeFileSync } from "original-fs";
 
 // The built directory structure
@@ -152,7 +152,8 @@ ipcMain.handle("open-win", (_, arg) => {
   if (process.env.VITE_DEV_SERVER_URL) {
     childWindow.loadURL(`${url}#${arg}`);
   } else {
-    childWindow.loadFile(indexHtml, { hash: arg });
+    childWindow.loadFile("/");
+    // childWindow.loadFile(indexHtml, { hash: arg });
   }
 });
 
@@ -238,27 +239,35 @@ ipcMain.handle(
 const conn = new LCUConnector();
 
 conn
-  .on("connect", () => {
-    ipcMain.handle(
-      "lcuRequest",
-      async (_event, url: string, method: string, args?: any) => {
-        {
-          const out = await conn
-            .request(url, method, args)
-            .get()
-            .catch((e) => ({ lcuApiError: e }));
-          // console.log(out?.lcuApiError?.error.response);
-          return out;
-        }
-      }
-      // .then((v) => v)
-      // .catch((e) => ({ lcuApiError: e }))
-    );
-  })
+  .on("connect", () => {})
   .on("uriupdate", (uri, data) =>
     win?.webContents.send(`lcuWatchEvent:${uri}`, data)
   );
 conn.connect();
+conn.listen();
+
+ipcMain.handle(
+  "lcuRequest",
+  async (_event, url: string, method: string, args?: any) => {
+    {
+      const out = await conn
+        .request(url, method, args)
+        .get()
+        .catch((e) => ({ lcuApiError: e }));
+      // console.log(out?.lcuApiError?.error.response);
+      return out;
+    }
+  }
+);
+
+ipcMain.handle("lcuRequestAsset", async (_event, uri: string) => {
+  const conn = new LCUAssetConnector();
+  conn.connect();
+  await conn
+    .request<ArrayBuffer>(uri, "get")
+    .get()
+    .catch((e) => ({ lcuApiError: e }));
+});
 
 // setInterval(() => {
 //   win?.webContents.send(

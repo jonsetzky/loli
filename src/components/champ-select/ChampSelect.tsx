@@ -1,7 +1,6 @@
 import { fetchLCU, useLCUWatch } from "@/hooks/updatableContent";
 import React, { useEffect, useState } from "react";
 import { ErrorPage } from "../ErrorPage";
-import { AssetImage } from "../common/AssetImage";
 import champions from "@/assets/champion.json";
 import { cancelCustomGameChampSelect } from "@/api/lobby/customGame";
 import * as lcu from "loli-lcu-api";
@@ -143,28 +142,7 @@ export const ChampSelect = () => {
             return (
               <AssetSprite {...cd.image} onClick={() => hoverChampion(c.id)} />
             );
-            // return '(
-            //   <AssetImage
-            //     className=""
-            //     uri={`/champion/${getChampionIconId(c.id)}.png`}
-            //     onClick={() => hoverChampion(c.id)}
-            //   />
-            // );'
           })}
-        {/* {pickableChampions
-          ?.map(
-            (c) =>
-              Object.entries(champions.data).find(
-                ([n, d]) => d.key === String(c)
-              )?.[1]
-          )
-          .filter((c) => c !== undefined)
-          .sort(function (a, b) {
-            return (a as any).id.localeCompare((b as any).id);
-          })
-          .map((c) => (
-            <AssetImage className="" uri={`/champion/${c?.id}.png`} />
-          ))} */}
       </div>
       <div>{JSON.stringify(session)}</div>
     </>

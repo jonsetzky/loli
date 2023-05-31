@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AssetImage } from "../common/AssetImage";
+import { LCUAssetImage } from "../common/AssetImage";
 import { Tooltip } from "../common/Tooltip";
 import { FullscreenElement } from "../common/FullscreenElement";
 import { fetchLCU, useLCUWatch } from "@/hooks/updatableContent";
@@ -106,7 +106,7 @@ export const NavbarSummonerIcon = ({
           </ContextMenuListItem>
         </ContextMenuList>
       </ContextMenu>
-      <AssetImage
+      <LCUAssetImage
         id="navbar-summoner-icon"
         uri={`/profileicon/${summoner?.profileIconId ?? "29"}.png`}
         data-context-menu

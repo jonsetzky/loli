@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.scss";
 import { Navbar } from "./components/navbar/Navbar";
 import {
-  createBrowserRouter,
+  createHashRouter,
   RouterProvider,
   Outlet,
   LoaderFunction,
@@ -46,7 +46,7 @@ const ErrorElement = () => {
   );
 };
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     errorElement: <ErrorElement />,

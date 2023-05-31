@@ -1,6 +1,6 @@
 import { fetchLCU, useLCUWatch } from "@/hooks/updatableContent";
 import React, { memo, useEffect, useId, useState } from "react";
-import { AssetImage } from "../common/AssetImage";
+
 import { ExternalLink } from "@/components/ExternalLink";
 import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuList } from "../context-menu/ContextMenuList";
@@ -90,11 +90,7 @@ export const FriendCard = ({
               </div>
             );
           })()}
-          {/* <AssetImage
-              key={friend.icon}
-              uri={`/profileicon/${friend.icon}.png`}
-              placeholderSrc="/profileicon/29.png"
-            /> */}
+
           <div className="grow flex flex-row justify-start">
             <div
               data-tooltip-id="friend-info-tooltip"

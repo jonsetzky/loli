@@ -1,5 +1,5 @@
 import React, { useEffect, useId, useState } from "react";
-import { AssetImage } from "../common/AssetImage";
+import { LCUAssetImage } from "../common/AssetImage";
 import { fetchLCU, useLCUWatch } from "@/hooks/updatableContent";
 import { Tooltip } from "../common/Tooltip";
 import { Role, RolePicker } from "./RolePicker";
@@ -124,10 +124,10 @@ export const LobbySummonerCard = ({
 
       <div className="flex flex-row ml-1 mr-1 mb-1 gap-1 h-full">
         <div className="flex flex-col gap-1 w-16">
-          <AssetImage
+          <LCUAssetImage
             key={summoner.icon}
             uri={`/profileicon/${summoner.icon}.png`}
-            placeholderSrc="/profileicon/29.png"
+            placeholderSrc={"/profileicon/29.png"}
           />
           {lobby?.gameConfig.showPositionSelector ? (
             <div className="flex flex-row grow justify-center">

@@ -2,7 +2,7 @@
   "name": "loli",
   "version": "2.2.1",
   "main": "dist-electron/main/index.js",
-  "description": "Improves the league of legends client.",
+  "description": "League of Legends improved",
   "license": "MIT",
   "private": true,
   "debug": {

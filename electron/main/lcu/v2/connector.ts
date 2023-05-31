@@ -4,7 +4,7 @@ import { readFileSync, existsSync } from "fs";
 import axios, { AxiosRequestConfig } from "axios";
 import path from "path";
 import YAML from "yaml";
-import { execSync } from "child_process";
+import { execSync, exec } from "child_process";
 import WebSocket from "ws";
 import {
   LCUConnectorRequestError,
@@ -12,6 +12,7 @@ import {
   ILCUResult,
 } from "loli-lcu-api/src/connector.types";
 import * as lcu from "loli-lcu-api";
+import { app } from "electron";
 
 export type LCUConnectorEvent = keyof LCUConnectorEventCallbacks;
 export type LCUConnectorCallback<E extends LCUConnectorEvent> =
@@ -56,11 +57,13 @@ const getLcuInstallPath = (patchLine: "live" | "pbe"): Promise<string> =>
       throw e;
     });
 
-const getApplicationCommandLine = (name: string) =>
-  execSync(`WMIC PROCESS WHERE name="${name}" GET commandline`)
-    .toString()
-    .replace(/\s+/g, " ")
-    .replace(/^commandline\s*/i, "");
+const getApplicationCommandLine = async (name: string) =>
+  new Promise<string>((resolve, reject) =>
+    exec(`WMIC PROCESS WHERE name="${name}" GET commandline`, (err, out) => {
+      if (err) reject("Error getting lcu command line");
+      resolve(out.replace(/\s+/g, " ").replace(/^commandline\s*/i, ""));
+    })
+  );
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
@@ -107,10 +110,68 @@ class LCUResult<T> implements ILCUResult<T> {
   };
 }
 
-export class LCUConnector implements ILCUConnector {
-  private eventEmitter: EventEmitter = new EventEmitter();
+const request = <T>(
+  connector: LCUConnector,
+  cfg: AxiosRequestConfig<any>,
+  url: string,
+  method: string,
+  args?: { [key: string]: any }
+): ILCUResult<T> => {
+  const createListener = (cb: (v: Promise<T>) => void): Destructor => {
+    const c = (uri: string, args: Promise<T>) =>
+      uri === url ? cb(args) : undefined;
 
-  private _clientOnline = false;
+    connector.on(`uriupdate`, c);
+    return () => connector.off(`uriupdate`, c);
+  };
+
+  if (!connector.connection)
+    return LCUResult.error(createListener, "clientoffline", url);
+
+  let config: AxiosRequestConfig<any> = {
+    url: `https://127.0.0.1:${connector.connection.port}${url}`,
+    method,
+    auth: {
+      password: connector.connection.pwd,
+      username: "riot",
+    },
+    httpsAgent: new https.Agent({
+      ca: readFileSync(path.join(process.env.PUBLIC, "riotgames.pem")),
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: args,
+  };
+  config = { ...config, ...cfg };
+
+  const value = axios
+    .request<T>(config)
+    .then((v) => v.data)
+    .catch((error) =>
+      Promise.reject({
+        reason: "httperror",
+        error: {
+          url: error.request.path,
+          data: error.data,
+          status: error.status,
+          message: error.message,
+          response: {
+            status: error.response.status,
+            statusText: error.response.statusText,
+            data: error.response.data,
+          },
+        },
+      })
+    );
+
+  return new LCUResult(createListener, value, url);
+};
+
+export class LCUConnector implements ILCUConnector {
+  protected eventEmitter: EventEmitter = new EventEmitter();
+
+  protected _clientOnline = false;
 
   public get clientOnline(): boolean {
     return this._clientOnline;
@@ -121,10 +182,19 @@ export class LCUConnector implements ILCUConnector {
     this._clientOnline = v;
   }
 
-  private tryConnecting? = false;
-  private connection?: Connection;
+  protected tryConnecting? = false;
+  protected _connection?: Connection;
 
-  private emit = <E extends LCUConnectorEvent>(
+  public set connection(v: Connection | undefined) {
+    if (this._connection?.port !== v?.port || this._connection?.pwd !== v?.pwd)
+      this.emit(v ? "lcuonline" : "lcuoffline");
+    this._connection = v;
+  }
+  public get connection(): Connection | undefined {
+    return this._connection;
+  }
+
+  protected emit = <E extends LCUConnectorEvent>(
     name: E,
     ...args: Parameters<LCUConnectorCallback<E>>
   ) => {
@@ -136,56 +206,7 @@ export class LCUConnector implements ILCUConnector {
     url: string,
     method: string,
     args?: { [key: string]: any }
-  ): ILCUResult<T> => {
-    const createListener = (cb: (v: Promise<T>) => void): Destructor => {
-      const c = (uri: string, args: Promise<T>) =>
-        uri === url ? cb(args) : undefined;
-
-      this.on(`uriupdate`, c);
-      return () => this.off(`uriupdate`, c);
-    };
-
-    if (!this.connection)
-      return LCUResult.error(createListener, "clientoffline", url);
-
-    const config: AxiosRequestConfig<any> = {
-      url: `https://127.0.0.1:${this.connection.port}${url}`,
-      method,
-      auth: {
-        password: this.connection.pwd,
-        username: "riot",
-      },
-      httpsAgent: new https.Agent({
-        ca: readFileSync("./riotgames.pem"),
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: args,
-    };
-
-    const value = axios
-      .request<T>(config)
-      .then((v) => v.data)
-      .catch((error) =>
-        Promise.reject({
-          reason: "httperror",
-          error: {
-            url: error.request.path,
-            data: error.data,
-            status: error.status,
-            message: error.message,
-            response: {
-              status: error.response.status,
-              statusText: error.response.statusText,
-              data: error.response.data,
-            },
-          },
-        })
-      );
-
-    return new LCUResult(createListener, value, url);
-  };
+  ): ILCUResult<T> => request(this, {}, url, method, args);
 
   on = <E extends LCUConnectorEvent | `uriupdate:${string}`>(
     event: E,
@@ -223,49 +244,106 @@ export class LCUConnector implements ILCUConnector {
    * Starts attempting to connect until disconnect is called.
    */
   connect = async () => {
-    console.log(await getLcuInstallPath("live"));
     this.tryConnecting = true;
     while (this.tryConnecting) {
+      if (this.connection) {
+        const clientCommandLine = await getApplicationCommandLine(
+          "LeagueClient.exe"
+        );
+        if (clientCommandLine === " ") this.connection = undefined;
+        await sleep(1500);
+        continue;
+      }
+
       let port: number | undefined;
       let pwd: string | undefined;
 
-      /** pwd and port can be get from either ux's cmd line or clients lockfile */
-      while (!port && !pwd) {
-        const uxCommandLine = getApplicationCommandLine("LeagueClientUx.exe");
-        if (uxCommandLine !== " ") {
-          this.clientOnline = true;
-          pwd = uxCommandLine.match(/\"--remoting-auth-token=(.+?)\"/)?.at(1);
-          port = Number(uxCommandLine.match(/\"--app-port=(\d+?)\"/)?.at(1));
-          if (!!port !== !!pwd)
-            throw new Error(
-              "couldn't get both port and pwd from ux's cmd line arguments"
-            );
-          continue;
-        }
-
-        const clientCommandLine = getApplicationCommandLine("LeagueClient.exe");
-        if (clientCommandLine === " ") return (this.clientOnline = false);
+      const uxCommandLine = await getApplicationCommandLine(
+        "LeagueClientUx.exe"
+      );
+      if (uxCommandLine !== " ") {
         this.clientOnline = true;
-
-        const lf = await readLockfile();
-        port = lf.port;
-        pwd = lf.pwd;
-
-        sleep(400);
+        pwd = uxCommandLine.match(/\"--remoting-auth-token=(.+?)\"/)?.at(1);
+        port = Number(uxCommandLine.match(/\"--app-port=(\d+?)\"/)?.at(1));
+        if (!port || !pwd)
+          throw new Error(
+            "couldn't get port or pwd from ux's cmd line arguments"
+          );
+        this.connection = {
+          pwd,
+          port,
+        };
+        continue;
       }
-      if (!port || !pwd) continue;
 
-      this.connection = { port, pwd };
+      const clientCommandLine = await getApplicationCommandLine(
+        "LeagueClient.exe"
+      );
+      if (clientCommandLine === " ") {
+        this.connection = undefined;
+        await sleep(1500);
+        continue;
+      }
+      const lf = await readLockfile();
+      port = lf.port;
+      pwd = lf.pwd;
+      this.connection = {
+        pwd,
+        port,
+      };
+
+      // ws.on("error", (e) => {
+      //   console.log("errer conn");
+      //   console.log("connection failed", e);
+      //   c._connection = undefined;
+      // });
+
+      // ws.on("open", function open() {
+      //   console.log("open conn");
+      //   ws.send('[5, "OnJsonApiEvent"]');
+      // });
+
+      // ws.on("close", () => {
+      //   console.log("close conn");
+      //   c._connection = undefined;
+      // });
+
+      // ws.on("message", (packet) => {
+      //   const packetStr = packet.toString();
+      //   if (!packetStr) return;
+      //   let [opcode, event, data]: [number, string, any] = JSON.parse(
+      //     packet.toString() ?? ""
+      //   );
+
+      //   c.emit(`uriupdate`, data.uri, data.data);
+      // });
+
+      // while (this._connection) {
+      //   await sleep(1000);
+      // }
+    }
+  };
+
+  protected tryListen = false;
+  listen = async () => {
+    while (this.tryListen) {
+      if (!this.connection) {
+        await sleep(1000);
+        continue;
+      }
+
       const c = this;
-      const ws = new WebSocket(`wss://riot:${pwd}@127.0.0.1:${port}`, {
-        auth: `Basic ${btoa(`riot:${pwd}`)}`,
-        ca: readFileSync("./riotgames.pem"),
-      });
-
+      const ws = new WebSocket(
+        `wss://riot:${this.connection.pwd}@127.0.0.1:${this.connection.port}`,
+        {
+          auth: `Basic ${btoa(`riot:${this.connection.pwd}`)}`,
+          ca: readFileSync(path.join(process.env.PUBLIC, "riotgames.pem")),
+        }
+      );
       ws.on("error", (e) => {
         console.log("errer conn");
         console.log("connection failed", e);
-        c.connection = undefined;
+        this.connection = undefined; // this will start a reconnection attempt
       });
 
       ws.on("open", function open() {
@@ -276,7 +354,9 @@ export class LCUConnector implements ILCUConnector {
 
       ws.on("close", () => {
         console.log("close conn");
-        c.connection = undefined;
+        this.connection = undefined; // this will start a reconnection attempt
+        c.emit("disconnect");
+        ws.terminate();
       });
 
       ws.on("message", (packet) => {
@@ -288,21 +368,37 @@ export class LCUConnector implements ILCUConnector {
 
         c.emit(`uriupdate`, data.uri, data.data);
       });
-
-      while (this.connection) {
-        await sleep(1000);
-      }
-      this.emit("disconnect");
     }
+  };
+
+  stopListening = () => {
+    this.tryListen = false;
   };
 
   disconnect = () => {
     this.tryConnecting = false;
-    this.connection = undefined;
-    this.emit("disconnect");
+    this._connection = undefined;
   };
 
   constructor() {
     this.eventEmitter.setMaxListeners(3);
   }
+}
+
+export class LCUAssetConnector extends LCUConnector {
+  request = <T>(
+    url: string,
+    method: string,
+    args?: { [key: string]: any } | undefined
+  ): ILCUResult<T> =>
+    request(
+      this,
+      {
+        headers: undefined,
+        responseType: "arraybuffer",
+      },
+      url,
+      method,
+      args
+    );
 }
