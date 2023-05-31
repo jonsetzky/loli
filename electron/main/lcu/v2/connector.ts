@@ -326,6 +326,7 @@ export class LCUConnector implements ILCUConnector {
 
   protected tryListen = false;
   listen = async () => {
+    this.tryListen = true;
     while (this.tryListen) {
       if (!this.connection) {
         await sleep(1000);
@@ -341,19 +342,19 @@ export class LCUConnector implements ILCUConnector {
         }
       );
       ws.on("error", (e) => {
-        console.log("errer conn");
-        console.log("connection failed", e);
+        // console.log("errer conn");
+        console.error("connection failed", e);
         this.connection = undefined; // this will start a reconnection attempt
       });
 
       ws.on("open", function open() {
-        console.log("open conn");
+        // console.log("open conn");
         ws.send('[5, "OnJsonApiEvent"]');
         c.emit("connect");
       });
 
       ws.on("close", () => {
-        console.log("close conn");
+        // console.log("close conn");
         this.connection = undefined; // this will start a reconnection attempt
         c.emit("disconnect");
         ws.terminate();
@@ -366,8 +367,13 @@ export class LCUConnector implements ILCUConnector {
           packet.toString() ?? ""
         );
 
+        // console.log("got update", data.uri);
         c.emit(`uriupdate`, data.uri, data.data);
       });
+
+      while (this.connection) {
+        await sleep(1000);
+      }
     }
   };
 
