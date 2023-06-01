@@ -202,7 +202,7 @@ export const LobbySummonerCard = ({
             <img
               src={
                 summoner !== undefined
-                  ? `/ranked-emblem/emblem-${summoner?.lol.rankedLeagueTier?.toLowerCase()}.png`
+                  ? `./ranked-emblem/emblem-${summoner?.lol.rankedLeagueTier?.toLowerCase()}.png`
                   : ""
               }
               spellCheck
