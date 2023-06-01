@@ -12,6 +12,7 @@
     }
   },
   "scripts": {
+    "install": "npm run dragontail:update",
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
     "preview": "vite preview",

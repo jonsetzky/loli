@@ -53,10 +53,15 @@ const main = async (download: boolean) => {
     console.log("URL", await getDragontailUrlByVersion(latest as any));
     await downloadTgz(
       await getDragontailUrlByVersion(latest as any),
-      dragontailFolder("temp")
+      dragontailFolder("temp", `${latest}_temp`)
     );
     writeFileSync(dragontailFolder("version"), latest);
-    dragontailPostProcess(dragontailFolder("temp", latest));
+    dragontailPostProcess(dragontailFolder("temp", `${latest}_temp`), latest);
+    await copy(
+      dragontailFolder("temp", `${latest}_temp`, latest),
+      dragontailFolder("temp", latest)
+    );
+    rmrf(dragontailFolder("temp", `${latest}_temp`));
   } else {
     latest = readFileSync("./dragontail/version").toString() as any;
   }
