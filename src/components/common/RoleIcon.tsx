@@ -1,6 +1,6 @@
 import React from "react";
 import { Tooltip } from "./Tooltip";
-import { LCUAssetImage } from "./AssetImage";
+import { DragontailAssetImage } from "./AssetImage";
 
 export const RoleIcon = (
   props: {

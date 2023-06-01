@@ -181,6 +181,9 @@ const electronHandler = {
         : callback(Promise.resolve(a));
     });
   },
+  lcuRequestAsset: async (uri: string): Promise<ArrayBuffer> => {
+    return (await ipcRenderer.invoke("lcuRequestAsset", uri)) as ArrayBuffer;
+  },
 };
 
 contextBridge.exposeInMainWorld("electron", electronHandler);

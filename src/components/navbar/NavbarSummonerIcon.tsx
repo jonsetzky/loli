@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { LCUAssetImage } from "../common/AssetImage";
+import { DragontailAssetImage } from "../common/AssetImage";
 import { Tooltip } from "../common/Tooltip";
 import { FullscreenElement } from "../common/FullscreenElement";
 import { fetchLCU, useLCUWatch } from "@/hooks/updatableContent";
@@ -9,6 +9,7 @@ import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 import * as lcu from "loli-lcu-api";
 import pfpData from "@/assets/dragontail/data/en_GB/profileicon.json";
 import { AssetSprite } from "../common/AssetSprite";
+import { LCUAssetImage } from "../common/LCUAssetImage";
 
 const setSummonerIcon = (id: number) => {
   fetchLCU((conn) =>
@@ -108,7 +109,9 @@ export const NavbarSummonerIcon = ({
       </ContextMenu>
       <LCUAssetImage
         id="navbar-summoner-icon"
-        uri={`/profileicon/${summoner?.profileIconId ?? "29"}.png`}
+        uri={`/lol-game-data/assets/v1/profile-icons/${
+          summoner?.profileIconId ?? "29"
+        }.jpg`}
         data-context-menu
       />
       <div className="xp-progress-bar absolute w-full bottom-0 h-1">

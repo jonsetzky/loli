@@ -3,7 +3,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 
 type LazyLoadImageProps = Parameters<typeof LazyLoadImage>[0];
 
-export const LCUAssetImage = ({
+export const DragontailAssetImage = ({
   uri,
   placeholderSrc,
   ...p

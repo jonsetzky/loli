@@ -152,14 +152,13 @@ const request = <T>(
       Promise.reject({
         reason: "httperror",
         error: {
+          statusCode: error.status,
           url: error.request.path,
-          data: error.data,
-          status: error.status,
-          message: error.message,
+          statusMessage: error.message,
           response: {
+            message: error.response.data.message,
+            errorCode: error.response.data.errorCode,
             status: error.response.status,
-            statusText: error.response.statusText,
-            data: error.response.data,
           },
         },
       })
@@ -389,6 +388,24 @@ export class LCUConnector implements ILCUConnector {
   constructor() {
     this.eventEmitter.setMaxListeners(3);
   }
+}
+
+export type LCUFN<T, A extends any[]> = (
+  connector: lcu.ILCUConnector,
+  ...args: A
+) => lcu.ILCUResult<T>;
+
+export class LCUConnectorV2 extends LCUConnector {
+  requestAsset = <T>(url: string): lcu.ILCUResult<T> =>
+    request(
+      this,
+      {
+        headers: undefined,
+        responseType: "arraybuffer",
+      },
+      url,
+      "get"
+    );
 }
 
 export class LCUAssetConnector extends LCUConnector {

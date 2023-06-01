@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain } from "electron";
+import { app, BrowserWindow, shell, ipcMain, session } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
 import { update } from "./update";
@@ -16,7 +16,11 @@ import {
   onSettingChange,
   setSetting,
 } from "./settings";
-import { LCUAssetConnector, LCUConnector } from "./lcu/v2/connector";
+import {
+  LCUAssetConnector,
+  LCUConnector,
+  LCUConnectorV2,
+} from "./lcu/v2/connector";
 import { writeFileSync } from "original-fs";
 
 // The built directory structure
@@ -236,7 +240,7 @@ ipcMain.handle(
   }
 );
 
-const conn = new LCUConnector();
+const conn = new LCUConnectorV2();
 
 conn
   .on("connect", () => {})
@@ -261,10 +265,8 @@ ipcMain.handle(
 );
 
 ipcMain.handle("lcuRequestAsset", async (_event, uri: string) => {
-  const conn = new LCUAssetConnector();
-  conn.connect();
-  await conn
-    .request<ArrayBuffer>(uri, "get")
+  return await conn
+    .requestAsset(uri)
     .get()
     .catch((e) => ({ lcuApiError: e }));
 });

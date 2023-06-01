@@ -1,7 +1,5 @@
 import React, { useEffect, useId, useState } from "react";
-import { LCUAssetImage } from "../common/AssetImage";
-import { fetchLCU, useLCUWatch } from "@/hooks/updatableContent";
-import { Tooltip } from "../common/Tooltip";
+import { useLCUWatch } from "@/hooks/updatableContent";
 import { Role, RolePicker } from "./RolePicker";
 import { useSetting } from "@/hooks/settings";
 import { setRoles } from "@/api/lobby/roles";
@@ -10,6 +8,8 @@ import { ContextMenu } from "../context-menu/ContextMenu";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 import { RoleIcon } from "../common/RoleIcon";
 import * as lcu from "loli-lcu-api";
+import { AssetSprite } from "../common/AssetSprite";
+import pfpData from "@/assets/dragontail/data/en_GB/profileicon.json";
 
 export const LobbySummonerCard = ({
   member,
@@ -124,11 +124,23 @@ export const LobbySummonerCard = ({
 
       <div className="flex flex-row ml-1 mr-1 mb-1 gap-1 h-full">
         <div className="flex flex-col gap-1 w-16">
-          <LCUAssetImage
-            key={summoner.icon}
-            uri={`/profileicon/${summoner.icon}.png`}
-            placeholderSrc={"/profileicon/29.png"}
-          />
+          {(() => {
+            const pfpd = Object.entries(pfpData.data).find(
+              ([id, data]) => id === String(member.summonerIconId)
+            )?.[1];
+            if (!pfpd) {
+              console.error(
+                "couldn't find profile icon with id",
+                member.summonerIconId
+              );
+              return <></>;
+            }
+            return (
+              <div className="w-6 " key={member.summonerIconId}>
+                <AssetSprite {...pfpd.image} scale={1} />
+              </div>
+            );
+          })()}
           {lobby?.gameConfig.showPositionSelector ? (
             <div className="flex flex-row grow justify-center">
               {memberIsLocal ? (

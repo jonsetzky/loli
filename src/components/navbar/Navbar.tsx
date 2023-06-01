@@ -5,7 +5,7 @@ import { Lockfile } from "electron/main/lcu/lockfile";
 import { Link } from "react-router-dom";
 import { Tooltip } from "../common/Tooltip";
 import { NavbarLink } from "./NavbarLink";
-import { LCUAssetImage } from "../common/AssetImage";
+import { DragontailAssetImage } from "../common/AssetImage";
 import { useSetting } from "../../hooks/settings";
 import { Settings } from "../../routes/Settings";
 import { NavbarSummonerIcon } from "./NavbarSummonerIcon";
