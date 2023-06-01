@@ -8,6 +8,8 @@ import { dragontailPostProcess } from "./postprocess";
 import { copy } from "fs-extra";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { setup } from "./setup";
+import config from "./ddragon.config";
+import { rmrf } from "./clean";
 
 interface VersionsManifest {
   latest: string;
@@ -32,26 +34,36 @@ const editVersionsManifest = (
 const dragontailFolder = (...p: string[]): string =>
   path.join("./dragontail", ...p);
 
-const main = async () => {
-  if (!(await checkDragontailUpdates())) {
-    console.log("No updates available.");
-    return;
+const main = async (download: boolean) => {
+  if (download) {
+    if (!(await checkDragontailUpdates())) {
+      console.log("No updates available.");
+      download = false;
+    }
+  } else {
+    console.log("Not checking for updates. Reinstalling dragontail.");
   }
 
   setup(".");
 
-  const latest = await getLatestVersion();
-  console.log("Downloading version", latest);
-  console.log("URL", await getDragontailUrlByVersion(latest as any));
+  let latest = await getLatestVersion();
 
-  await downloadTgz(
-    await getDragontailUrlByVersion(latest as any),
-    dragontailFolder("temp")
-  );
+  if (download) {
+    console.log("Downloading version", latest);
+    console.log("URL", await getDragontailUrlByVersion(latest as any));
+    await downloadTgz(
+      await getDragontailUrlByVersion(latest as any),
+      dragontailFolder("temp")
+    );
+    writeFileSync(dragontailFolder("version"), latest);
+    dragontailPostProcess(dragontailFolder("temp", latest));
+  } else {
+    latest = readFileSync("./dragontail/version").toString() as any;
+  }
 
-  dragontailPostProcess(dragontailFolder("temp"));
-
-  writeFileSync(dragontailFolder("version"), latest);
+  if (existsSync("./src/assets/dragontail/data"))
+    rmrf("./src/assets/dragontail/data");
+  if (existsSync("./public/dragontail/img")) rmrf("./public/dragontail/img");
 
   copy(
     dragontailFolder("temp", latest, "data"),
@@ -59,11 +71,20 @@ const main = async () => {
     { overwrite: true }
   );
 
-  copy(dragontailFolder("temp", latest, "img"), "./public/dragontail/img", {
-    overwrite: true,
+  config.includeImg?.forEach((imgFolder) => {
+    copy(
+      dragontailFolder("temp", latest, "img", imgFolder),
+      path.join("./public/dragontail/img", imgFolder),
+      {
+        overwrite: true,
+      }
+    );
   });
 };
 
 if (require.main === module) {
-  main();
+  let download = true;
+  if (process.argv.includes("nodownload")) download = false;
+
+  main(download);
 }

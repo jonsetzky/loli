@@ -10,7 +10,8 @@ export const setup = (dir: string) => {
   ensureDir(d("dragontail"));
   ensureDir(d("public/dragontail/img"));
   ensureDir(d("src/assets/dragontail/data"));
-  fs.writeFileSync(d("dragontail", "version"), "");
+  if (!fs.existsSync(d("dragontail", "version")))
+    fs.writeFileSync(d("dragontail", "version"), "");
 };
 
 if (require.main === module) {

@@ -3,7 +3,7 @@ type Config = {
 };
 
 export const config: Config = {
-  includeImg: [],
+  includeImg: ["sprite"],
 };
 
 export default config;
