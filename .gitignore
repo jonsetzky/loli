@@ -33,9 +33,9 @@ yarn.lock
 /playwright/.cache/
 
 # data dragon
-public/dragontail
-src/assets/dragontail
-dragontail
+/public/dragontail
+/src/assets/dragontail
+/dragontail/
 
 # lcu api schema
 script/schema
