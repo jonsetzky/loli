@@ -30,8 +30,13 @@ export const ChampSelect = () => {
   const [me, setMe] =
     useState<lcu.TeamBuilderDirectChampSelectPlayerSelection | null>(null);
 
+  const [showSpellSelector, setShowSpellSelector] = useState<
+    "spell1" | "spell2" | null
+  >(null);
+
   useEffect(() => {
-    // console.log(session);
+    // console.log("session", session);
+    // console.log("lobby", lobby);
     if (!session) return;
     const me = session?.myTeam.find(
       (m) => m.cellId === session.localPlayerCellId
@@ -45,7 +50,7 @@ export const ChampSelect = () => {
     fetchLCU(lcu.champion_mastery.local_player.getChampionMastery)
       .get()
       .then((cm) => {
-        console.log("mastery", cm);
+        // console.log("mastery", cm);
         setChampionMastery(cm);
       });
   }, [session]);
@@ -119,7 +124,7 @@ export const ChampSelect = () => {
   //   console.log(championData);
   // }, [championData]);
 
-  if (!session) return <ErrorPage>loading champ select</ErrorPage>;
+  if (!session || !lobby) return <ErrorPage>loading champ select</ErrorPage>;
 
   return (
     <div className="bg-black flex flex-row h-full">
@@ -169,15 +174,86 @@ export const ChampSelect = () => {
                 {...(Object.values(summonerSpellData.data).find((spellData) => {
                   return spellData.key === String(me?.spell1Id);
                 })?.image as any)}
-                className="w-12 h-12 mr-2"
+                onClick={() => setShowSpellSelector("spell1")}
+                className="w-12 h-12 mr-2 cursor-pointer hover:scale-110 transition-transform"
               />
               <AssetSprite
                 {...(Object.values(summonerSpellData.data).find((spellData) => {
                   return spellData.key === String(me?.spell2Id);
                 })?.image as any)}
-                className="w-12 h-12 mr-2"
+                onClick={() => setShowSpellSelector("spell2")}
+                className="w-12 h-12 mr-2 cursor-pointer hover:scale-110 transition-transform"
               />
             </div>
+            {showSpellSelector && (
+              <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+                <div className="bg-black outline outline-1 outline-white rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                  <div className="flex flex-wrap gap-4 justify-center">
+                    {Object.values(summonerSpellData.data)
+                      .filter((spell) =>
+                        spell.modes.includes(lobby?.gameConfig?.gameMode || "")
+                      )
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((spell) => {
+                        const isSelected =
+                          (showSpellSelector === "spell1" &&
+                            Number(spell.key) === me?.spell1Id) ||
+                          (showSpellSelector === "spell2" &&
+                            Number(spell.key) === me?.spell2Id);
+                        return (
+                          <div
+                            key={spell.key}
+                            className={`flex flex-col items-center cursor-pointer hover:scale-110 transition-transform ${
+                              isSelected
+                                ? "ring-4 ring-white bg-white text-black font-black"
+                                : ""
+                            }`}
+                            onClick={() => {
+                              let newSpells = {
+                                spell1Id: me?.spell1Id,
+                                spell2Id: me?.spell2Id,
+                              };
+
+                              if (showSpellSelector === "spell1") {
+                                newSpells.spell1Id = Number(spell.key);
+                              } else {
+                                newSpells.spell2Id = Number(spell.key);
+                              }
+                              // if both spells would be the same, swap them instead
+                              if (newSpells.spell1Id === newSpells.spell2Id) {
+                                newSpells = {
+                                  spell1Id: me?.spell2Id,
+                                  spell2Id: me?.spell1Id,
+                                };
+                              }
+
+                              fetchLCU(
+                                lcu.champ_select.session.patchMySelection,
+                                newSpells
+                              );
+                              setShowSpellSelector(null);
+                            }}
+                          >
+                            <AssetSprite
+                              {...spell.image}
+                              className="w-14 h-14"
+                            />
+                            <span className="text-xs mt-1 text-center">
+                              {spell.name}
+                            </span>
+                          </div>
+                        );
+                      })}
+                  </div>
+                  <button
+                    className="btn mt-6 block mx-auto"
+                    onClick={() => setShowSpellSelector(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
