@@ -22,21 +22,20 @@ export const ChampSelect = () => {
     "CHAMPION"
   );
   const [championMastery, setChampionMastery] = useState<
-    lcu.LolCollectionsCollectionsChampionMastery[] | null
+    lcu.LolChampionMasteryChampionMastery[] | null
   >();
 
   const [selectedChampion, setSelectedChampion] = useState<number | null>(null);
 
   useEffect(() => {
+    console.log(session);
     if (!session) return;
     const me = session?.myTeam.find(
       (m) => m.cellId === session.localPlayerCellId
     );
     if (!me) return;
-    fetchLCU(
-      lcu.collections.inventories.getChampionMasteryBySummonerId,
-      me.summonerId
-    )
+
+    fetchLCU(lcu.champion_mastery.local_player.getChampionMastery)
       .get()
       .then((cm) => {
         console.log("mastery", cm);
@@ -47,12 +46,13 @@ export const ChampSelect = () => {
   // championMastery[0];
   const hoverChampion = (id: number, lockIn: boolean = false) => {
     console.log("trying to hover", id);
+
     if (!session) return;
-    const pickAction: lcu.LolChampSelectChampSelectAction = (
+    const pickAction: lcu.LolChampSelectLegacyChampSelectAction = (
       session.actions[0] as any
     ).find(
-      (a: lcu.LolChampSelectChampSelectAction) =>
-        a.type === "pick" && a.actorCellId === session.localPlayerCellId
+      (a: lcu.LolChampSelectLegacyChampSelectAction) =>
+        a?.type === "pick" && a?.actorCellId === session.localPlayerCellId
     );
 
     console.log(pickAction);
@@ -60,6 +60,7 @@ export const ChampSelect = () => {
       ...pickAction,
       championId: id,
       completed: lockIn,
+      duration: 0,
     })
       .get()
       .then((v: any) => console.log("got ", v))
