@@ -16,9 +16,16 @@ const getChampionIconId = (id: number) => {
 export const ChampSelect = () => {
   const session = useLCUWatch(lcu.champ_select.getSession, console.error);
   const lobby = useLCUWatch(lcu.lobby.getLobby, console.error);
+  const champSelectInventory = useLCUWatch(
+    lcu.inventory.getInventoryByInventoryType,
+    console.error,
+    "CHAMPION"
+  );
   const [championMastery, setChampionMastery] = useState<
     lcu.LolCollectionsCollectionsChampionMastery[] | null
   >();
+
+  const [selectedChampion, setSelectedChampion] = useState<number | null>(null);
 
   useEffect(() => {
     if (!session) return;
@@ -75,16 +82,23 @@ export const ChampSelect = () => {
   useEffect(() => {
     if (!session || hovering) return;
 
-    session.localPlayerCellId;
     const me = session.myTeam.find(
       (m) => m.cellId === session.localPlayerCellId
     );
     if (me === undefined) return;
 
+    // update selected champion display
+    if (me.championId !== 0) {
+      setSelectedChampion(me.championId);
+    } else {
+      setSelectedChampion(null);
+    }
+
     if (me.championId === 0) hoverChampion(120);
   }, [session]);
 
   useEffect(() => {
+    // time left looper
     if (!session) return;
 
     const end =
@@ -96,55 +110,91 @@ export const ChampSelect = () => {
   }, [session]);
 
   if (!session) return <ErrorPage>loading champ select</ErrorPage>;
-  return (
-    <>
-      <div className="h-24 " />
-      <div>{(timeLeft / 1000).toFixed(1)}</div>
 
-      <div>
-        {lobby?.gameConfig.gameMode !== "PRACTICETOOL" ? (
-          ""
-        ) : (
-          <button
-            className="btn"
-            onClick={() => {
-              cancelCustomGameChampSelect();
-            }}
-          >
-            Quit
-          </button>
+  return (
+    <div className="bg-black flex flex-row h-full">
+      <div className="flex-1">
+        {selectedChampion && (
+          <div className="flex flex-col items-center justify-center h-full">
+            <AssetSprite
+              {...(Object.values(championData.data).find(
+                (c) => c.key === String(selectedChampion)
+              )?.image as any)}
+              className="w-40 h-40 mb-4"
+            />
+            <span className="text-xl font-bold">
+              {
+                Object.values(championData.data).find(
+                  (c) => c.id === String(selectedChampion)
+                )?.name
+              }
+            </span>
+          </div>
         )}
       </div>
-      <div className="grid grid-cols-7">
-        {allGridChamps
-          ?.sort(
-            (a, b) =>
-              a.name.localeCompare(b.name) -
-              (a.positionsFavorited.length * 10) /
-                (a.positionsFavorited.length || 1) +
-              (b.positionsFavorited.length * 10) /
-                (b.positionsFavorited.length || 1)
-          )
-          // ?.sort((a, b) => {
-          //   return b.masteryPoints - a.masteryPoints;
-          // })
-          ?.map((c) => {
-            const cd = Object.entries(championData.data).find(
-              ([name, value]) => Number.parseInt(value?.key) === c.id
-            )?.[1];
-            if (!cd)
-              return (
-                <div
-                  className="bg-slate-700"
-                  style={{ width: "48px", height: "48px" }}
-                />
-              );
-            return (
-              <AssetSprite {...cd?.image} onClick={() => hoverChampion(c.id)} />
-            );
-          })}
+      <div className="w-1/2 flex flex-col items-center h-full max-h-full">
+        <div className="flex flex-col items-center justify-end ">
+          <div className="h-12 pt-4">{(timeLeft / 1000).toFixed(1)}</div>
+          <div className="grid grid-cols-7 overflow-y-auto mx-auto h-[460px]">
+            {allGridChamps
+              ?.sort(
+                (a, b) =>
+                  a.name.localeCompare(b.name) -
+                  (a.positionsFavorited.length * 10) /
+                    (a.positionsFavorited.length || 1) +
+                  (b.positionsFavorited.length * 10) /
+                    (b.positionsFavorited.length || 1)
+              )
+              ?.filter((c) => {
+                if (!pickableChampions) return true;
+                return pickableChampions.includes(c.id);
+              })
+              ?.map((c) => {
+                const cd = Object.entries(championData.data).find(
+                  ([name, value]) => Number.parseInt(value?.key) === c.id
+                )?.[1];
+                if (!cd)
+                  return (
+                    <div
+                      className="bg-slate-700 m-2 p-2"
+                      style={{ width: "48px", height: "48px" }}
+                    >
+                      {c.name}
+                    </div>
+                  );
+                return (
+                  <div className="flex flex-col items-center">
+                    <AssetSprite
+                      {...cd?.image}
+                      onClick={() => hoverChampion(c.id)}
+                      className="m-2 mb-0 p-2 mx-auto cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out"
+                    />
+                    <span className="text-xs text-center mb-1">{c.name}</span>
+                  </div>
+                );
+              })}
+          </div>
+
+          <div className="flex flex-row items-center mt-4 w-full">
+            <div className="flex-1 flex justify-end">
+              {lobby?.gameConfig.gameMode !== "PRACTICETOOL" ? (
+                ""
+              ) : (
+                <button
+                  className="btn"
+                  onClick={() => {
+                    cancelCustomGameChampSelect();
+                  }}
+                >
+                  Quit
+                </button>
+              )}
+            </div>
+          </div>
+          {/* <div>{JSON.stringify(session)}</div> */}
+        </div>
       </div>
-      <div>{JSON.stringify(session)}</div>
-    </>
+      <div className="flex-1" />
+    </div>
   );
 };
