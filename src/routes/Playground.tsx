@@ -9,6 +9,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useNavigationType } from "react-router-dom";
 import * as lcu from "loli-lcu-api";
 import { AssetSprite } from "@/components/common/AssetSprite";
+import { fetchLCU } from "@/hooks/updatableContent";
 
 const test = () => {};
 /**
@@ -63,6 +64,19 @@ export const Playground = () => {
           }}
         >
           start practice tool
+        </div>
+        <div
+          id="test-context-item"
+          data-context-menu
+          className="btn whitespace-nowrap"
+          onClick={async () => {
+            await fetchLCU(lcu.simple_dialog_messages.postMessages, {
+              msgBody: ["Hello world"],
+              msgType: "Test",
+            });
+          }}
+        >
+          lcu.simple_dialog_messages.postMessages
         </div>
       </div>
     </div>
