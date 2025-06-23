@@ -130,7 +130,7 @@ export const ChampSelect = () => {
           // })
           ?.map((c) => {
             const cd = Object.entries(championData.data).find(
-              ([name, value]) => Number.parseInt(value.key) === c.id
+              ([name, value]) => Number.parseInt(value?.key) === c.id
             )?.[1];
             if (!cd)
               return (
@@ -140,7 +140,7 @@ export const ChampSelect = () => {
                 />
               );
             return (
-              <AssetSprite {...cd.image} onClick={() => hoverChampion(c.id)} />
+              <AssetSprite {...cd?.image} onClick={() => hoverChampion(c.id)} />
             );
           })}
       </div>

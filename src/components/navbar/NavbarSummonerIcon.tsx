@@ -61,7 +61,7 @@ export const NavbarSummonerIcon = ({
                   <AssetSprite
                     data-context-menu
                     id={`summoner-icon-editor-icon-${id}`}
-                    {...pfpd.image}
+                    {...pfpd?.image}
                     scale={1.2}
                     onClick={(e) => {
                       e.stopPropagation();
