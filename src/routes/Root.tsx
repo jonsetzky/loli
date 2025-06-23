@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ClientStatus as IClientStatus } from "electron/main/lcu/client";
 import { ClientStatus } from "../components/ClientStatus";
 import { Navbar } from "../components/navbar/Navbar";
 import { Outlet, useOutletContext, useRevalidator } from "react-router-dom";

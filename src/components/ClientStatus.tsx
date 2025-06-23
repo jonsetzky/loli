@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useSyncExternalStore } from "react";
 import { FullscreenNotification } from "./FullscreenNotification";
 import { useLoaderData } from "react-router-dom";
-import type { LCUStatus } from "electron/main/lcu";
+import type { LCUStatus } from "loli-lcu-client";
 
 export const ClientStatus = () => {
   const [status, setStatus] = useState<LCUStatus>("starting");

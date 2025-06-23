@@ -1,5 +1,5 @@
 import React from "react";
-import type { Lockfile } from "electron/main/lcu/lockfile";
+import type { Lockfile } from "loli-lcu-client";
 
 export const ExternalLink = ({
   uri,

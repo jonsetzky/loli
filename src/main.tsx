@@ -15,9 +15,7 @@ import {
   Link,
 } from "react-router-dom";
 import { Play } from "./routes/Play";
-import { ClientStatus } from "./components/ClientStatus";
 import { Root } from "./routes/Root";
-import { ClientStatus as IClientStatus } from "electron/main/lcu/client";
 import { Home } from "./routes/Home";
 import { Setups } from "./routes/Setups";
 import { Playground } from "./routes/Playground";
