@@ -109,26 +109,52 @@ export const ChampSelect = () => {
     return () => clearInterval(t);
   }, [session]);
 
+  useEffect(() => {
+    console.log(championData);
+  }, [championData]);
+
   if (!session) return <ErrorPage>loading champ select</ErrorPage>;
 
   return (
     <div className="bg-black flex flex-row h-full">
       <div className="flex-1">
         {selectedChampion && (
-          <div className="flex flex-col items-center justify-center h-full">
-            <AssetSprite
-              {...(Object.values(championData.data).find(
-                (c) => c.key === String(selectedChampion)
-              )?.image as any)}
-              className="w-40 h-40 mb-4"
-            />
-            <span className="text-xl font-bold">
-              {
-                Object.values(championData.data).find(
-                  (c) => c.id === String(selectedChampion)
-                )?.name
-              }
-            </span>
+          <div className="flex flex-row items-center justify-center h-full">
+            <div className="flex flex-col items-center justify-center h-full">
+              <AssetSprite
+                {...(Object.values(championData.data).find(
+                  (c) => c.key === String(selectedChampion)
+                )?.image as any)}
+                className="w-40 h-40 mb-4"
+              />
+              <span className="text-xl font-bold">
+                {
+                  Object.values(championData.data).find(
+                    (c) => c.key === String(selectedChampion)
+                  )?.name
+                }
+              </span>
+            </div>
+
+            <button
+              className="btn"
+              onClick={() => {
+                hoverChampion(selectedChampion, true);
+              }}
+            >
+              Lock In
+            </button>
+            {/* <button
+              className="btn"
+              onClick={() => {
+                fetchLCU(
+                  lcu.game_client_chat.postPartyMessages,
+                  "Hello from the Champ Select component!"
+                ).get();
+              }}
+            >
+              Say hello!
+            </button> */}
           </div>
         )}
       </div>
