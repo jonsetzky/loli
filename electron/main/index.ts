@@ -2,11 +2,17 @@ import { app, BrowserWindow, shell, ipcMain, session } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
 import { update } from "./update";
-import { Lockfile, readLockfile } from "./lcu/lockfile";
-import { startClient, isClientAlive } from "./lcu/client";
+import {
+  Lockfile,
+  readLockfile,
+  startClient,
+  isClientAlive,
+  request,
+  requestAsset,
+  LCUStatus,
+  LCUConnectorV2,
+} from "loli-lcu-client";
 import Store from "electron-store";
-import { LCU, LCUStatus } from "./lcu";
-import { request, requestAsset } from "./lcu/request";
 import * as lcu from "loli-lcu-api";
 
 import {
@@ -16,12 +22,8 @@ import {
   onSettingChange,
   setSetting,
 } from "./settings";
-import {
-  LCUAssetConnector,
-  LCUConnector,
-  LCUConnectorV2,
-} from "./lcu/v2/connector";
 import { writeFileSync } from "original-fs";
+import { LCURunner } from "./lcuRunner";
 
 // The built directory structure
 //
@@ -72,6 +74,8 @@ const preload = join(__dirname, "../preload/index.js");
 const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
 
+let shouldLcuRun = false;
+
 async function createWindow() {
   win = new BrowserWindow({
     title: "Main window",
@@ -110,10 +114,10 @@ async function createWindow() {
   // Apply electron-updater
   update(win);
 
-  const lcu = new LCU();
-  lcu.start(win);
+  const lcuRunner = new LCURunner();
+  lcuRunner.start(win);
   ipcMain.handle("getLcuStatus", (): LCUStatus => {
-    return lcu.status;
+    return lcuRunner.status;
   });
 
   ipcMain.handle("window:isFocused", (e) => win?.isFocused());
@@ -243,7 +247,13 @@ ipcMain.handle(
 const conn = new LCUConnectorV2();
 
 conn
+  .on("connect", () => {
+    win?.webContents.send("updateLcuStatus", "connected");
+  })
   .on("connect", () => {})
+  .on("disconnect", () => {
+    win?.webContents.send("updateLcuStatus", "disconnected");
+  })
   .on("uriupdate", (uri, data) =>
     win?.webContents.send(`lcuWatchEvent:${uri}`, data)
   );

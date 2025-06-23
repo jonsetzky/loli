@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { LCUStatus } from "electron/main/lcu";
+import { LCUStatus } from "loli-lcu-client";
 import type {
   SettingsKeys,
   SettingsValueType,

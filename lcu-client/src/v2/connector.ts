@@ -136,7 +136,7 @@ const request = <T>(
       username: "riot",
     },
     httpsAgent: new https.Agent({
-      ca: readFileSync(path.join(process.env.PUBLIC, "riotgames.pem")),
+      ca: readFileSync(path.resolve(__dirname, "../../riotgames.pem")),
     }),
     headers: {
       "Content-Type": "application/json",
@@ -169,6 +169,8 @@ const request = <T>(
 
 export class LCUConnector implements ILCUConnector {
   protected eventEmitter: EventEmitter = new EventEmitter();
+
+  protected lcuStatus: LCUStatus = "disconnected";
 
   protected _clientOnline = false;
 
@@ -207,6 +209,14 @@ export class LCUConnector implements ILCUConnector {
     args?: { [key: string]: any }
   ): ILCUResult<T> => request(this, {}, url, method, args);
 
+  /**
+   * Event types:
+   *  - `connect`: emitted when the connector connects to the LCU.
+   *  - `disconnect`: emitted when the connector disconnects from the LCU.
+   *  - `lcuonline`: emitted when the LCU is online.
+   *  - `lcuoffline`: emitted when the LCU is offline.
+   *  - `uriupdate:<uri>`: emitted when a URI is updated. The uri is the first argument, and the data is the second argument.
+   * */
   on = <E extends LCUConnectorEvent | `uriupdate:${string}`>(
     event: E,
     callback: (
@@ -249,7 +259,7 @@ export class LCUConnector implements ILCUConnector {
         const clientCommandLine = await getApplicationCommandLine(
           "LeagueClient.exe"
         );
-        if (clientCommandLine === " ") this.connection = undefined;
+        if (clientCommandLine === " ") this.connection = undefined; // if client is not running, we set connection to undefined to start a reconnection attempt
         await sleep(1500);
         continue;
       }
@@ -261,6 +271,7 @@ export class LCUConnector implements ILCUConnector {
         "LeagueClientUx.exe"
       );
       if (uxCommandLine !== " ") {
+        // if ux is running, we can get the port and pwd from its command line
         this.clientOnline = true;
         pwd = uxCommandLine.match(/\"--remoting-auth-token=(.+?)\"/)?.at(1);
         port = Number(uxCommandLine.match(/\"--app-port=(\d+?)\"/)?.at(1));
@@ -337,7 +348,7 @@ export class LCUConnector implements ILCUConnector {
         `wss://riot:${this.connection.pwd}@127.0.0.1:${this.connection.port}`,
         {
           auth: `Basic ${btoa(`riot:${this.connection.pwd}`)}`,
-          ca: readFileSync(path.join(process.env.PUBLIC, "riotgames.pem")),
+          ca: readFileSync(path.resolve(__dirname, "../../riotgames.pem")),
         }
       );
       ws.on("error", (e) => {
@@ -395,7 +406,24 @@ export type LCUFN<T, A extends any[]> = (
   ...args: A
 ) => lcu.ILCUResult<T>;
 
+export type LCUStatus =
+  | "starting"
+  | "connected"
+  | "connecting"
+  | "disconnected";
+
 export class LCUConnectorV2 extends LCUConnector {
+  private isConnected = false;
+
+  constructor() {
+    super();
+    this.on("connect", () => {
+      this.isConnected = true;
+    }).on("disconnect", () => {
+      this.isConnected = false;
+    });
+  }
+
   requestAsset = <T>(url: string): lcu.ILCUResult<T> =>
     request(
       this,
@@ -406,6 +434,14 @@ export class LCUConnectorV2 extends LCUConnector {
       url,
       "get"
     );
+
+  getStatus = (): LCUStatus => {
+    if (this.isConnected) return "connected";
+    if (!this.connection) return "disconnected";
+
+    if (this.tryListen && !this.isConnected) return "connecting";
+    return "connecting";
+  };
 }
 
 export class LCUAssetConnector extends LCUConnector {

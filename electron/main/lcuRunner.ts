@@ -1,27 +1,24 @@
-import { AxiosBasicCredentials } from "axios";
-import { Lockfile, readLockfile } from "./lockfile";
-import https from "https";
-import fs from "fs";
+import {
+  isClientAlive,
+  LCUStatus,
+  readLockfile,
+  startClient,
+  request,
+} from "loli-lcu-client";
+import { getSetting, offSettingChange, onSettingChange } from "./settings";
+import { EventEmitter, WebSocket } from "ws";
+import { BrowserWindow } from "electron";
 import { readFileSync } from "fs";
-import { WebSocket } from "ws";
-import { BrowserWindow, app } from "electron";
-import { request } from "./request";
-import { isClientAlive, startClient } from "./client";
-import { getSetting, offSettingChange, onSettingChange } from "../settings";
 import path from "path";
-
-export type LCUStatus =
-  | "starting"
-  | "connected"
-  | "connecting"
-  | "disconnected";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-export class LCU {
+export class LCURunner {
   private shouldRun = false;
   private _status: LCUStatus = "starting";
   private win?: BrowserWindow;
+  private emitter: EventEmitter = new EventEmitter();
+
   get status() {
     return this._status;
   }
@@ -34,6 +31,18 @@ export class LCU {
   };
 
   constructor() {}
+
+  onStatusChange = (callback: (status: LCUStatus) => void) => {
+    return this.emitter.on("statusChange", callback);
+  };
+
+  onMessage = (
+    callback: (opcode: number, event: string, data: any) => void = () => {}
+  ) => {
+    return this.emitter.on("message", (opcode, event, data) => {
+      callback(opcode, event, data);
+    });
+  };
 
   start = async (win: BrowserWindow) => {
     this.win = win;
