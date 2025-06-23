@@ -71,18 +71,27 @@ export const LobbySummonerCard = ({
 
   // console.log(lobby?.localMember.summonerId, member.summonerId);
 
+  console.log(member);
+
   return (
     <div
       className={
-        "flex flex-col bg-white text-black basis-[3.5rem] " +
+        "flex flex-col bg-white text-black flex-1 basis-1/5 " +
         (searchState.searchState === "Invalid" && !member.ready
           ? "opacity-25"
           : "")
       }
-      id={member.summonerName}
-      data-context-menu
+      id={String(summoner.summonerId)}
+      data-context-menu={String(summoner.summonerId)}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        // Optionally, trigger your context menu logic here if needed
+      }}
     >
-      <ContextMenu targetId={member.summonerName} label={member.summonerName}>
+      <ContextMenu
+        targetId={String(summoner.summonerId)}
+        label={String(summoner.summonerId)}
+      >
         <ContextMenuList>
           <ContextMenuListItem>😳</ContextMenuListItem>
           <ContextMenuListItem
@@ -93,6 +102,15 @@ export const LobbySummonerCard = ({
             }
           >
             Open friend in Browser
+          </ContextMenuListItem>
+          <ContextMenuListItem
+            onClick={() =>
+              window.electron.openExternal(
+                `/lol-ranked/v1/ranked-stats/${member.puuid}`
+              )
+            }
+          >
+            Open ranked stats in Browser
           </ContextMenuListItem>
         </ContextMenuList>
       </ContextMenu>
@@ -118,7 +136,7 @@ export const LobbySummonerCard = ({
           </div>
         </div>
 
-        <div className="font-bold">{member.summonerName}</div>
+        <div className="font-bold">{summoner.gameName}</div>
         <div className="basis-1/3 grow"></div>
       </div>
 

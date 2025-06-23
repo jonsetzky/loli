@@ -2,7 +2,7 @@ import { useLCUWatch } from "@/hooks/updatableContent";
 import React, { useEffect, useState } from "react";
 import { LobbySummonerCard } from "./LobbySummonerCard";
 import { FullscreenNotification } from "../FullscreenNotification";
-import queues from "../../assets/queues.json";
+// import queues from "../../assets/queues.json";
 import { ErrorPage } from "@/components/ErrorPage";
 import { GameModePicker } from "@/components/game-mode-picker/GameModePicker";
 import { setPartyType } from "@/api/lobby/party";
@@ -13,6 +13,7 @@ import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 import * as lcu from "loli-lcu-api";
 import { startCustomGameChampSelect } from "@/api/lobby/customGame";
+import { useCachedQueues } from "@/hooks/useCachedQueues";
 
 export const Lobby = () => {
   // const ctx = useRootContext();
@@ -21,12 +22,13 @@ export const Lobby = () => {
   const [arrowVisible, setArrowVisible] = useState(false);
   const [queuePickerVisible, setQueuePickerVisible] = useState(false);
 
+  const queues = useCachedQueues();
+
   const lobby = useLCUWatch(lcu.lobby.getLobby, (err) =>
     err.error.response.status === 404
       ? undefined
       : console.error("error getting lobby", err)
   );
-
   const searchState = useLCUWatch(
     lcu.lobby.lobby_matchmaking.getSearchState,
     (err) => console.error("error getting search state", err)
@@ -51,6 +53,23 @@ export const Lobby = () => {
         </ErrorPage>
       </>
     );
+
+  const queueType = queues.queues?.find(
+    (q) => q.queueId === lobby?.gameConfig.queueId
+  );
+  if (!queueType) {
+    console.warn(
+      "Couldn't find game mode for game mode id",
+      lobby?.gameConfig.queueId,
+      "in queues.json"
+    );
+  }
+
+  console.log("lobby", lobby);
+  // console.log(
+  //   "gamemode",
+  //   queues.queues?.find((q) => q.queueId === lobby.gameConfig.queueId)
+  // );
 
   const searching = searchState?.searchState !== "Invalid";
   const canSearchOrCancel = lobby.canStartActivity || searching;
@@ -138,10 +157,10 @@ export const Lobby = () => {
           onClick={() => setQueuePickerVisible(true)}
         >
           {lobby.gameConfig.gameMode}
-          {queues.find((q) => q.queueId === lobby.gameConfig.queueId)
-            ? " - " +
-              queues.find((q) => q.queueId === lobby.gameConfig.queueId)
-                ?.description
+          {queues.loading
+            ? "Loading..."
+            : queueType
+            ? " - " + queueType.description
             : ""}
           <div className="relative">
             <div className="absolute w-full h-full top-1.5 left-1">

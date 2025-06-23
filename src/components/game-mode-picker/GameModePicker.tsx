@@ -37,6 +37,8 @@ export const GameModePicker = ({
   const queueInfo = useLCUWatch(lcu.game_queues.getQueues);
   const mapInfo = useLCUWatch(lcu.maps.getMaps);
 
+  // console.log("queueInfo", queueInfo);
+
   if (!queueInfo || !mapInfo) return <></>;
 
   const allAvailableQueues = queueInfo?.filter(
