@@ -88,7 +88,7 @@ export const FriendList = ({
         >
           <div
             className={
-              "w-full h-full overflow-clip "
+              "w-full h-full overflow-clip  outline outline-1 outline-white"
               // `transition-transform z-50  ${
               //   visible ? "" : directions.get(direction)
               // } ` + className ?? ""

@@ -35,12 +35,8 @@ export const FriendCard = ({
 
   if (!friend) return <></>;
 
-  // console.log("rerendering", puuid);
-
-  // console.log(friend.lol);
-
   return (
-    <>
+    <div>
       <ContextMenu targetId={id} label={friend.name}>
         <ContextMenuList>
           <ContextMenuListItem
@@ -73,7 +69,7 @@ export const FriendCard = ({
         key={"sus"}
         id={id}
         data-context-menu
-        className="bg-black text-white no-drag"
+        className=" text-white no-drag"
       >
         <div className="flex w-full">
           {(() => {
@@ -91,13 +87,23 @@ export const FriendCard = ({
             );
           })()}
 
-          <div className="grow flex flex-row justify-start">
+          <div className="grow flex flex-col justify-center">
             <div
               data-tooltip-id="friend-info-tooltip"
               data-tooltip-content={friend.puuid}
+              className="flex items-center"
             >
-              {friend.name}
+              <span className="px-1 font-semibold text-white text-base">
+                {friend.gameName}
+              </span>
+              <span
+                className="text-xs text-gray-400 bg-gray-900 px-1 py-0.5 rounded"
+                style={{ position: "relative", top: "1px" }}
+              >
+                {friend.gameTag}
+              </span>
             </div>
+            <div className="text-xs text-gray-300 mt-1">{friend.name}</div>
           </div>
           <div
             data-tooltip-id={tooltip !== null ? "status-tooltip" : ""}
@@ -111,6 +117,6 @@ export const FriendCard = ({
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
