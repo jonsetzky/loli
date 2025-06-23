@@ -3,7 +3,11 @@ import * as ts from "typescript";
 import { prettier } from "./prettier";
 import { IField, IStructType } from "./combine";
 import { CONFIG2, joinPath } from "./config";
-import { Compiler, createIdentifier } from "./compile";
+import {
+  Compiler,
+  createIdentifier,
+  convertToValidSymbolName,
+} from "./compile";
 
 const primitiveTypes = [
   "int64",
@@ -48,7 +52,9 @@ export const primToTsType = (p: PrimitiveType): string => {
 };
 
 const createProperty = (f: IField) => {
-  const ifPrimToTsType = (t: any) => (isPrimitive(t) ? primToTsType(t) : t);
+  f.name = convertToValidSymbolName(f.name);
+  const ifPrimToTsType = (t: any) =>
+    isPrimitive(t) ? primToTsType(t) : convertToValidSymbolName(t);
 
   let type: any = ts.factory.createTypeReferenceNode(
     ifPrimToTsType(f.type.type)
@@ -81,7 +87,7 @@ const createProperty = (f: IField) => {
 const createInterface = (t: IStructType) =>
   ts.factory.createInterfaceDeclaration(
     [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-    t.name,
+    convertToValidSymbolName(t.name),
     undefined,
     undefined,
     t.fields.map((f) => createProperty(f))
@@ -90,7 +96,7 @@ const createInterface = (t: IStructType) =>
 const createUnionType = (t: IStructType) =>
   ts.factory.createTypeAliasDeclaration(
     [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-    t.name,
+    convertToValidSymbolName(t.name),
     undefined,
     // ts.factory.createtype
     // ts.factory.createTypeLiteralNode(

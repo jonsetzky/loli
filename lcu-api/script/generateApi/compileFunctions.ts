@@ -222,7 +222,10 @@ const createNamespaceOrFunctionNode = (
   name: string,
   data: { [key: string]: { [k: string]: any } | IFunction }
 ) => {
-  if (Object.keys(data).includes("name"))
+  if (
+    Object.keys(data).includes("name") &&
+    Object.keys(data).includes("http_method")
+  )
     return createFunctionNode(data as any);
   return createNamespaceNode(name, data);
 };
