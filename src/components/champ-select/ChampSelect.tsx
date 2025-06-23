@@ -6,6 +6,7 @@ import { cancelCustomGameChampSelect } from "@/api/lobby/customGame";
 import * as lcu from "loli-lcu-api";
 import { sortText } from "@/util";
 import championData from "@/assets/dragontail/data/en_GB/champion.json";
+import summonerSpellData from "@/assets/dragontail/data/en_GB/summoner.json";
 import { AssetSprite } from "../common/AssetSprite";
 
 const getChampionIconId = (id: number) => {
@@ -26,14 +27,20 @@ export const ChampSelect = () => {
   >();
 
   const [selectedChampion, setSelectedChampion] = useState<number | null>(null);
+  const [me, setMe] =
+    useState<lcu.TeamBuilderDirectChampSelectPlayerSelection | null>(null);
 
   useEffect(() => {
-    console.log(session);
+    // console.log(session);
     if (!session) return;
     const me = session?.myTeam.find(
       (m) => m.cellId === session.localPlayerCellId
     );
-    if (!me) return;
+    if (!me) {
+      setMe(null);
+      return;
+    }
+    setMe(me);
 
     fetchLCU(lcu.champion_mastery.local_player.getChampionMastery)
       .get()
@@ -118,43 +125,59 @@ export const ChampSelect = () => {
     <div className="bg-black flex flex-row h-full">
       <div className="flex-1">
         {selectedChampion && (
-          <div className="flex flex-row items-center justify-center h-full">
-            <div className="flex flex-col items-center justify-center h-full">
-              <AssetSprite
-                {...(Object.values(championData.data).find(
-                  (c) => c.key === String(selectedChampion)
-                )?.image as any)}
-                className="w-40 h-40 mb-4"
-              />
-              <span className="text-xl font-bold">
-                {
-                  Object.values(championData.data).find(
-                    (c) => c?.key === String(selectedChampion)
-                  )?.name
-                }
-              </span>
-            </div>
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="flex flex-row items-center justify-center">
+              <div className="flex flex-col items-center justify-center h-full">
+                <AssetSprite
+                  {...(Object.values(championData.data).find(
+                    (c) => c.key === String(selectedChampion)
+                  )?.image as any)}
+                  className="w-40 h-40 mb-4"
+                />
+                <span className="text-xl font-bold">
+                  {
+                    Object.values(championData.data).find(
+                      (c) => c?.key === String(selectedChampion)
+                    )?.name
+                  }
+                </span>
+              </div>
 
-            <button
-              className="btn"
-              onClick={() => {
-                hoverChampion(selectedChampion, true);
-              }}
-            >
-              Lock In
-            </button>
-            <button
-              className="btn"
-              onClick={() => {
-                // fetchLCU(lcu.game_client_chat.postInstantMessages, {
-                // body: `Hello from ${lcu.lol_summoner.getSummonerName()}`,
-                // type: "chat",
-                // channelId: "champ-select",
-                // }).get();
-              }}
-            >
-              Say hello!
-            </button>
+              <button
+                className="btn"
+                onClick={() => {
+                  hoverChampion(selectedChampion, true);
+                }}
+              >
+                Lock In
+              </button>
+              <button
+                className="btn"
+                onClick={() => {
+                  // fetchLCU(lcu.game_client_chat.postInstantMessages, {
+                  // body: `Hello from ${lcu.lol_summoner.getSummonerName()}`,
+                  // type: "chat",
+                  // channelId: "champ-select",
+                  // }).get();
+                }}
+              >
+                Say hello!
+              </button>
+            </div>
+            <div className="flex flex-row items-center justify-center mt-4">
+              <AssetSprite
+                {...(Object.values(summonerSpellData.data).find((spellData) => {
+                  return spellData.key === String(me?.spell1Id);
+                })?.image as any)}
+                className="w-12 h-12 mr-2"
+              />
+              <AssetSprite
+                {...(Object.values(summonerSpellData.data).find((spellData) => {
+                  return spellData.key === String(me?.spell2Id);
+                })?.image as any)}
+                className="w-12 h-12 mr-2"
+              />
+            </div>
           </div>
         )}
       </div>
