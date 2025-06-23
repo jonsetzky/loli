@@ -94,8 +94,6 @@ export const ChampSelect = () => {
     } else {
       setSelectedChampion(null);
     }
-
-    if (me.championId === 0) hoverChampion(120);
   }, [session]);
 
   useEffect(() => {
@@ -110,9 +108,9 @@ export const ChampSelect = () => {
     return () => clearInterval(t);
   }, [session]);
 
-  useEffect(() => {
-    console.log(championData);
-  }, [championData]);
+  // useEffect(() => {
+  //   console.log(championData);
+  // }, [championData]);
 
   if (!session) return <ErrorPage>loading champ select</ErrorPage>;
 
@@ -131,7 +129,7 @@ export const ChampSelect = () => {
               <span className="text-xl font-bold">
                 {
                   Object.values(championData.data).find(
-                    (c) => c.key === String(selectedChampion)
+                    (c) => c?.key === String(selectedChampion)
                   )?.name
                 }
               </span>
@@ -145,17 +143,18 @@ export const ChampSelect = () => {
             >
               Lock In
             </button>
-            {/* <button
+            <button
               className="btn"
               onClick={() => {
-                fetchLCU(
-                  lcu.game_client_chat.postPartyMessages,
-                  "Hello from the Champ Select component!"
-                ).get();
+                // fetchLCU(lcu.game_client_chat.postInstantMessages, {
+                // body: `Hello from ${lcu.lol_summoner.getSummonerName()}`,
+                // type: "chat",
+                // channelId: "champ-select",
+                // }).get();
               }}
             >
               Say hello!
-            </button> */}
+            </button>
           </div>
         )}
       </div>
