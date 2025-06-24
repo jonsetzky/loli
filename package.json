@@ -1,6 +1,6 @@
 {
   "name": "loli",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": "jonsetzky",
   "main": "dist-electron/main/index.js",
   "description": "League of Legends improved",
