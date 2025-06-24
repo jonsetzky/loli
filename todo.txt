@@ -1,0 +1,50 @@
+riot client has started and still spamming "not alive\nstarting lol client"
+	stops when leagueoflegends text pops on screen
+
+Error: ENOENT: no such file or directory, open 'C:\Riot Games\League of Legends\lockfile'
+
+starting takes forever, first white blank screen
+	and after 30 seconds a loading screen
+
+make champ select timer take into account possible latency to server and the time it's allowed to go over the timer
+	also make a tooltip where this is explained
+	- champ select is allowed to go to a timer of -3 (in practice tool) (sample size of 2)
+
+todo add other languages besides english to dragontail
+	also make the assets to be added programmatically so build doesn't depend on the build environment!!!!!!!
+
+starting sometimes doesn't load players icon in the navbar
+
+
+
+match found screen is cursed
+
+lockfile info is scuffed
+
+electron.exe stays in the task manager and hogs about 10% of cpu. this is problematic since i had 3 of them after a dev session. not acceptable!!!!!!!!!
+
+filter out disabled queues (have an option in settings to toggle this behaviour)
+    enabledqueueids
+        /lol-platform-config/v1/namespaces/ClientSystemStates
+
+/lol-game-queues/v1/queues
+    use this instead of the piss useless hook that i created that fetches queues.json from static rito server.
+
+/sanitizer/v1/status
+    this can be used to estimate how toxic the user is
+
+add a notification to the end user when loli client is running using dialogs (example in the playground)
+    lcu.simple_dialog_messages.postMessages
+
+support for brawl champ & rune selection
+    endpoint for setting champ & rune /lol-lobby/v1/lobby/members/localMember/player-slots
+    ? endpoint for seeing whether gamemode has champ select or not?
+        "showPositionSelector": false,
+        "showQuickPlaySlotSelection": true
+        @ /lol-lobby/v2/lobby
+
+
+DONE
+build randomly fails probs because of dragontail part in the build command (in npm install)
+
+

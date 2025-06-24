@@ -67,6 +67,9 @@ session expiration could be found in one of these
 currency
     /lol-inventory/v1/wallet?currencyTypes=["RP", "lol_blue_essence"]
 
+/plugin-manager/v2/descriptions
+    list of descriptions for all plugins
+
 invite to lobby
     /lol-lobby/v2/lobby/members/{summonerId}/grant-invite
     /lol-lobby/v2/lobby/invitations
@@ -161,6 +164,21 @@ support for multiple clients open at the same time
     then get these from the output. one line should be one client
         --remoting-auth-token=t5u_SRm4f7I23shUOL3SkQ --app-port=60820
 
+assets from rito that are shipped with client
+ - sprite images. these are quite small and will not affect the end size much
+ - text data from dragontail. also small and wont affect size
+
+
+project structure
+ - electron: electron source code (preload bridges code between "back" and "frontend". runs on the machine and serves the front end app.
+ - src: source code of the front end application which runs on top of electron
+ - scripts
+    - dragontail - although not functional right now, used to update dragontail data from rito. wip and needs considerations about build size of the app.
+ - lcu-api: client code for Accessin LCU API (league of legends client app)
+ - lcu-client: it was a centralized method for managing the client
+
+
+lcu.simple_dialog_messages.postMessages is fun
 
 ----------- USED -----------
 
