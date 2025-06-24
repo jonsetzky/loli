@@ -213,6 +213,11 @@ export const LobbySummonerCard = ({
           ) : (
             <div className="flex flex-row grow justify-evenly h-4" />
           )}
+          {lobby?.gameConfig.showQuickPlaySlotSelection ? (
+            <>champs</>
+          ) : (
+            <div className="flex flex-row grow justify-evenly h-4" />
+          )}
         </div>
         <div className="flex bg-black text-white w-full divide-x divide-dashed">
           <div className="w-72 truncate"></div>
