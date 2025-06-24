@@ -31,6 +31,7 @@ const patch = (ns: object, path?: string) => {
 };
 patch({ lcu });
 
+let listenerDestructor: (() => void) | null = null;
 /**
  * This hook fetches an endpoint and stores the result in localStorage.
  * TBD cache invalidation strategy.
@@ -68,20 +69,22 @@ export function useLCUGlobalCache<T, A extends any[]>(
     // Do not fetch if the last fetch was too recent
     if (now - lastFetch < MIN_FETCH_INTERVAL_MS) return;
 
-    console.log("refetchign global cache for", key);
-    // Only fetch if not in cache
-    fetchLCU(lcuFn, ...args)
-      .get()
-      .catch((err: lcu.LCUConnectorRequestError) => {
-        console.error(`Error fetching ${key}:`, err);
-        setValue(null);
-      })
-      .then((data) => {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-        localStorage.setItem(LAST_FETCH_KEY, now.toString());
-        setValue(data);
-      })
-      .finally(() => setLoading(false));
+    // console.log(`Fetching ${key} from LCU...`);
+
+    if (listenerDestructor) listenerDestructor(); // remove previous listener if it exists
+    listenerDestructor = fetchLCU(lcuFn, ...args).watch((update) =>
+      update
+        .catch((err: lcu.LCUConnectorRequestError) => {
+          console.error(`Error fetching ${key}:`, err);
+          setValue(null);
+        })
+        .then((data) => {
+          // console.log(`Got cache update for ${key} from LCU`);
+          localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+          localStorage.setItem(LAST_FETCH_KEY, now.toString());
+          setValue(data);
+        })
+    );
   }, []);
 
   return { value, loading };
