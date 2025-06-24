@@ -21,9 +21,11 @@ export const PerkImage = ({
     >
       <div
         key={`border-${uri}`}
-        className={`rounded-full border-2 w-${String(size + 4)} h-${String(
-          size + 4
-        )} absolute animate-[appear-brightness_0.8s_ease-in_forwards] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${
+        style={{
+          width: `${(size + 4) / 4}rem`,
+          height: `${(size + 4) / 4}rem`,
+        }}
+        className={`rounded-full border-2 absolute animate-[appear-brightness_0.8s_ease-in_forwards] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${
           active ? "border-white" : "border-transparent"
         }`}
       ></div>
