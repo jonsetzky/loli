@@ -45,6 +45,10 @@ support for brawl champ & rune selection
 
 ranked lobby results in a gigantic rank (because lobby is at max 2 players)
 
+swiftplay lobby creates two rune pages for the champions that the player is hovering
+    - how does this interact wiht rune page limit?
+        there's a "isTemporary" property in /lol-perks/v1/pages
+
 DONE
 build randomly fails probs because of dragontail part in the build command (in npm install)
 

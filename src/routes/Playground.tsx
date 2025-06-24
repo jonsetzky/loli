@@ -10,6 +10,7 @@ import { useNavigate, useNavigationType } from "react-router-dom";
 import * as lcu from "loli-lcu-api";
 import { AssetSprite } from "@/components/common/AssetSprite";
 import { fetchLCU } from "@/hooks/updatableContent";
+import { RuneSelector } from "@/components/RuneSelector";
 
 const test = () => {};
 /**
@@ -19,6 +20,7 @@ const test = () => {};
 
 export const Playground = () => {
   const [test, setTest] = useState(false);
+  const [runePickerVisible, setRunePickerVisible] = useState(false);
   const navigate = useNavigate();
 
   return (
@@ -28,6 +30,13 @@ export const Playground = () => {
         (test ? "bg-black text-white" : "bg-gray-400 text-black")
       }
     >
+      <RuneSelector
+        visible={runePickerVisible}
+        setVisible={setRunePickerVisible}
+        setRunes={(selectedPerkIds) => {
+          console.log("setting runes TBD");
+        }}
+      />
       <div className="grid h-full w-full text-center place-content-center overflow-hidden place-items-center">
         playground
         <div
@@ -78,6 +87,12 @@ export const Playground = () => {
         >
           lcu.simple_dialog_messages.postMessages
         </div>
+        <button
+          className="btn whitespace-nowrap"
+          onClick={() => setRunePickerVisible(true)}
+        >
+          Open rune selector
+        </button>
       </div>
     </div>
   );

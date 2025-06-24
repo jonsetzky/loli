@@ -127,3 +127,15 @@ border-radius: 1pt;
 ::-webkit-scrollbar-thumb:hover {
 background: #666;
 }
+
+
+@keyframes appear-brightness {
+from { filter: brightness(0); }
+to { filter: brightness(1); }
+}
+.animate-\[appear-brightness_0\.3s_ease-in_forwards\] {
+animation: appear-brightness 0.3s ease-in forwards;
+}
+.animate-\[appear-brightness_0\.8s_ease-in_forwards\] {
+animation: appear-brightness 0.8s ease-in forwards;
+}

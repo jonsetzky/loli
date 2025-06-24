@@ -23,7 +23,6 @@ export const Lobby = () => {
   /** Determines the party publicity */
   const [arrowVisible, setArrowVisible] = useState(false);
   const [queuePickerVisible, setQueuePickerVisible] = useState(false);
-  const [runePickerVisible, setRunePickerVisible] = useState(false);
 
   // const queues = useCachedQueues();
   const { value: maps, loading: mapsLoading } = useLCUGlobalCache(
@@ -103,13 +102,6 @@ export const Lobby = () => {
         setVisible={setQueuePickerVisible}
         setQueue={setLobbyQueueId}
       ></GameModePicker>
-      <RuneSelector
-        visible={runePickerVisible}
-        setVisible={setRunePickerVisible}
-        setRunes={(selectedPerkIds) => {
-          console.log("setting runes TBD");
-        }}
-      />
       {searchState?.searchState === "Found" ? (
         <FullscreenNotification>
           <button

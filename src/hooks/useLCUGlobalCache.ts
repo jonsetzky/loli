@@ -41,7 +41,7 @@ export function useLCUGlobalCache<T, A extends any[]>(
   lcuFn: LCUFN<T, A>,
   ...args: A
 ) {
-  const [value, setValue] = useState<void | T | null>(null);
+  const [value, setValue] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -82,7 +82,7 @@ export function useLCUGlobalCache<T, A extends any[]>(
           // console.log(`Got cache update for ${key} from LCU`);
           localStorage.setItem(CACHE_KEY, JSON.stringify(data));
           localStorage.setItem(LAST_FETCH_KEY, now.toString());
-          setValue(data);
+          setValue(data || null);
         })
     );
   }, []);
