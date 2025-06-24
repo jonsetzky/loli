@@ -43,6 +43,7 @@ support for brawl champ & rune selection
         "showQuickPlaySlotSelection": true
         @ /lol-lobby/v2/lobby
 
+ranked lobby results in a gigantic rank (because lobby is at max 2 players)
 
 DONE
 build randomly fails probs because of dragontail part in the build command (in npm install)
