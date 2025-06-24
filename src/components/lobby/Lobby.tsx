@@ -13,16 +13,25 @@ import { ContextMenuList } from "../context-menu/ContextMenuList";
 import { ContextMenuListItem } from "../context-menu/ContextMenuListItem";
 import * as lcu from "loli-lcu-api";
 import { startCustomGameChampSelect } from "@/api/lobby/customGame";
-import { useCachedQueues } from "@/hooks/useCachedQueues";
+import { RuneSelector } from "../RuneSelector";
+import {
+  refetchLCUGlobalCache,
+  useLCUGlobalCache,
+} from "@/hooks/useLCUGlobalCache";
 
 export const Lobby = () => {
-  // const ctx = useRootContext();
-
   /** Determines the party publicity */
   const [arrowVisible, setArrowVisible] = useState(false);
   const [queuePickerVisible, setQueuePickerVisible] = useState(false);
+  const [runePickerVisible, setRunePickerVisible] = useState(false);
 
-  const queues = useCachedQueues();
+  // const queues = useCachedQueues();
+  const { value: maps, loading: mapsLoading } = useLCUGlobalCache(
+    lcu.maps.getMaps
+  );
+  const { value: queues, loading: queuesLoading } = useLCUGlobalCache(
+    lcu.game_queues.getQueues
+  );
 
   const lobby = useLCUWatch(lcu.lobby.getLobby, (err) =>
     err.error.response.status === 404
@@ -54,9 +63,7 @@ export const Lobby = () => {
       </>
     );
 
-  const queueType = queues.queues?.find(
-    (q) => q.queueId === lobby?.gameConfig.queueId
-  );
+  const queueType = queues?.find((q) => q.id === lobby?.gameConfig.queueId);
   if (!queueType) {
     console.warn(
       "Couldn't find game mode for game mode id",
@@ -65,7 +72,7 @@ export const Lobby = () => {
     );
   }
 
-  console.log("lobby", lobby);
+  // console.log("lobby", lobby);
   // console.log(
   //   "gamemode",
   //   queues.queues?.find((q) => q.queueId === lobby.gameConfig.queueId)
@@ -96,6 +103,13 @@ export const Lobby = () => {
         setVisible={setQueuePickerVisible}
         setQueue={setLobbyQueueId}
       ></GameModePicker>
+      <RuneSelector
+        visible={runePickerVisible}
+        setVisible={setRunePickerVisible}
+        setRunes={(selectedPerkIds) => {
+          console.log("setting runes TBD");
+        }}
+      />
       {searchState?.searchState === "Found" ? (
         <FullscreenNotification>
           <button
@@ -157,7 +171,7 @@ export const Lobby = () => {
           onClick={() => setQueuePickerVisible(true)}
         >
           {lobby.gameConfig.gameMode}
-          {queues.loading
+          {queuesLoading
             ? "Loading..."
             : queueType
             ? " - " + queueType.description
@@ -239,10 +253,6 @@ export const Lobby = () => {
           </div>
         </div>
       </div>
-      {/* <div className="object-scale-down h-12"> */}
-      {/* </div> */}
-
-      {/* <p className="bg-white">{JSON.stringify(lobby)}</p> */}
     </>
   );
 };
